@@ -15,28 +15,45 @@ const FleetDashboard = ({
     alerts: 0,
     routes: 0
   });
-  const [recentAlerts, setRecentAlerts] = useState<any[]>([]);
+  const [recentEvents, setRecentEvents] = useState<any[]>([]);
   useEffect(() => {
     loadDashboardData();
 
-    // Suscribirse a alertas en tiempo real
-    const alertsSubscription = supabase.channel('alertas').on('postgres_changes', {
+    // Suscribirse a eventos de cruces en tiempo real
+    const eventsSubscription = supabase.channel('cruces').on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
-      table: 'alertas'
+      table: 'cruces_registrados'
     }, payload => {
-      console.log('Nueva alerta:', payload);
+      console.log('Nuevo evento:', payload);
       loadDashboardData();
     }).subscribe();
     return () => {
-      alertsSubscription.unsubscribe();
+      eventsSubscription.unsubscribe();
     };
   }, []);
   const loadDashboardData = async () => {
+    // Fecha de hace 60 minutos
+    const sixtyMinutesAgo = new Date();
+    sixtyMinutesAgo.setMinutes(sixtyMinutesAgo.getMinutes() - 60);
+
     // Cargar estadísticas
-    const [trucksResult, alertsResult, routesResult] = await Promise.all([supabase.from('camiones').select('estado'), supabase.from('alertas').select('*').eq('estado', 'activa').order('timestamp', {
-      ascending: false
-    }).limit(5), supabase.from('rutas').select('id').eq('activa', true)]);
+    const [trucksResult, eventsLastHourResult, recentEventsResult] = await Promise.all([
+      supabase.from('camiones').select('estado'), 
+      supabase.from('cruces_registrados')
+        .select('*')
+        .gte('timestamp', sixtyMinutesAgo.toISOString()),
+      supabase.from('cruces_registrados')
+        .select(`
+          *,
+          camiones(placas),
+          casetas_autopista(nombre, autopista),
+          rutas(nombre)
+        `)
+        .order('timestamp', { ascending: false })
+        .limit(10)
+    ]);
+
     if (trucksResult.data) {
       const activeTrucks = trucksResult.data.filter(t => t.estado === 'activo').length;
       setStats(prev => ({
@@ -45,18 +62,16 @@ const FleetDashboard = ({
         activeTrucks
       }));
     }
-    if (alertsResult.data) {
+    
+    if (eventsLastHourResult.data) {
       setStats(prev => ({
         ...prev,
-        alerts: alertsResult.data.length
+        alerts: eventsLastHourResult.data.length
       }));
-      setRecentAlerts(alertsResult.data);
     }
-    if (routesResult.data) {
-      setStats(prev => ({
-        ...prev,
-        routes: routesResult.data.length
-      }));
+    
+    if (recentEventsResult.data) {
+      setRecentEvents(recentEventsResult.data);
     }
   };
   const getPriorityColor = (priority: string) => {
@@ -126,24 +141,28 @@ const FleetDashboard = ({
             </CardContent>
           </Card>
 
-          {/* Recent Alerts */}
+          {/* Recent Events */}
           <Card>
             <CardHeader>
-              <CardTitle>Alertas Recientes</CardTitle>
-              <CardDescription>Últimas notificaciones del sistema</CardDescription>
+              <CardTitle>Eventos Recientes</CardTitle>
+              <CardDescription>Historial de cruces registrados</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentAlerts.length === 0 ? <p className="text-sm text-muted-foreground">No hay alertas activas</p> : recentAlerts.map(alert => <div key={alert.id} className="flex items-start space-x-3 p-3 border rounded-lg">
+              {recentEvents.length === 0 ? <p className="text-sm text-muted-foreground">No hay eventos registrados</p> : recentEvents.map(event => <div key={event.id} className="flex items-start space-x-3 p-3 border rounded-lg">
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{alert.titulo}</p>
-                        <Badge variant={getPriorityColor(alert.prioridad)}>
-                          {alert.prioridad}
+                        <p className="text-sm font-medium">
+                          {event.camiones?.placas} - {event.casetas_autopista?.nombre}
+                        </p>
+                        <Badge variant="outline">
+                          {event.tipo_cruce}
                         </Badge>
                       </div>
-                      {alert.descripcion && <p className="text-xs text-muted-foreground">{alert.descripcion}</p>}
                       <p className="text-xs text-muted-foreground">
-                        {new Date(alert.timestamp).toLocaleString('es-MX')}
+                        {event.casetas_autopista?.autopista} • {event.rutas?.nombre}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(event.timestamp).toLocaleString('es-MX')}
                       </p>
                     </div>
                   </div>)}
