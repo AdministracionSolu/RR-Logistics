@@ -87,7 +87,7 @@ const FleetDashboard = ({
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Activos</CardTitle>
@@ -107,17 +107,6 @@ const FleetDashboard = ({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.alerts}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rutas Activas</CardTitle>
-              <div className="text-2xl">
-            </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.routes}</div>
             </CardContent>
           </Card>
         </div>
