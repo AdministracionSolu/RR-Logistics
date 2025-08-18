@@ -76,8 +76,8 @@ const FleetDashboard = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gestión de Flota</h1>
-            <p className="text-muted-foreground">Monitoreo de flota en tiempo real</p>
+            <h1 className="text-3xl font-bold tracking-tight">Monitoreo en tiempo real </h1>
+            <p className="text-muted-foreground">Borrador 1</p>
           </div>
           <div className="flex space-x-2">
             <a href="/eventos" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
