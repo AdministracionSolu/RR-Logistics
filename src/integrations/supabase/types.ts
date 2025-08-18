@@ -14,7 +14,353 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alertas: {
+        Row: {
+          camion_id: string
+          descripcion: string | null
+          estado: string | null
+          id: string
+          prioridad: string | null
+          resuelto_en: string | null
+          resuelto_por: string | null
+          timestamp: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          camion_id: string
+          descripcion?: string | null
+          estado?: string | null
+          id?: string
+          prioridad?: string | null
+          resuelto_en?: string | null
+          resuelto_por?: string | null
+          timestamp?: string
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          camion_id?: string
+          descripcion?: string | null
+          estado?: string | null
+          id?: string
+          prioridad?: string | null
+          resuelto_en?: string | null
+          resuelto_por?: string | null
+          timestamp?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alertas_camion_id_fkey"
+            columns: ["camion_id"]
+            isOneToOne: false
+            referencedRelation: "camiones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camiones: {
+        Row: {
+          año: number | null
+          combustible_porcentaje: number | null
+          conductor_id: string | null
+          created_at: string
+          estado: string | null
+          id: string
+          kilometraje_total: number | null
+          modelo: string | null
+          placas: string
+          ruta_asignada_id: string | null
+          ubicacion_actual_lat: number | null
+          ubicacion_actual_lng: number | null
+          ultimo_mantenimiento: string | null
+          updated_at: string
+          velocidad_actual: number | null
+        }
+        Insert: {
+          año?: number | null
+          combustible_porcentaje?: number | null
+          conductor_id?: string | null
+          created_at?: string
+          estado?: string | null
+          id?: string
+          kilometraje_total?: number | null
+          modelo?: string | null
+          placas: string
+          ruta_asignada_id?: string | null
+          ubicacion_actual_lat?: number | null
+          ubicacion_actual_lng?: number | null
+          ultimo_mantenimiento?: string | null
+          updated_at?: string
+          velocidad_actual?: number | null
+        }
+        Update: {
+          año?: number | null
+          combustible_porcentaje?: number | null
+          conductor_id?: string | null
+          created_at?: string
+          estado?: string | null
+          id?: string
+          kilometraje_total?: number | null
+          modelo?: string | null
+          placas?: string
+          ruta_asignada_id?: string | null
+          ubicacion_actual_lat?: number | null
+          ubicacion_actual_lng?: number | null
+          ultimo_mantenimiento?: string | null
+          updated_at?: string
+          velocidad_actual?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camiones_conductor_id_fkey"
+            columns: ["conductor_id"]
+            isOneToOne: false
+            referencedRelation: "conductores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "camiones_ruta_asignada_id_fkey"
+            columns: ["ruta_asignada_id"]
+            isOneToOne: false
+            referencedRelation: "rutas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      casetas_autopista: {
+        Row: {
+          activa: boolean | null
+          autopista: string
+          created_at: string
+          id: string
+          km: number | null
+          lat: number
+          lng: number
+          nombre: string
+          sentido: string | null
+        }
+        Insert: {
+          activa?: boolean | null
+          autopista: string
+          created_at?: string
+          id?: string
+          km?: number | null
+          lat: number
+          lng: number
+          nombre: string
+          sentido?: string | null
+        }
+        Update: {
+          activa?: boolean | null
+          autopista?: string
+          created_at?: string
+          id?: string
+          km?: number | null
+          lat?: number
+          lng?: number
+          nombre?: string
+          sentido?: string | null
+        }
+        Relationships: []
+      }
+      conductores: {
+        Row: {
+          created_at: string
+          email: string | null
+          estado: string | null
+          id: string
+          licencia: string
+          nombre: string
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          estado?: string | null
+          id?: string
+          licencia: string
+          nombre: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          estado?: string | null
+          id?: string
+          licencia?: string
+          nombre?: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cruces_registrados: {
+        Row: {
+          camion_id: string
+          caseta_id: string
+          id: string
+          ruta_id: string | null
+          timestamp: string
+          tipo_cruce: string
+        }
+        Insert: {
+          camion_id: string
+          caseta_id: string
+          id?: string
+          ruta_id?: string | null
+          timestamp?: string
+          tipo_cruce: string
+        }
+        Update: {
+          camion_id?: string
+          caseta_id?: string
+          id?: string
+          ruta_id?: string | null
+          timestamp?: string
+          tipo_cruce?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cruces_registrados_camion_id_fkey"
+            columns: ["camion_id"]
+            isOneToOne: false
+            referencedRelation: "camiones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cruces_registrados_caseta_id_fkey"
+            columns: ["caseta_id"]
+            isOneToOne: false
+            referencedRelation: "casetas_autopista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cruces_registrados_ruta_id_fkey"
+            columns: ["ruta_id"]
+            isOneToOne: false
+            referencedRelation: "rutas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rutas: {
+        Row: {
+          activa: boolean | null
+          created_at: string
+          descripcion: string | null
+          destino: string
+          distancia_km: number | null
+          id: string
+          nombre: string
+          origen: string
+          tiempo_estimado_hrs: number | null
+          updated_at: string
+        }
+        Insert: {
+          activa?: boolean | null
+          created_at?: string
+          descripcion?: string | null
+          destino: string
+          distancia_km?: number | null
+          id?: string
+          nombre: string
+          origen: string
+          tiempo_estimado_hrs?: number | null
+          updated_at?: string
+        }
+        Update: {
+          activa?: boolean | null
+          created_at?: string
+          descripcion?: string | null
+          destino?: string
+          distancia_km?: number | null
+          id?: string
+          nombre?: string
+          origen?: string
+          tiempo_estimado_hrs?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      supervisores: {
+        Row: {
+          created_at: string
+          email: string
+          empresa: string | null
+          id: string
+          nombre: string
+          rol: string | null
+          telefono: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          empresa?: string | null
+          id?: string
+          nombre: string
+          rol?: string | null
+          telefono?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          empresa?: string | null
+          id?: string
+          nombre?: string
+          rol?: string | null
+          telefono?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ubicaciones_tiempo_real: {
+        Row: {
+          camion_id: string
+          direccion: string | null
+          id: string
+          lat: number
+          lng: number
+          timestamp: string
+          velocidad: number | null
+        }
+        Insert: {
+          camion_id: string
+          direccion?: string | null
+          id?: string
+          lat: number
+          lng: number
+          timestamp?: string
+          velocidad?: number | null
+        }
+        Update: {
+          camion_id?: string
+          direccion?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          timestamp?: string
+          velocidad?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ubicaciones_tiempo_real_camion_id_fkey"
+            columns: ["camion_id"]
+            isOneToOne: false
+            referencedRelation: "camiones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
