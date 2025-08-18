@@ -38,22 +38,14 @@ const FleetDashboard = ({
     sixtyMinutesAgo.setMinutes(sixtyMinutesAgo.getMinutes() - 60);
 
     // Cargar estadísticas
-    const [trucksResult, eventsLastHourResult, recentEventsResult] = await Promise.all([
-      supabase.from('camiones').select('estado'), 
-      supabase.from('cruces_registrados')
-        .select('*')
-        .gte('timestamp', sixtyMinutesAgo.toISOString()),
-      supabase.from('cruces_registrados')
-        .select(`
+    const [trucksResult, eventsLastHourResult, recentEventsResult] = await Promise.all([supabase.from('camiones').select('estado'), supabase.from('cruces_registrados').select('*').gte('timestamp', sixtyMinutesAgo.toISOString()), supabase.from('cruces_registrados').select(`
           *,
           camiones(placas),
           casetas_autopista(nombre, autopista),
           rutas(nombre)
-        `)
-        .order('timestamp', { ascending: false })
-        .limit(10)
-    ]);
-
+        `).order('timestamp', {
+      ascending: false
+    }).limit(10)]);
     if (trucksResult.data) {
       const activeTrucks = trucksResult.data.filter(t => t.estado === 'activo').length;
       setStats(prev => ({
@@ -62,14 +54,12 @@ const FleetDashboard = ({
         activeTrucks
       }));
     }
-    
     if (eventsLastHourResult.data) {
       setStats(prev => ({
         ...prev,
         alerts: eventsLastHourResult.data.length
       }));
     }
-    
     if (recentEventsResult.data) {
       setRecentEvents(recentEventsResult.data);
     }
@@ -116,7 +106,7 @@ const FleetDashboard = ({
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Alertas</CardTitle>
+              <CardTitle className="text-sm font-medium">Número de eventos en la última hora</CardTitle>
               <div className="text-2xl">
             </div>
             </CardHeader>
