@@ -1,73 +1,74 @@
-# Welcome to your Lovable project
+# FleetWatch - Sistema de Monitoreo de Flotas
 
-## Project info
+Sistema de monitoreo y seguimiento de flotas en tiempo real desarrollado con React, TypeScript y Tailwind CSS.
 
-**URL**: https://lovable.dev/projects/91a81a03-762b-4037-845f-1dc4039abaaa
+## Características
 
-## How can I edit this code?
+- Monitoreo en tiempo real de vehículos
+- Dashboard con métricas y estadísticas
+- Mapas interactivos con Mapbox
+- Notificaciones de eventos
+- Interfaz responsive y moderna
 
-There are several ways of editing your application.
+## Tecnologías Utilizadas
 
-**Use Lovable**
+- **Frontend Framework**: React 18 con TypeScript
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **UI Components**: shadcn/ui
+- **Maps**: Mapbox GL JS
+- **Backend**: Supabase
+- **State Management**: React Query
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/91a81a03-762b-4037-845f-1dc4039abaaa) and start prompting.
+## Instalación Local
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# Clonar el repositorio
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Instalar dependencias
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Configurar variables de entorno
+# Crear archivo .env.local con las claves necesarias
+
+# Ejecutar en modo desarrollo
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Configuración
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Mapbox Token
+El sistema requiere un token de Mapbox para mostrar los mapas. Obtén tu token en [mapbox.com](https://mapbox.com) y configúralo en la aplicación.
 
-**Use GitHub Codespaces**
+### Supabase
+Configura tu proyecto de Supabase y las credenciales necesarias para la base de datos y autenticación.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Estructura del Proyecto
 
-## What technologies are used for this project?
+```
+src/
+├── components/          # Componentes React
+├── pages/              # Páginas de la aplicación
+├── hooks/              # Custom hooks
+├── lib/                # Utilidades y configuración
+├── integrations/       # Integraciones externas
+└── assets/            # Recursos estáticos
+```
 
-This project is built with:
+## Despliegue
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+El proyecto puede ser desplegado en cualquier plataforma que soporte aplicaciones React estáticas.
 
-## How can I deploy this project?
+## Contribuir
 
-Simply open [Lovable](https://lovable.dev/projects/91a81a03-762b-4037-845f-1dc4039abaaa) and click on Share -> Publish.
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-## Can I connect a custom domain to my Lovable project?
+## Licencia
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Este proyecto está licenciado bajo la Licencia MIT.
