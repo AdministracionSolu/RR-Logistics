@@ -20,9 +20,12 @@ export type Database = {
           descripcion: string | null
           estado: string | null
           id: string
+          minutos_sin_cruce: number | null
           prioridad: string | null
           resuelto_en: string | null
           resuelto_por: string | null
+          saldo_alerta: number | null
+          tag_relacionado: string | null
           timestamp: string
           tipo: string
           titulo: string
@@ -32,9 +35,12 @@ export type Database = {
           descripcion?: string | null
           estado?: string | null
           id?: string
+          minutos_sin_cruce?: number | null
           prioridad?: string | null
           resuelto_en?: string | null
           resuelto_por?: string | null
+          saldo_alerta?: number | null
+          tag_relacionado?: string | null
           timestamp?: string
           tipo: string
           titulo: string
@@ -44,9 +50,12 @@ export type Database = {
           descripcion?: string | null
           estado?: string | null
           id?: string
+          minutos_sin_cruce?: number | null
           prioridad?: string | null
           resuelto_en?: string | null
           resuelto_por?: string | null
+          saldo_alerta?: number | null
+          tag_relacionado?: string | null
           timestamp?: string
           tipo?: string
           titulo?: string
@@ -68,13 +77,18 @@ export type Database = {
           conductor_id: string | null
           created_at: string
           estado: string | null
+          gasto_dia_actual: number | null
           id: string
           kilometraje_total: number | null
           modelo: string | null
           placas: string
           ruta_asignada_id: string | null
+          saldo_actual: number | null
+          tag_id: string | null
           ubicacion_actual_lat: number | null
           ubicacion_actual_lng: number | null
+          ultimo_cruce_id: string | null
+          ultimo_cruce_timestamp: string | null
           ultimo_mantenimiento: string | null
           updated_at: string
           velocidad_actual: number | null
@@ -85,13 +99,18 @@ export type Database = {
           conductor_id?: string | null
           created_at?: string
           estado?: string | null
+          gasto_dia_actual?: number | null
           id?: string
           kilometraje_total?: number | null
           modelo?: string | null
           placas: string
           ruta_asignada_id?: string | null
+          saldo_actual?: number | null
+          tag_id?: string | null
           ubicacion_actual_lat?: number | null
           ubicacion_actual_lng?: number | null
+          ultimo_cruce_id?: string | null
+          ultimo_cruce_timestamp?: string | null
           ultimo_mantenimiento?: string | null
           updated_at?: string
           velocidad_actual?: number | null
@@ -102,13 +121,18 @@ export type Database = {
           conductor_id?: string | null
           created_at?: string
           estado?: string | null
+          gasto_dia_actual?: number | null
           id?: string
           kilometraje_total?: number | null
           modelo?: string | null
           placas?: string
           ruta_asignada_id?: string | null
+          saldo_actual?: number | null
+          tag_id?: string | null
           ubicacion_actual_lat?: number | null
           ubicacion_actual_lng?: number | null
+          ultimo_cruce_id?: string | null
+          ultimo_cruce_timestamp?: string | null
           ultimo_mantenimiento?: string | null
           updated_at?: string
           velocidad_actual?: number | null
@@ -135,34 +159,43 @@ export type Database = {
           activa: boolean | null
           autopista: string
           created_at: string
+          direccion_valida: string[] | null
           id: string
           km: number | null
           lat: number
           lng: number
           nombre: string
+          plaza_nombre: string | null
           sentido: string | null
+          tipo_caseta: string | null
         }
         Insert: {
           activa?: boolean | null
           autopista: string
           created_at?: string
+          direccion_valida?: string[] | null
           id?: string
           km?: number | null
           lat: number
           lng: number
           nombre: string
+          plaza_nombre?: string | null
           sentido?: string | null
+          tipo_caseta?: string | null
         }
         Update: {
           activa?: boolean | null
           autopista?: string
           created_at?: string
+          direccion_valida?: string[] | null
           id?: string
           km?: number | null
           lat?: number
           lng?: number
           nombre?: string
+          plaza_nombre?: string | null
           sentido?: string | null
+          tipo_caseta?: string | null
         }
         Relationships: []
       }
@@ -248,6 +281,61 @@ export type Database = {
           },
         ]
       }
+      movimiento_rastros: {
+        Row: {
+          camion_id: string
+          caseta_id: string
+          created_at: string
+          direccion_inferida: string | null
+          id: string
+          orden_secuencia: number | null
+          timestamp: string
+          toll_event_id: string | null
+        }
+        Insert: {
+          camion_id: string
+          caseta_id: string
+          created_at?: string
+          direccion_inferida?: string | null
+          id?: string
+          orden_secuencia?: number | null
+          timestamp: string
+          toll_event_id?: string | null
+        }
+        Update: {
+          camion_id?: string
+          caseta_id?: string
+          created_at?: string
+          direccion_inferida?: string | null
+          id?: string
+          orden_secuencia?: number | null
+          timestamp?: string
+          toll_event_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimiento_rastros_camion_id_fkey"
+            columns: ["camion_id"]
+            isOneToOne: false
+            referencedRelation: "camiones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "movimiento_rastros_caseta_id_fkey"
+            columns: ["caseta_id"]
+            isOneToOne: false
+            referencedRelation: "casetas_autopista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "movimiento_rastros_toll_event_id_fkey"
+            columns: ["toll_event_id"]
+            isOneToOne: false
+            referencedRelation: "toll_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rutas: {
         Row: {
           activa: boolean | null
@@ -322,6 +410,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      toll_events: {
+        Row: {
+          carril_id: number | null
+          caseta_id: string | null
+          caseta_nombre: string | null
+          clase: string | null
+          concepto: string | null
+          created_at: string
+          fecha_hora: string
+          folio: string | null
+          id: string
+          importe: number | null
+          reconciled: boolean | null
+          saldo: number | null
+          source_type: string | null
+          tag_id: string
+          updated_at: string
+        }
+        Insert: {
+          carril_id?: number | null
+          caseta_id?: string | null
+          caseta_nombre?: string | null
+          clase?: string | null
+          concepto?: string | null
+          created_at?: string
+          fecha_hora: string
+          folio?: string | null
+          id?: string
+          importe?: number | null
+          reconciled?: boolean | null
+          saldo?: number | null
+          source_type?: string | null
+          tag_id: string
+          updated_at?: string
+        }
+        Update: {
+          carril_id?: number | null
+          caseta_id?: string | null
+          caseta_nombre?: string | null
+          clase?: string | null
+          concepto?: string | null
+          created_at?: string
+          fecha_hora?: string
+          folio?: string | null
+          id?: string
+          importe?: number | null
+          reconciled?: boolean | null
+          saldo?: number | null
+          source_type?: string | null
+          tag_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "toll_events_caseta_id_fkey"
+            columns: ["caseta_id"]
+            isOneToOne: false
+            referencedRelation: "casetas_autopista"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ubicaciones_tiempo_real: {
         Row: {
