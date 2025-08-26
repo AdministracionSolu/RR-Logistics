@@ -59,17 +59,35 @@ const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
             if (!line) continue;
             
             const cols = parseCSVLine(line);
-            if (cols.length >= 8) {
+            if (cols.length >= 9) {
+              // Improved PASE CSV parsing - expected format:
+              // tag_id, concepto, fecha, hora, caseta_id/nombre, carril_id, clase, importe, saldo, [folio]
+              const fecha = cols[2]?.replace(/"/g, '').trim();
+              const hora = cols[3]?.replace(/"/g, '').trim();
+              const casetaInfo = cols[4]?.replace(/"/g, '').trim();
+              
+              // Combine fecha and hora for proper datetime
+              let fechaHora: string;
+              if (fecha && hora) {
+                fechaHora = `${fecha} ${hora}`;
+              } else {
+                fechaHora = fecha || new Date().toISOString();
+              }
+              
+              // Extract caseta number from various formats (366, "Caseta 366", etc.)
+              const casetaNumero = casetaInfo.match(/\d+/)?.[0] || casetaInfo;
+              
               events.push({
-                tag_id: cols[0]?.replace(/"/g, ''),
-                concepto: cols[1]?.replace(/"/g, ''),
-                fecha_hora: cols[2]?.replace(/"/g, ''),
-                caseta_nombre: cols[3]?.replace(/"/g, ''),
-                carril_id: parseInt(cols[4]?.replace(/"/g, '')) || null,
-                clase: cols[5]?.replace(/"/g, ''),
-                importe: parseFloat(cols[6]?.replace(/"/g, '')) || 0,
-                saldo: parseFloat(cols[7]?.replace(/"/g, '')) || 0,
-                folio: cols[8]?.replace(/"/g, '') || null
+                tag_id: cols[0]?.replace(/"/g, '').trim(),
+                concepto: cols[1]?.replace(/"/g, '').trim(),
+                fecha_hora: fechaHora,
+                caseta_numero: casetaNumero,
+                caseta_nombre: casetaInfo,
+                carril_id: parseInt(cols[5]?.replace(/"/g, '')) || null,
+                clase: cols[6]?.replace(/"/g, '').trim(),
+                importe: parseFloat(cols[7]?.replace(/"/g, '')) || 0,
+                saldo: parseFloat(cols[8]?.replace(/"/g, '')) || 0,
+                folio: cols[9]?.replace(/"/g, '').trim() || null
               });
             }
           }
@@ -85,13 +103,26 @@ const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
     });
   };
 
-  const findCasetaByName = async (casetaNombre: string) => {
+  const findCasetaByName = async (casetaNumero: string, casetaNombre: string) => {
+    // Try to find by number first (more reliable)
+    if (casetaNumero) {
+      const { data } = await supabase
+        .from('casetas_autopista')
+        .select('id')
+        .ilike('nombre', `%${casetaNumero}%`)
+        .limit(1)
+        .maybeSingle();
+      
+      if (data?.id) return data.id;
+    }
+    
+    // Fallback to name matching
     const { data } = await supabase
       .from('casetas_autopista')
       .select('id')
       .ilike('nombre', `%${casetaNombre}%`)
       .limit(1)
-      .single();
+      .maybeSingle();
     
     return data?.id || null;
   };
@@ -109,12 +140,24 @@ const FileUploader = ({ onUploadComplete }: FileUploaderProps) => {
         try {
           const event = events[i];
           
-          // Find caseta by name
-          const casetaId = await findCasetaByName(event.caseta_nombre);
+          // Find caseta by number/name
+          const casetaId = await findCasetaByName(event.caseta_numero, event.caseta_nombre);
           
-          // Parse date
-          const fechaHora = new Date(event.fecha_hora);
+          // Parse date with better handling
+          let fechaHora: Date;
+          try {
+            fechaHora = new Date(event.fecha_hora);
+            if (isNaN(fechaHora.getTime())) {
+              // Try parsing different date formats
+              const dateStr = event.fecha_hora.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1');
+              fechaHora = new Date(dateStr);
+            }
+          } catch {
+            fechaHora = new Date();
+          }
+          
           if (isNaN(fechaHora.getTime())) {
+            console.warn('Invalid date:', event.fecha_hora);
             results.errors++;
             continue;
           }
