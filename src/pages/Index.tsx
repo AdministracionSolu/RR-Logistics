@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
+import ExpandedFleetDashboard from '@/components/ExpandedFleetDashboard';
 import MapboxTokenInput from '@/components/MapboxTokenInput';
-import FleetDashboard from '@/components/FleetDashboard';
 
 const Index = () => {
   const [mapboxToken, setMapboxToken] = useState<string>('');
@@ -20,7 +20,7 @@ const Index = () => {
     return <MapboxTokenInput onTokenSubmit={handleTokenSubmit} />;
   }
 
-  return <FleetDashboard mapboxToken={mapboxToken} />;
+  return <ExpandedFleetDashboard mapboxToken={mapboxToken} />;
 };
 
 export default Index;

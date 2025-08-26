@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Eventos from "./pages/Eventos";
 import NotFound from "./pages/NotFound";
+import Navigation from "./components/Navigation";
+import AlertsGenerator from "./components/AlertsGenerator";
 
 const queryClient = new QueryClient();
 
@@ -15,12 +17,16 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/eventos" element={<Eventos />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AlertsGenerator />
+        <div className="min-h-screen bg-background">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/eventos" element={<Eventos />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
