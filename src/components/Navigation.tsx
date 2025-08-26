@@ -29,8 +29,7 @@ const Navigation = () => {
             <Map className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">FleetWatch</h1>
-            <p className="text-xs text-muted-foreground">by Solú</p>
+            <h1 className="text-lg font-semibold">Gestión interna</h1>
           </div>
         </div>
 

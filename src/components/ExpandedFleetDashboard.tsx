@@ -267,7 +267,7 @@ const ExpandedFleetDashboard = ({ mapboxToken }: { mapboxToken: string }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">FleetWatch Dashboard</h1>
+          <h1 className="text-3xl font-bold">Gestión interna</h1>
           <p className="text-muted-foreground">Sistema de monitoreo de flotilla por casetas</p>
         </div>
       </div>
