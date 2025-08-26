@@ -24,7 +24,7 @@ const Eventos = () => {
   const [formData, setFormData] = useState({
     camion_id: '',
     caseta_id: '',
-    ruta_id: '',
+    ruta_id: 'none',
     tipo_cruce: 'entrada'
   });
 
@@ -126,7 +126,7 @@ const Eventos = () => {
       .from('cruces_registrados')
       .insert([{
         ...formData,
-        ruta_id: formData.ruta_id || null
+        ruta_id: formData.ruta_id === 'none' ? null : formData.ruta_id
       }]);
 
     if (error) {
@@ -144,7 +144,7 @@ const Eventos = () => {
       setFormData({
         camion_id: '',
         caseta_id: '',
-        ruta_id: '',
+        ruta_id: 'none',
         tipo_cruce: 'entrada'
       });
       setIsDialogOpen(false);
@@ -232,7 +232,7 @@ const Eventos = () => {
                         <SelectValue placeholder="Selecciona una ruta" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Sin ruta asignada</SelectItem>
+                        <SelectItem value="none">Sin ruta asignada</SelectItem>
                         {rutas.map((ruta) => (
                           <SelectItem key={ruta.id} value={ruta.id}>
                             {ruta.nombre}
