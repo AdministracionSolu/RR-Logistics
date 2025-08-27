@@ -281,42 +281,6 @@ export type Database = {
           },
         ]
       }
-      duplicate_charge_alerts: {
-        Row: {
-          created_at: string
-          first_event: Json
-          id: string
-          resolved_at: string | null
-          resolved_by: string | null
-          second_event: Json
-          status: string
-          tag_id: string
-          time_difference_minutes: number
-        }
-        Insert: {
-          created_at?: string
-          first_event: Json
-          id?: string
-          resolved_at?: string | null
-          resolved_by?: string | null
-          second_event: Json
-          status?: string
-          tag_id: string
-          time_difference_minutes: number
-        }
-        Update: {
-          created_at?: string
-          first_event?: Json
-          id?: string
-          resolved_at?: string | null
-          resolved_by?: string | null
-          second_event?: Json
-          status?: string
-          tag_id?: string
-          time_difference_minutes?: number
-        }
-        Relationships: []
-      }
       movimiento_rastros: {
         Row: {
           camion_id: string

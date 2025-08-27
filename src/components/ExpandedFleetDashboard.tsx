@@ -363,7 +363,7 @@ const ExpandedFleetDashboard = ({ mapboxToken }: { mapboxToken: string }) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="h-[520px] p-4">
-                  <FleetMap />
+                  <FleetMap mapboxToken={mapboxToken} />
                 </CardContent>
               </Card>
             </div>

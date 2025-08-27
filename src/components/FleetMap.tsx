@@ -1,197 +1,262 @@
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import { Icon } from 'leaflet';
+import { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
-import 'leaflet/dist/leaflet.css';
 
-// Fix for default markers in react-leaflet
-delete (Icon.Default.prototype as any)._getIconUrl;
-Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+interface FleetMapProps {
+  mapboxToken: string;
+}
 
 interface TruckLocation {
   id: string;
   placas: string;
   modelo: string;
   tag_id: string;
-  saldo_disponible: number;
-  credito_disponible: number;
+  saldo_actual: number;
+  gasto_dia_actual: number;
+  ultimo_cruce_timestamp: string | null;
   lat?: number;
   lng?: number;
-  lastCaseta?: string;
-  lastCarretera?: string;
-  lastRuta?: string;
-  lastTime?: string;
-  trail?: Array<{ lat: number; lng: number; time: string; caseta: string }>;
+  caseta_nombre?: string;
+  trail?: Array<{
+    lat: number;
+    lng: number;
+    timestamp: string;
+    caseta_nombre: string;
+  }>;
 }
 
-const FleetMap = () => {
-  const [trucks, setTrucks] = useState<TruckLocation[]>([]);
+const FleetMap = ({ mapboxToken }: FleetMapProps) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const [trucks, setTrucks] = useState<any[]>([]);
 
   useEffect(() => {
-    loadTrucks();
+    if (!mapContainer.current || !mapboxToken) return;
+
+    mapboxgl.accessToken = mapboxToken;
     
-    // Set up real-time subscription
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-99.1332, 19.4326], // Ciudad de México
+      zoom: 10,
+    });
+
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Cargar camiones
+    loadTrucks();
+
+    // Suscribirse a actualizaciones en tiempo real
     const subscription = supabase
-      .channel('ubicaciones-tiempo-real')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'toll_events'
-      }, () => {
-        loadTrucks();
-      })
+      .channel('ubicaciones_tiempo_real')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'ubicaciones_tiempo_real' },
+        (payload) => {
+          console.log('Actualización de ubicación:', payload);
+          loadTrucks();
+        }
+      )
       .subscribe();
 
     return () => {
+      map.current?.remove();
       subscription.unsubscribe();
     };
-  }, []);
+  }, [mapboxToken]);
 
   const loadTrucks = async () => {
     try {
-      // Get active trucks (use correct field name)
-      const { data: camiones } = await supabase
+      // Get trucks with their last toll crossing location
+      const { data: trucksData, error } = await supabase
         .from('camiones')
-        .select('*')
-        .eq('estado', 'activo');
+        .select(`
+          id,
+          placas,
+          modelo,
+          tag_id,
+          saldo_actual,
+          gasto_dia_actual,
+          ultimo_cruce_timestamp,
+          estado
+        `)
+        .eq('estado', 'activo')
+        .not('tag_id', 'is', null);
 
-      if (!camiones) return;
+      if (error) {
+        console.error('Error cargando camiones:', error);
+        return;
+      }
 
-      const trucksWithLocation: TruckLocation[] = [];
+      if (!trucksData) return;
 
-      for (const camion of camiones) {
-        const truck: TruckLocation = {
-          id: camion.id,
-          placas: camion.placas,
-          modelo: camion.modelo,
-          tag_id: camion.tag_id,
-          saldo_disponible: camion.saldo_actual || 0,
-          credito_disponible: 0, // No hay campo de crédito en la tabla
-        };
+      // Get latest toll events for each truck with caseta location
+      const trucksWithLocations: TruckLocation[] = [];
 
-        // Get latest toll event for this truck (simplified query)
+      for (const truck of trucksData) {
+        // Get latest toll event with caseta coordinates
         const { data: latestEvent } = await supabase
           .from('toll_events')
-          .select('fecha_hora, caseta_nombre, caseta_id')
-          .eq('tag_id', camion.tag_id)
+          .select(`
+            fecha_hora,
+            caseta_nombre,
+            casetas_autopista (
+              lat,
+              lng,
+              nombre
+            )
+          `)
+          .eq('tag_id', truck.tag_id)
           .order('fecha_hora', { ascending: false })
           .limit(1)
-          .maybeSingle();
+          .single();
 
-        // Get caseta coordinates if we have a caseta_id (usar solo campos que existen)
-        if (latestEvent?.caseta_id) {
-          const { data: casetaData } = await supabase
-            .from('casetas_autopista')
-            .select('lat, lng, nombre')
-            .eq('id', latestEvent.caseta_id)
-            .maybeSingle();
-
-          if (casetaData?.lat && casetaData?.lng) {
-            truck.lat = casetaData.lat;
-            truck.lng = casetaData.lng;
-            truck.lastCaseta = casetaData.nombre;
-            truck.lastCarretera = latestEvent.caseta_nombre; // Usar el nombre de la caseta del evento
-            truck.lastRuta = ''; // Sin dato de ruta
-            truck.lastTime = latestEvent.fecha_hora;
-          }
-        }
-
-        // Get trail (last 5 events for desktop)
-        const { data: trailEvents } = await supabase
+        // Get trail (last 5 toll events of today)
+        const { data: trailData } = await supabase
           .from('toll_events')
-          .select('fecha_hora, caseta_nombre, caseta_id')
-          .eq('tag_id', camion.tag_id)
+          .select(`
+            fecha_hora,
+            caseta_nombre,
+            casetas_autopista (
+              lat,
+              lng
+            )
+          `)
+          .eq('tag_id', truck.tag_id)
+          .gte('fecha_hora', new Date().toISOString().split('T')[0])
           .order('fecha_hora', { ascending: false })
           .limit(5);
 
-        // Get coordinates for trail points
-        if (trailEvents) {
-          const trailData = [];
-          for (const event of trailEvents) {
-            if (event.caseta_id) {
-              const { data: coords } = await supabase
-                .from('casetas_autopista')
-                .select('lat, lng')
-                .eq('id', event.caseta_id)
-                .maybeSingle();
-              if (coords?.lat && coords?.lng) {
-                trailData.push({
-                  lat: coords.lat,
-                  lng: coords.lng,
-                  time: event.fecha_hora,
-                  caseta: event.caseta_nombre
-                });
-              }
-            }
-          }
-          truck.trail = trailData;
-        }
+        const truckLocation: TruckLocation = {
+          ...truck,
+          lat: latestEvent?.casetas_autopista?.lat,
+          lng: latestEvent?.casetas_autopista?.lng,
+          caseta_nombre: latestEvent?.caseta_nombre,
+          trail: trailData?.map(event => ({
+            lat: event.casetas_autopista?.lat || 0,
+            lng: event.casetas_autopista?.lng || 0,
+            timestamp: event.fecha_hora,
+            caseta_nombre: event.caseta_nombre
+          })).filter(point => point.lat && point.lng) || []
+        };
 
-        trucksWithLocation.push(truck);
+        if (truckLocation.lat && truckLocation.lng) {
+          trucksWithLocations.push(truckLocation);
+        }
       }
 
-      setTrucks(trucksWithLocation);
+      setTrucks(trucksWithLocations);
+      
+      // Update map markers and trails
+      if (map.current) {
+        updateMapDisplay(trucksWithLocations);
+      }
+
     } catch (error) {
       console.error('Error loading trucks:', error);
     }
   };
 
-  const trucksWithCoords = trucks.filter(truck => truck.lat && truck.lng);
+  const updateMapDisplay = (trucksData: TruckLocation[]) => {
+    if (!map.current) return;
 
-  // Mexico center coordinates
-  const mexicoCenter: [number, number] = [23.6345, -102.5528];
+    // Clear existing markers and sources
+    const existingMarkers = document.querySelectorAll('.truck-marker');
+    existingMarkers.forEach(marker => marker.remove());
+
+    // Remove existing trail sources and layers
+    trucksData.forEach(truck => {
+      const trailSourceId = `trail-${truck.id}`;
+      if (map.current!.getSource(trailSourceId)) {
+        map.current!.removeLayer(`${trailSourceId}-line`);
+        map.current!.removeSource(trailSourceId);
+      }
+    });
+
+    trucksData.forEach((truck) => {
+      if (truck.lat && truck.lng) {
+        // Create truck marker
+        const el = document.createElement('div');
+        el.className = 'truck-marker';
+        el.innerHTML = '🚛';
+        el.style.fontSize = '28px';
+        el.style.cursor = 'pointer';
+        el.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))';
+
+        // Enhanced popup with toll data
+        const lastCrossing = truck.ultimo_cruce_timestamp 
+          ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX')
+          : 'Sin cruces recientes';
+
+        const popup = new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`
+            <div class="p-3 min-w-[200px]">
+              <h3 class="font-bold text-lg">${truck.placas}</h3>
+              <p><strong>Modelo:</strong> ${truck.modelo || 'N/A'}</p>
+              <p><strong>TAG:</strong> ${truck.tag_id}</p>
+              <p><strong>Última caseta:</strong> ${truck.caseta_nombre || 'N/A'}</p>
+              <p><strong>Último cruce:</strong> ${lastCrossing}</p>
+              <p><strong>Saldo:</strong> $${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
+              <p><strong>Gasto hoy:</strong> $${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
+            </div>
+          `);
+
+        new mapboxgl.Marker(el)
+          .setLngLat([truck.lng, truck.lat])
+          .setPopup(popup)
+          .addTo(map.current!);
+
+        // Add trail if available
+        if (truck.trail && truck.trail.length > 1) {
+          const trailCoordinates = truck.trail.map(point => [point.lng, point.lat]);
+          
+          const trailSourceId = `trail-${truck.id}`;
+          
+          // Add trail source
+          map.current!.addSource(trailSourceId, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: trailCoordinates
+              }
+            }
+          });
+
+          // Add trail line layer
+          map.current!.addLayer({
+            id: `${trailSourceId}-line`,
+            type: 'line',
+            source: trailSourceId,
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': '#3b82f6',
+              'line-width': 3,
+              'line-opacity': 0.7,
+              'line-gradient': [
+                'interpolate',
+                ['linear'],
+                ['line-progress'],
+                0, '#ef4444',
+                0.5, '#f59e0b',
+                1, '#10b981'
+              ]
+            }
+          });
+        }
+      }
+    });
+  };
 
   return (
-    <div className="h-full w-full rounded-lg overflow-hidden">
-      <MapContainer
-        center={mexicoCenter}
-        zoom={6}
-        className="h-full w-full"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        
-        {/* Render truck markers */}
-        {trucksWithCoords.map((truck) => (
-          <div key={truck.id}>
-            <Marker position={[truck.lat!, truck.lng!]}>
-              <Popup>
-                <div className="text-sm">
-                  <div className="font-semibold">{truck.placas}</div>
-                  <div className="text-muted-foreground">{truck.modelo}</div>
-                  {truck.lastCaseta && <div className="mt-1">{truck.lastCaseta}</div>}
-                  {truck.lastCarretera && <div className="text-xs">{truck.lastCarretera}</div>}
-                  {truck.lastTime && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {new Date(truck.lastTime).toLocaleString('es-MX')}
-                    </div>
-                  )}
-                  <div className="mt-2 text-xs">
-                    <div>Saldo: ${truck.saldo_disponible.toLocaleString()}</div>
-                    <div>Crédito: ${truck.credito_disponible.toLocaleString()}</div>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-            
-            {/* Render trail */}
-            {truck.trail && truck.trail.length > 1 && (
-              <Polyline
-                positions={truck.trail.map(point => [point.lat, point.lng])}
-                color="#3b82f6"
-                weight={2}
-                opacity={0.6}
-              />
-            )}
-          </div>
-        ))}
-      </MapContainer>
+    <div className="relative w-full h-full">
+      <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
     </div>
   );
 };

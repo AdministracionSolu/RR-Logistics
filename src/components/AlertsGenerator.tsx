@@ -125,54 +125,50 @@ const AlertsGenerator = () => {
       // Detectar patrones inusuales (por ejemplo, demasiados cruces en poco tiempo)
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-      const { data: highActivityEvents } = await supabase
+      const { data: highActivityTrucks } = await supabase
         .from('toll_events')
-        .select('tag_id, fecha_hora, caseta_nombre')
+        .select(`
+          tag_id,
+          camiones!inner (
+            id,
+            placas
+          )
+        `)
         .gte('fecha_hora', oneHourAgo.toISOString())
         .order('tag_id');
 
-      if (!highActivityEvents) return;
+      if (!highActivityTrucks) return;
 
       // Agrupar por tag_id y contar eventos
-      const activityCount: { [key: string]: number } = {};
+      const activityCount: { [key: string]: { count: number; truck: any } } = {};
       
-      highActivityEvents.forEach(event => {
+      highActivityTrucks.forEach(event => {
         if (!activityCount[event.tag_id]) {
-          activityCount[event.tag_id] = 0;
+          activityCount[event.tag_id] = { count: 0, truck: event.camiones };
         }
-        activityCount[event.tag_id]++;
+        activityCount[event.tag_id].count++;
       });
 
       // Alertar si más de 10 cruces en 1 hora (patrón inusual)
-      for (const [tagId, count] of Object.entries(activityCount)) {
-        if (count > 10) {
-          // Get truck info
-          const { data: truck } = await supabase
-            .from('camiones')
-            .select('id, placas')
-            .eq('tag_id', tagId)
-            .maybeSingle();
-
-          if (!truck) continue;
-
+      for (const [tagId, data] of Object.entries(activityCount)) {
+        if (data.count > 10) {
           // Verificar si ya existe alerta reciente
           const { data: existingAlert } = await supabase
             .from('alertas')
             .select('id')
-            .eq('camion_id', truck.id)
+            .eq('camion_id', data.truck.id)
             .eq('tipo', 'patron_inusual')
             .eq('estado', 'activa')
             .gte('timestamp', oneHourAgo.toISOString())
-            .limit(1)
-            .maybeSingle();
+            .limit(1);
 
-          if (!existingAlert) {
+          if (!existingAlert || existingAlert.length === 0) {
             await supabase
               .from('alertas')
               .insert({
-                camion_id: truck.id,
-                titulo: `Patrón inusual en unidad ${truck.placas}`,
-                descripcion: `La unidad ${truck.placas} registró ${count} cruces en la última hora, lo cual es inusual.`,
+                camion_id: data.truck.id,
+                titulo: `Patrón inusual en unidad ${data.truck.placas}`,
+                descripcion: `La unidad ${data.truck.placas} registró ${data.count} cruces en la última hora, lo cual es inusual.`,
                 tipo: 'patron_inusual',
                 prioridad: 'baja',
                 tag_relacionado: tagId
