@@ -2,11 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import MobileFleetMap from '@/components/MobileFleetMap';
 
-interface MobileDashboardProps {
-  mapboxToken: string;
-}
-
-const MobileDashboard = ({ mapboxToken }: MobileDashboardProps) => {
+const MobileDashboard = () => {
   const [alertsCount, setAlertsCount] = useState(0);
 
   useEffect(() => {
@@ -34,7 +30,7 @@ const MobileDashboard = ({ mapboxToken }: MobileDashboardProps) => {
 
   return (
     <div className="h-full">
-      <MobileFleetMap mapboxToken={mapboxToken} />
+      <MobileFleetMap />
     </div>
   );
 };

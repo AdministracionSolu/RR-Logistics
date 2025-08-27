@@ -126,7 +126,7 @@ const FleetDashboard = ({
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-96">
-                <FleetMap mapboxToken={mapboxToken} />
+                <FleetMap />
               </div>
             </CardContent>
           </Card>
