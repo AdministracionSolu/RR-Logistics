@@ -85,16 +85,7 @@ const MobileFleetMap = ({ mapboxToken }: MobileFleetMapProps) => {
     try {
       const { data: trucksData } = await supabase
         .from('camiones')
-        .select(`
-          id,
-          placas,
-          modelo,
-          tag_id,
-          saldo_actual,
-          gasto_dia_actual,
-          ultimo_cruce_timestamp,
-          estado
-        `)
+        .select('*')
         .eq('estado', 'activo')
         .not('tag_id', 'is', null);
 
@@ -119,7 +110,7 @@ const MobileFleetMap = ({ mapboxToken }: MobileFleetMapProps) => {
             .from('casetas_autopista')
             .select('lat, lng, nombre')
             .eq('id', latestEvent.caseta_id)
-            .single();
+            .maybeSingle();
           casetaCoords = casetaData;
         }
 
@@ -141,7 +132,7 @@ const MobileFleetMap = ({ mapboxToken }: MobileFleetMapProps) => {
                 .from('casetas_autopista')
                 .select('lat, lng')
                 .eq('id', event.caseta_id)
-                .single();
+                .maybeSingle();
               if (coords?.lat && coords?.lng) {
                 trailData.push({
                   ...event,
