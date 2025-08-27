@@ -8,21 +8,14 @@ import { useToast } from '@/hooks/use-toast';
 
 interface DuplicateAlert {
   id: string;
-  tag_id: string;
-  first_event: {
-    caseta_nombre: string;
-    fecha_hora: string;
-    importe: number;
-  };
-  second_event: {
-    caseta_nombre: string;
-    fecha_hora: string;
-    importe: number;
-  };
-  time_difference_minutes: number;
-  status: 'active' | 'resolved';
-  created_at: string;
+  tag_relacionado: string;
+  titulo: string;
+  descripcion: string;
+  prioridad: string;
+  estado: string;
+  timestamp: string;
   placas?: string;
+  time_difference_minutes?: number;
 }
 
 const Alertas = () => {
@@ -43,16 +36,23 @@ const Alertas = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('duplicate_charge_alerts')
+        .from('alertas')
         .select(`
           *,
           camiones!inner(placas)
         `)
-        .order('created_at', { ascending: false });
+        .eq('tipo', 'cobro_duplicado')
+        .order('timestamp', { ascending: false });
 
       if (error) throw error;
       
-      setAlerts(data || []);
+      const alertsWithPlacas = data?.map(alert => ({
+        ...alert,
+        placas: alert.camiones?.placas,
+        time_difference_minutes: alert.minutos_sin_cruce || 0
+      })) || [];
+      
+      setAlerts(alertsWithPlacas);
     } catch (error) {
       console.error('Error loading alerts:', error);
       toast({
@@ -102,32 +102,36 @@ const Alertas = () => {
             if (timeDiff <= 30) {
               // Check if alert already exists
               const { data: existingAlert } = await supabase
-                .from('duplicate_charge_alerts')
+                .from('alertas')
                 .select('id')
-                .eq('tag_id', tagId)
-                .eq('first_event->fecha_hora', event1.fecha_hora)
-                .eq('second_event->fecha_hora', event2.fecha_hora)
+                .eq('tag_relacionado', tagId)
+                .eq('tipo', 'cobro_duplicado')
+                .gte('timestamp', twoHoursAgo.toISOString())
                 .single();
 
               if (!existingAlert) {
-                // Create new alert
-                await supabase
-                  .from('duplicate_charge_alerts')
-                  .insert({
-                    tag_id: tagId,
-                    first_event: {
-                      caseta_nombre: event1.caseta_nombre,
-                      fecha_hora: event1.fecha_hora,
-                      importe: event1.importe
-                    },
-                    second_event: {
-                      caseta_nombre: event2.caseta_nombre,
-                      fecha_hora: event2.fecha_hora,
-                      importe: event2.importe
-                    },
-                    time_difference_minutes: Math.round(timeDiff),
-                    status: 'active'
-                  });
+                // Get camion_id for the tag
+                const { data: camion } = await supabase
+                  .from('camiones')
+                  .select('id')
+                  .eq('tag_id', tagId)
+                  .single();
+
+                if (camion) {
+                  // Create new alert using existing alertas table
+                  await supabase
+                    .from('alertas')
+                    .insert({
+                      camion_id: camion.id,
+                      tag_relacionado: tagId,
+                      titulo: 'Cobro duplicado detectado',
+                      descripcion: `Cobros en ${event1.caseta_nombre} y ${event2.caseta_nombre} con ${Math.round(timeDiff)} minutos de diferencia`,
+                      tipo: 'cobro_duplicado',
+                      prioridad: 'alta',
+                      estado: 'activa',
+                      minutos_sin_cruce: Math.round(timeDiff)
+                    });
+                }
               }
             }
           }
@@ -144,8 +148,11 @@ const Alertas = () => {
   const resolveAlert = async (alertId: string) => {
     try {
       const { error } = await supabase
-        .from('duplicate_charge_alerts')
-        .update({ status: 'resolved' })
+        .from('alertas')
+        .update({ 
+          estado: 'resuelta',
+          resuelto_en: new Date().toISOString()
+        })
         .eq('id', alertId);
 
       if (error) throw error;
@@ -173,8 +180,8 @@ const Alertas = () => {
     }).format(amount);
   };
 
-  const activeAlerts = alerts.filter(alert => alert.status === 'active');
-  const resolvedAlerts = alerts.filter(alert => alert.status === 'resolved');
+  const activeAlerts = alerts.filter(alert => alert.estado === 'activa');
+  const resolvedAlerts = alerts.filter(alert => alert.estado === 'resuelta');
 
   return (
     <div className="h-full overflow-auto p-4 space-y-4">
@@ -246,7 +253,7 @@ const Alertas = () => {
                   <div className="flex items-center space-x-2">
                     <AlertTriangle className="h-4 w-4 text-red-500" />
                     <span className="font-medium">
-                      {alert.placas || alert.tag_id}
+                      {alert.placas || alert.tag_relacionado}
                     </span>
                     <Badge variant="destructive">Activa</Badge>
                   </div>
@@ -261,34 +268,24 @@ const Alertas = () => {
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 text-sm">
-                  <div className="bg-white rounded p-3">
-                    <p className="font-medium">Primer cobro</p>
-                    <p className="text-muted-foreground">
-                      {alert.first_event.caseta_nombre} - {formatCurrency(alert.first_event.importe)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(alert.first_event.fecha_hora).toLocaleString('es-MX')}
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded p-3">
-                    <p className="font-medium">Segundo cobro</p>
-                    <p className="text-muted-foreground">
-                      {alert.second_event.caseta_nombre} - {formatCurrency(alert.second_event.importe)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(alert.second_event.fecha_hora).toLocaleString('es-MX')}
-                    </p>
-                  </div>
+                <div className="bg-white rounded p-3 text-sm">
+                  <p className="font-medium">{alert.titulo}</p>
+                  <p className="text-muted-foreground mt-1">
+                    {alert.descripcion}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(alert.timestamp).toLocaleString('es-MX')}
+                  </p>
                 </div>
 
-                <div className="flex items-center space-x-2 text-sm">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    Diferencia: {alert.time_difference_minutes} minutos
-                  </span>
-                </div>
+                {alert.time_difference_minutes && (
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">
+                      Diferencia: {alert.time_difference_minutes} minutos
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </CardContent>
@@ -327,17 +324,16 @@ const Alertas = () => {
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     <span className="font-medium text-sm">
-                      {alert.placas || alert.tag_id}
+                      {alert.placas || alert.tag_relacionado}
                     </span>
                     <Badge variant="secondary">Resuelta</Badge>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(alert.created_at).toLocaleDateString('es-MX')}
+                    {new Date(alert.timestamp).toLocaleDateString('es-MX')}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {alert.first_event.caseta_nombre} → {alert.second_event.caseta_nombre} 
-                  ({alert.time_difference_minutes} min)
+                  {alert.titulo} - {alert.descripcion}
                 </p>
               </div>
             ))}

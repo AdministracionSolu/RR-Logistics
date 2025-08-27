@@ -21,9 +21,10 @@ const MobileDashboard = ({ mapboxToken }: MobileDashboardProps) => {
   const loadAlertsCount = async () => {
     try {
       const { count } = await supabase
-        .from('duplicate_charge_alerts')
+        .from('alertas')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('tipo', 'cobro_duplicado')
+        .eq('estado', 'activa');
 
       setAlertsCount(count || 0);
     } catch (error) {

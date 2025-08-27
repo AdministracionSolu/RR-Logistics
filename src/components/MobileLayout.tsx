@@ -1,16 +1,40 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Map, Calendar, AlertTriangle, Settings, Bell } from 'lucide-react';
+import { Map, Calendar, AlertTriangle, Settings } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MobileLayoutProps {
   children: ReactNode;
-  alertsCount?: number;
 }
 
-const MobileLayout = ({ children, alertsCount = 0 }: MobileLayoutProps) => {
+const MobileLayout = ({ children }: MobileLayoutProps) => {
+  const [alertsCount, setAlertsCount] = useState(0);
   const location = useLocation();
+
+  useEffect(() => {
+    loadAlertsCount();
+    
+    // Update alerts count every minute
+    const interval = setInterval(loadAlertsCount, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadAlertsCount = async () => {
+    try {
+      const { count } = await supabase
+        .from('alertas')
+        .select('*', { count: 'exact', head: true })
+        .eq('tipo', 'cobro_duplicado')
+        .eq('estado', 'activa');
+
+      setAlertsCount(count || 0);
+    } catch (error) {
+      console.error('Error loading alerts count:', error);
+    }
+  };
 
   const navItems = [
     {

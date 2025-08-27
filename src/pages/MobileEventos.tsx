@@ -65,7 +65,7 @@ const MobileEventos = () => {
 
       const eventsWithPlacas = data?.map(event => ({
         ...event,
-        placas: event.camiones?.placas
+        placas: (event.camiones as any)?.placas
       })) || [];
 
       if (append) {

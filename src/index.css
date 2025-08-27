@@ -39,19 +39,12 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -101,5 +94,42 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    .truck-marker {
+      font-size: 24px !important;
+    }
+    
+    .mapboxgl-popup-content {
+      max-width: 280px;
+      font-size: 14px;
+    }
+    
+    .mapboxgl-ctrl-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .mapboxgl-ctrl-zoom-in,
+    .mapboxgl-ctrl-zoom-out {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+  }
+
+  /* Safe area for mobile devices */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Touch targets for mobile */
+  @media (max-width: 768px) {
+    button, a {
+      min-height: 44px;
+      min-width: 44px;
+    }
   }
 }

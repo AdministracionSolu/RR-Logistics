@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import ExpandedFleetDashboard from '@/components/ExpandedFleetDashboard';
+import MobileDashboard from '@/pages/MobileDashboard';
 import MapboxTokenInput from '@/components/MapboxTokenInput';
 
 const Index = () => {
@@ -20,7 +20,7 @@ const Index = () => {
     return <MapboxTokenInput onTokenSubmit={handleTokenSubmit} />;
   }
 
-  return <ExpandedFleetDashboard mapboxToken={mapboxToken} />;
+  return <MobileDashboard mapboxToken={mapboxToken} />;
 };
 
 export default Index;

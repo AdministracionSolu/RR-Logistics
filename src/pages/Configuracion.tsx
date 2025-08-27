@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Settings, MapPin, Bell, Database, Trash2, Download, RefreshCw } from 'lucide-react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const Configuracion = () => {
   const [settings, setSettings] = useState({
@@ -37,7 +37,7 @@ const Configuracion = () => {
       const [eventsCount, trucksCount, alertsCount] = await Promise.all([
         supabase.from('toll_events').select('*', { count: 'exact', head: true }),
         supabase.from('camiones').select('*', { count: 'exact', head: true }),
-        supabase.from('duplicate_charge_alerts').select('*', { count: 'exact', head: true })
+        supabase.from('alertas').select('*', { count: 'exact', head: true })
       ]);
 
       setStats({
@@ -55,9 +55,9 @@ const Configuracion = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('duplicate_charge_alerts')
+        .from('alertas')
         .delete()
-        .neq('id', '');
+        .eq('tipo', 'cobro_duplicado');
 
       if (error) throw error;
 
