@@ -8,8 +8,9 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, MapPin, Bell, Database, Trash2, Download, RefreshCw } from 'lucide-react';
+import { Settings, MapPin, Bell, Database, Trash2, Download, RefreshCw, Upload } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import FileUploader from '@/components/FileUploader';
 
 const Configuracion = () => {
   const [settings, setSettings] = useState({
@@ -261,11 +262,14 @@ const Configuracion = () => {
         </CardContent>
       </Card>
 
+      {/* File Upload */}
+      <FileUploader onUploadComplete={loadStats} />
+
       {/* Data Management */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Trash2 className="h-5 w-5" />
+            <Database className="h-5 w-5" />
             <span>Gestión de Datos</span>
           </CardTitle>
           <CardDescription>

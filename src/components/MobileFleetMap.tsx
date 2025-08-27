@@ -103,50 +103,66 @@ const MobileFleetMap = ({ mapboxToken }: MobileFleetMapProps) => {
       const trucksWithLocations: TruckLocation[] = [];
 
       for (const truck of trucksData) {
-        // Get latest toll event
+        // Get latest toll event (simplified query without joins)
         const { data: latestEvent } = await supabase
           .from('toll_events')
-          .select(`
-            fecha_hora,
-            caseta_nombre,
-            casetas_autopista (
-              lat,
-              lng,
-              nombre
-            )
-          `)
+          .select('fecha_hora, caseta_nombre, caseta_id')
           .eq('tag_id', truck.tag_id)
           .order('fecha_hora', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
+
+        // Get caseta coordinates if we have a caseta_id
+        let casetaCoords = null;
+        if (latestEvent?.caseta_id) {
+          const { data: casetaData } = await supabase
+            .from('casetas_autopista')
+            .select('lat, lng, nombre')
+            .eq('id', latestEvent.caseta_id)
+            .single();
+          casetaCoords = casetaData;
+        }
 
         // Get trail (last 3 events for mobile simplicity)
-        const { data: trailData } = await supabase
+        const { data: trailEvents } = await supabase
           .from('toll_events')
-          .select(`
-            fecha_hora,
-            caseta_nombre,
-            casetas_autopista (
-              lat,
-              lng
-            )
-          `)
+          .select('fecha_hora, caseta_nombre, caseta_id')
           .eq('tag_id', truck.tag_id)
           .gte('fecha_hora', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .order('fecha_hora', { ascending: false })
           .limit(3);
 
+        // Get coordinates for trail points
+        const trailData = [];
+        if (trailEvents) {
+          for (const event of trailEvents) {
+            if (event.caseta_id) {
+              const { data: coords } = await supabase
+                .from('casetas_autopista')
+                .select('lat, lng')
+                .eq('id', event.caseta_id)
+                .single();
+              if (coords?.lat && coords?.lng) {
+                trailData.push({
+                  ...event,
+                  ...coords
+                });
+              }
+            }
+          }
+        }
+
         const truckLocation: TruckLocation = {
           ...truck,
-          lat: latestEvent?.casetas_autopista?.lat,
-          lng: latestEvent?.casetas_autopista?.lng,
-          caseta_nombre: latestEvent?.caseta_nombre,
-          trail: trailData?.map(event => ({
-            lat: event.casetas_autopista?.lat || 0,
-            lng: event.casetas_autopista?.lng || 0,
+          lat: casetaCoords?.lat,
+          lng: casetaCoords?.lng,
+          caseta_nombre: latestEvent?.caseta_nombre || casetaCoords?.nombre,
+          trail: trailData.map(event => ({
+            lat: event.lat || 0,
+            lng: event.lng || 0,
             timestamp: event.fecha_hora,
             caseta_nombre: event.caseta_nombre
-          })).filter(point => point.lat && point.lng) || []
+          })).filter(point => point.lat && point.lng)
         };
 
         if (truckLocation.lat && truckLocation.lng) {
