@@ -23,17 +23,19 @@ const Navigation = () => {
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center px-4">
-        <div className="flex items-center space-x-2 mr-8">
+      <div className="container flex h-16 items-center px-2 sm:px-4">
+        {/* Logo and title - responsive sizing */}
+        <div className="flex items-center space-x-1 sm:space-x-2 mr-2 sm:mr-4">
           <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-md">
-            <Map className="h-5 w-5 text-primary-foreground" />
+            <Map className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
           </div>
-          <div>
-            <h1 className="text-lg font-semibold">Gestión interna</h1>
+          <div className="hidden sm:block">
+            <h1 className="text-sm sm:text-lg font-semibold">Gestión interna</h1>
           </div>
         </div>
 
-        <div className="flex items-center space-x-1">
+        {/* Navigation items - mobile optimized */}
+        <div className="flex items-center space-x-1 flex-1 justify-center sm:justify-start">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
@@ -44,19 +46,20 @@ const Navigation = () => {
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   className={cn(
-                    'flex items-center gap-2',
+                    'flex items-center gap-1 sm:gap-2 px-2 sm:px-3',
                     isActive && 'bg-primary text-primary-foreground'
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {item.label}
+                  <span className="hidden xs:inline text-xs sm:text-sm">{item.label}</span>
                 </Button>
               </Link>
             );
           })}
         </div>
 
-        <div className="ml-auto flex items-center space-x-2">
+        {/* Last update - hidden on mobile */}
+        <div className="hidden lg:flex items-center space-x-2">
           <div className="text-xs text-muted-foreground">
             Última actualización: {new Date().toLocaleTimeString('es-MX')}
           </div>

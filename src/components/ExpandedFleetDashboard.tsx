@@ -263,135 +263,146 @@ const ExpandedFleetDashboard = ({ mapboxToken }: { mapboxToken: string }) => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Gestión interna</h1>
-          <p className="text-muted-foreground">Sistema de monitoreo de flotilla por casetas</p>
-        </div>
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+      {/* Header - mobile optimized */}
+      <div className="space-y-2 sm:space-y-1">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Gestión interna</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Sistema de monitoreo de flotilla por casetas
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+      {/* Stats Cards - mobile-first responsive grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Unidades Activas</div>
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Truck className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <div className="text-xs sm:text-sm text-muted-foreground">Activas</div>
             </div>
-            <div className="text-2xl font-bold">{stats.activeTrucks}</div>
-            <div className="text-xs text-muted-foreground">de {stats.totalTrucks} total</div>
+            <div className="text-lg sm:text-2xl font-bold">{stats.activeTrucks}</div>
+            <div className="text-xs text-muted-foreground">de {stats.totalTrucks}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Cruces (1h)</div>
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <div className="text-xs sm:text-sm text-muted-foreground">Cruces 1h</div>
             </div>
-            <div className="text-2xl font-bold">{stats.eventsLastHour}</div>
+            <div className="text-lg sm:text-2xl font-bold">{stats.eventsLastHour}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Gasto Diario</div>
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <div className="text-xs sm:text-sm text-muted-foreground">Gasto Hoy</div>
             </div>
-            <div className="text-xl font-bold text-red-600">
+            <div className="text-sm sm:text-xl font-bold text-red-600">
               {formatCurrency(stats.totalDailyExpense)}
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Saldo Promedio</div>
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <div className="text-xs sm:text-sm text-muted-foreground">Saldo Prom</div>
             </div>
-            <div className="text-xl font-bold text-green-600">
+            <div className="text-sm sm:text-xl font-bold text-green-600">
               {formatCurrency(stats.averageBalance)}
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Alertas Activas</div>
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <div className="text-xs sm:text-sm text-muted-foreground">Alertas</div>
             </div>
-            <div className="text-2xl font-bold text-orange-600">{stats.alertsCount}</div>
+            <div className="text-lg sm:text-2xl font-bold text-orange-600">{stats.alertsCount}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Última Act.</div>
+          <CardContent className="p-2 sm:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <div className="text-xs sm:text-sm text-muted-foreground">Últ. Act.</div>
             </div>
-            <div className="text-sm font-medium">
+            <div className="text-xs sm:text-sm font-medium">
               {new Date().toLocaleTimeString('es-MX')}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content Tabs */}
+      {/* Main Content Tabs - mobile optimized */}
       <Tabs defaultValue="map" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="map">Mapa en Vivo</TabsTrigger>
-          <TabsTrigger value="fleet">Estado de Flota</TabsTrigger>
-          <TabsTrigger value="upload">Cargar Archivos</TabsTrigger>
-          <TabsTrigger value="history">Historial</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+          <TabsTrigger value="map" className="text-xs sm:text-sm p-2 sm:p-3">
+            <span className="hidden sm:inline">Mapa en Vivo</span>
+            <span className="sm:hidden">Mapa</span>
+          </TabsTrigger>
+          <TabsTrigger value="fleet" className="text-xs sm:text-sm p-2 sm:p-3">
+            <span className="hidden sm:inline">Estado de Flota</span>
+            <span className="sm:hidden">Flota</span>
+          </TabsTrigger>
+          <TabsTrigger value="upload" className="text-xs sm:text-sm p-2 sm:p-3">
+            <span className="hidden sm:inline">Cargar Archivos</span>
+            <span className="sm:hidden">Archivos</span>
+          </TabsTrigger>
+          <TabsTrigger value="history" className="text-xs sm:text-sm p-2 sm:p-3">
+            Historial
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="map" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Map */}
-            <div className="lg:col-span-2">
-              <Card className="h-[600px]">
-                <CardHeader>
-                  <CardTitle>Mapa de Flota</CardTitle>
-                  <CardDescription>
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+            {/* Map - mobile-first sizing */}
+            <div className="xl:col-span-2">
+              <Card className="h-[400px] sm:h-[500px] lg:h-[600px]">
+                <CardHeader className="pb-2 sm:pb-6">
+                  <CardTitle className="text-lg sm:text-xl">Mapa de Flota</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
                     Ubicaciones basadas en último cruce de caseta
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="h-[520px] p-4">
+                <CardContent className="h-[320px] sm:h-[420px] lg:h-[520px] p-2 sm:p-4">
                   <FleetMap mapboxToken={mapboxToken} />
                 </CardContent>
               </Card>
             </div>
 
-            {/* Alerts Panel */}
-            <div>
-              <Card className="h-[600px]">
-                <CardHeader>
-                  <CardTitle>Alertas Recientes</CardTitle>
+            {/* Alerts Panel - mobile responsive */}
+            <div className="xl:col-span-1">
+              <Card className="h-[400px] sm:h-[500px] lg:h-[600px]">
+                <CardHeader className="pb-2 sm:pb-6">
+                  <CardTitle className="text-lg sm:text-xl">Alertas Recientes</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 overflow-y-auto h-[520px]">
+                <CardContent className="space-y-2 sm:space-y-3 overflow-y-auto h-[320px] sm:h-[420px] lg:h-[520px]">
                   {alerts.length === 0 ? (
-                    <p className="text-center text-muted-foreground">No hay alertas activas</p>
+                    <p className="text-center text-muted-foreground text-sm">No hay alertas activas</p>
                   ) : (
                     alerts.map((alert) => (
-                      <Alert key={alert.id}>
-                        <AlertTriangle className="h-4 w-4" />
+                      <Alert key={alert.id} className="p-2 sm:p-4">
+                        <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
                         <AlertDescription>
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge variant={getPriorityColor(alert.prioridad)}>
+                          <div className="flex items-center justify-between mb-1 sm:mb-2">
+                            <Badge variant={getPriorityColor(alert.prioridad)} className="text-xs">
                               {alert.prioridad}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
                               {new Date(alert.timestamp).toLocaleString('es-MX')}
                             </span>
                           </div>
-                          <p className="font-medium">{alert.titulo}</p>
-                          <p className="text-sm">{alert.descripcion}</p>
+                          <p className="font-medium text-sm sm:text-base">{alert.titulo}</p>
+                          <p className="text-xs sm:text-sm">{alert.descripcion}</p>
                           {alert.tag_relacionado && (
                             <p className="text-xs text-muted-foreground mt-1">
                               TAG: {alert.tag_relacionado}
@@ -416,7 +427,7 @@ const ExpandedFleetDashboard = ({ mapboxToken }: { mapboxToken: string }) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {trucks.map((truck) => (
                   <Card key={truck.id} className="border">
                     <CardContent className="p-4">
