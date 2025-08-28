@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
+import { useRouteSimulation } from '@/hooks/useRouteSimulation';
+import SimulationControls from '@/components/SimulationControls';
 
 interface FleetMapProps {
   mapboxToken: string;
@@ -30,6 +32,10 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [trucks, setTrucks] = useState<any[]>([]);
+  const [selectedTruckMarker, setSelectedTruckMarker] = useState<mapboxgl.Marker | null>(null);
+  const [simulationMarker, setSimulationMarker] = useState<mapboxgl.Marker | null>(null);
+  
+  const simulation = useRouteSimulation();
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -63,6 +69,7 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
     return () => {
       map.current?.remove();
       subscription.unsubscribe();
+      simulation.cleanup();
     };
   }, [mapboxToken]);
 
@@ -184,7 +191,7 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
         el.style.cursor = 'pointer';
         el.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))';
 
-        // Enhanced popup with toll data
+        // Enhanced popup with toll data and simulation button
         const lastCrossing = truck.ultimo_cruce_timestamp 
           ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX')
           : 'Sin cruces recientes';
@@ -199,13 +206,29 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
               <p><strong>Último cruce:</strong> ${lastCrossing}</p>
               <p><strong>Saldo:</strong> $${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
               <p><strong>Gasto hoy:</strong> $${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
+              <div class="mt-3 pt-2 border-t">
+                <button 
+                  id="simulate-${truck.id}" 
+                  class="w-full px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                >
+                  🚛 Simular Recorrido
+                </button>
+              </div>
             </div>
           `);
 
-        new mapboxgl.Marker(el)
+        const marker = new mapboxgl.Marker(el)
           .setLngLat([truck.lng, truck.lat])
           .setPopup(popup)
           .addTo(map.current!);
+
+        // Add simulation button click handler
+        popup.on('open', () => {
+          const simulateBtn = document.getElementById(`simulate-${truck.id}`);
+          if (simulateBtn) {
+            simulateBtn.onclick = () => startTruckSimulation(truck);
+          }
+        });
 
         // Add trail if available
         if (truck.trail && truck.trail.length > 1) {
@@ -254,9 +277,176 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
     });
   };
 
+  const startTruckSimulation = async (truck: TruckLocation) => {
+    // Close any open popup
+    if (map.current) {
+      map.current.getCanvasContainer().querySelectorAll('.mapboxgl-popup').forEach(popup => {
+        (popup as HTMLElement).remove();
+      });
+    }
+
+    // Load truck route and start simulation
+    const routePoints = await simulation.loadTruckRoute(truck.placas, truck.tag_id);
+    
+    if (routePoints.length === 0) {
+      alert('No se encontraron datos de recorrido para este camión en las últimas 24 horas.');
+      return;
+    }
+
+    // Setup simulation callbacks
+    simulation.setCallbacks({
+      onUpdate: (currentPoint, progress) => {
+        updateSimulationMarker(currentPoint);
+        drawProgressiveLine(routePoints, Math.floor((progress / 100) * routePoints.length));
+      },
+      onComplete: () => {
+        console.log('Simulation completed');
+      }
+    });
+  };
+
+  const updateSimulationMarker = (point: { lat: number; lng: number; caseta_nombre: string }) => {
+    if (!map.current) return;
+
+    // Remove existing simulation marker
+    if (simulationMarker) {
+      simulationMarker.remove();
+    }
+
+    // Create animated simulation marker
+    const el = document.createElement('div');
+    el.className = 'simulation-marker';
+    el.innerHTML = '🚚';
+    el.style.fontSize = '24px';
+    el.style.filter = 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.8))';
+    el.style.animation = 'pulse 2s infinite';
+    
+    const marker = new mapboxgl.Marker(el)
+      .setLngLat([point.lng, point.lat])
+      .addTo(map.current);
+
+    setSimulationMarker(marker);
+  };
+
+  const drawProgressiveLine = (routePoints: Array<{ lat: number; lng: number }>, currentIndex: number) => {
+    if (!map.current || currentIndex < 1) return;
+
+    const sourceId = 'simulation-route';
+    const layerId = 'simulation-route-line';
+    const completedLayerId = 'simulation-route-completed';
+
+    // Remove existing layers and sources
+    if (map.current.getLayer(layerId)) {
+      map.current.removeLayer(layerId);
+    }
+    if (map.current.getLayer(completedLayerId)) {
+      map.current.removeLayer(completedLayerId);
+    }
+    if (map.current.getSource(sourceId)) {
+      map.current.removeSource(sourceId);
+    }
+
+    // Completed route (green line)
+    const completedCoordinates = routePoints
+      .slice(0, currentIndex + 1)
+      .map(point => [point.lng, point.lat]);
+
+    // Remaining route (gray line)  
+    const remainingCoordinates = routePoints
+      .slice(currentIndex)
+      .map(point => [point.lng, point.lat]);
+
+    // Add completed route
+    if (completedCoordinates.length > 1) {
+      map.current.addSource(`${sourceId}-completed`, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: completedCoordinates
+          }
+        }
+      });
+
+      map.current.addLayer({
+        id: completedLayerId,
+        type: 'line',
+        source: `${sourceId}-completed`,
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#10b981',
+          'line-width': 4,
+          'line-opacity': 0.8
+        }
+      });
+    }
+
+    // Add remaining route
+    if (remainingCoordinates.length > 1) {
+      map.current.addSource(sourceId, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: remainingCoordinates
+          }
+        }
+      });
+
+      map.current.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#94a3b8',
+          'line-width': 2,
+          'line-opacity': 0.5,
+          'line-dasharray': [5, 5]
+        }
+      });
+    }
+  };
+
+  // Add CSS for pulse animation
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
+      <SimulationControls
+        isPlaying={simulation.isPlaying}
+        progress={simulation.progress}
+        selectedTruck={simulation.selectedTruck}
+        onPlay={simulation.startSimulation}
+        onPause={simulation.pauseSimulation}
+        onStop={simulation.stopSimulation}
+        onRestart={simulation.restartSimulation}
+        onSpeedChange={simulation.setSpeed}
+        speed={simulation.speed}
+      />
     </div>
   );
 };
