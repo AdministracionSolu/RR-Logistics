@@ -34,6 +34,8 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
   const [trucks, setTrucks] = useState<any[]>([]);
   const [selectedTruckMarker, setSelectedTruckMarker] = useState<mapboxgl.Marker | null>(null);
   const [simulationMarker, setSimulationMarker] = useState<mapboxgl.Marker | null>(null);
+  const [simulationStartDate, setSimulationStartDate] = useState<Date | undefined>(undefined);
+  const [simulationEndDate, setSimulationEndDate] = useState<Date | undefined>(undefined);
   
   const simulation = useRouteSimulation();
 
@@ -286,10 +288,22 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
     }
 
     // Load truck route and start simulation
-    const routePoints = await simulation.loadTruckRoute(truck.placas, truck.tag_id);
+    await loadSimulationRoute(truck);
+  };
+
+  const loadSimulationRoute = async (truck: TruckLocation) => {
+    const routePoints = await simulation.loadTruckRoute(
+      truck.placas, 
+      truck.tag_id, 
+      simulationStartDate, 
+      simulationEndDate
+    );
     
     if (routePoints.length === 0) {
-      alert('No se encontraron datos de recorrido para este camión en las últimas 24 horas.');
+      const periodText = simulationStartDate && simulationEndDate 
+        ? `entre ${simulationStartDate.toLocaleDateString('es-MX')} y ${simulationEndDate.toLocaleDateString('es-MX')}`
+        : 'en el período seleccionado';
+      alert(`No se encontraron datos de recorrido para este camión ${periodText}.`);
       return;
     }
 
@@ -446,6 +460,20 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
         onRestart={simulation.restartSimulation}
         onSpeedChange={simulation.setSpeed}
         speed={simulation.speed}
+        startDate={simulationStartDate}
+        endDate={simulationEndDate}
+        onDateRangeChange={(startDate, endDate) => {
+          setSimulationStartDate(startDate);
+          setSimulationEndDate(endDate);
+        }}
+        onReloadRoute={() => {
+          if (simulation.selectedTruck && trucks.length > 0) {
+            const currentTruck = trucks.find(t => t.placas === simulation.selectedTruck);
+            if (currentTruck) {
+              loadSimulationRoute(currentTruck);
+            }
+          }
+        }}
       />
     </div>
   );

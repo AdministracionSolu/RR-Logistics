@@ -2,6 +2,7 @@ import { Play, Pause, Square, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
+import DateRangePicker from '@/components/DateRangePicker';
 
 interface SimulationControlsProps {
   isPlaying: boolean;
@@ -13,6 +14,10 @@ interface SimulationControlsProps {
   onRestart: () => void;
   onSpeedChange: (speed: number) => void;
   speed: number;
+  startDate?: Date | undefined;
+  endDate?: Date | undefined;
+  onDateRangeChange: (startDate: Date | undefined, endDate: Date | undefined) => void;
+  onReloadRoute: () => void;
 }
 
 const SimulationControls = ({
@@ -24,15 +29,40 @@ const SimulationControls = ({
   onStop,
   onRestart,
   onSpeedChange,
-  speed
+  speed,
+  startDate,
+  endDate,
+  onDateRangeChange,
+  onReloadRoute
 }: SimulationControlsProps) => {
   if (!selectedTruck) return null;
 
   return (
-    <Card className="absolute bottom-4 left-1/2 transform -translate-x-1/2 p-4 bg-background/95 backdrop-blur-sm border shadow-lg z-10 w-[90%] max-w-md">
+    <Card className="absolute bottom-4 left-1/2 transform -translate-x-1/2 p-4 bg-background/95 backdrop-blur-sm border shadow-lg z-10 w-[90%] max-w-lg">
       <div className="space-y-3">
         <div className="text-center">
           <h3 className="font-semibold text-sm">Simulación: {selectedTruck}</h3>
+        </div>
+
+        {/* Date Range Picker */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Período:</span>
+          <div className="flex gap-2">
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onDateRangeChange={onDateRangeChange}
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onReloadRoute}
+              className="h-8 px-2 text-xs"
+            >
+              Actualizar
+            </Button>
+          </div>
         </div>
         
         {/* Progress Bar */}
