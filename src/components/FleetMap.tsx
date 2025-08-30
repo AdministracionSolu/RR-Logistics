@@ -348,6 +348,7 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
     const sourceId = 'simulation-route';
     const layerId = 'simulation-route-line';
     const completedLayerId = 'simulation-route-completed';
+    const completedSourceId = `${sourceId}-completed`;
 
     // Remove existing layers and sources
     if (map.current.getLayer(layerId)) {
@@ -358,6 +359,9 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
     }
     if (map.current.getSource(sourceId)) {
       map.current.removeSource(sourceId);
+    }
+    if (map.current.getSource(completedSourceId)) {
+      map.current.removeSource(completedSourceId);
     }
 
     // Completed route (green line)
