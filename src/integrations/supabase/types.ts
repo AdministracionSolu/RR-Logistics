@@ -70,6 +70,72 @@ export type Database = {
           },
         ]
       }
+      bot_config: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          interval_minutes: number
+          last_execution: string | null
+          next_execution: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_minutes?: number
+          last_execution?: string | null
+          next_execution?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_minutes?: number
+          last_execution?: string | null
+          next_execution?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bot_execution_logs: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          error_message: string | null
+          execution_details: Json | null
+          execution_id: string
+          id: string
+          records_processed: number | null
+          start_time: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string | null
+          error_message?: string | null
+          execution_details?: Json | null
+          execution_id: string
+          id?: string
+          records_processed?: number | null
+          start_time?: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string | null
+          error_message?: string | null
+          execution_details?: Json | null
+          execution_id?: string
+          id?: string
+          records_processed?: number | null
+          start_time?: string
+          status?: string
+        }
+        Relationships: []
+      }
       camiones: {
         Row: {
           año: number | null

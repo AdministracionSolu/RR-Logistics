@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Calendar, Map, Upload, History, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, Calendar, Map, Upload, History, AlertTriangle, Bot } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -18,6 +18,12 @@ const Navigation = () => {
       label: 'Eventos',
       icon: Calendar,
       description: 'Registro y historial de cruces'
+    },
+    {
+      href: '/bot-admin',
+      label: 'Bot Admin',
+      icon: Bot,
+      description: 'Administración del bot automatizado'
     }
   ];
 

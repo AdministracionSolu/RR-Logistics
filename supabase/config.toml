@@ -59,6 +59,9 @@ template = "Your code is {{ .Code }}"
 [functions.webhook-cruces]
 verify_jwt = false
 
+[functions.pase-scraper]
+verify_jwt = false
+
 [edge_runtime]
 ip_version = "ipv4"
 policy = "per_worker"
