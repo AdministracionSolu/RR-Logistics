@@ -18,13 +18,13 @@ const Navigation = () => {
       label: 'Eventos',
       icon: Calendar,
       description: 'Registro y historial de cruces'
-    },
-    {
-      href: '/bot-admin',
-      label: 'Bot Admin',
-      icon: Bot,
-      description: 'Administración del bot automatizado'
     }
+    // {
+    //   href: '/bot-admin',
+    //   label: 'Bot Admin',
+    //   icon: Bot,
+    //   description: 'Administración del bot automatizado'
+    // }
   ];
 
   return (
