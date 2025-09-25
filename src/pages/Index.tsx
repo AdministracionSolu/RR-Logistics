@@ -41,7 +41,7 @@ const Index = () => {
                   RR Logistics
                 </h1>
                 <p className="text-xl sm:text-2xl text-primary-foreground/90 font-medium">
-                  Smart solutions for transport and logistics
+                  Soluciones inteligentes para transporte y logística
                 </p>
                 <p className="text-lg text-primary-foreground/80 max-w-xl">
                   Soluciones de software y hardware para el transporte y la logística en México
