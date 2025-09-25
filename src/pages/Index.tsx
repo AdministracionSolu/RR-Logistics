@@ -440,14 +440,7 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Contact Info</h3>
-              <div className="space-y-2 text-muted-foreground">
-                <p>contacto@rrlogistics.mx</p>
-                <p>+52 (55) 1234-5678</p>
-                <p>México</p>
-              </div>
-            </div>
+            
           </div>
 
           <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
