@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Map, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import CreateTestUsers from '@/components/CreateTestUsers';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -119,6 +120,9 @@ const Login = () => {
           
         </div>
       </div>
+      
+      {/* Componente temporal para crear usuarios de prueba */}
+      <CreateTestUsers />
     </div>;
 };
 export default Login;
