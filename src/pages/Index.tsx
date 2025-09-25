@@ -40,9 +40,7 @@ const Index = () => {
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
                   RR Logistics
                 </h1>
-                <p className="text-xl sm:text-2xl text-primary-foreground/90 font-medium">
-                  Soluciones inteligentes para transporte y logística
-                </p>
+                
                 <p className="text-lg text-primary-foreground/80 max-w-xl">
                   Soluciones de software y hardware para el transporte y la logística en México
                 </p>
@@ -92,9 +90,7 @@ const Index = () => {
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                   About RR Logistics
                 </h2>
-                <p className="text-xl text-muted-foreground">
-                  Innovating Mexican logistics industry
-                </p>
+                <p className="text-xl text-muted-foreground">Innovando en la industria</p>
               </div>
               
               <p className="text-lg leading-relaxed">
