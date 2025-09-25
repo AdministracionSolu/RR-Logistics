@@ -87,9 +87,7 @@ const Index = () => {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
             <div className="space-y-6">
               <div className="space-y-3">
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  Acerca de RR Logistics
-                </h2>
+                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Acerca de nosotros</h2>
                 <p className="text-xl text-muted-foreground">Innovando en la industria</p>
               </div>
               
