@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { LogOut, Map } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import SpotEmbed from '@/components/SpotEmbed';
 
 const DashboardB = () => {
   const { profile, signOut } = useAuth();
@@ -59,58 +60,9 @@ const DashboardB = () => {
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="container mx-auto p-4">
-        <div className="space-y-4">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold">Mapa de Seguimiento en Tiempo Real</h2>
-            <p className="text-muted-foreground">
-              Monitor de ubicaciones GPS del sistema SPOT
-            </p>
-          </div>
-
-          {/* Mapa incrustado */}
-          <div className="w-full bg-card rounded-lg border shadow-lg overflow-hidden">
-            <div className="aspect-video md:aspect-[16/10] lg:aspect-[16/9] w-full">
-              <iframe
-                src="https://maps.findmespot.com/s/K16M"
-                className="w-full h-full border-0"
-                title="Mapa SPOT en Tiempo Real"
-                loading="lazy"
-                allow="geolocation"
-              />
-            </div>
-          </div>
-
-          {/* Información adicional */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="bg-card rounded-lg p-4 border">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                Estado del Sistema
-              </h3>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Conectado</span>
-              </div>
-            </div>
-
-            <div className="bg-card rounded-lg p-4 border">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                Última Actualización
-              </h3>
-              <p className="text-sm font-medium">
-                {new Date().toLocaleString('es-MX')}
-              </p>
-            </div>
-
-            <div className="bg-card rounded-lg p-4 border">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                Tipo de Mapa
-              </h3>
-              <p className="text-sm font-medium">SPOT GPS Tracking</p>
-            </div>
-          </div>
-        </div>
+      {/* Main content - Solo el mapa */}
+      <main className="w-full h-[calc(100vh-64px)]">
+        <SpotEmbed />
       </main>
     </div>
   );

@@ -20,12 +20,12 @@ serve(async (req) => {
 
     // Create Usuario A
     const { data: userA, error: errorA } = await supabaseAdmin.auth.admin.createUser({
-      email: 'usuario.a@gestion.com',
-      password: 'contraeñaa',
+      email: 'a@solu.mx',
+      password: 'Passw0rd!A',
       email_confirm: true,
       user_metadata: {
         user_type: 'tipo_a',
-        full_name: 'Usuario A'
+        full_name: 'Usuario A - Gestión'
       }
     })
 
@@ -37,12 +37,12 @@ serve(async (req) => {
 
     // Create Usuario B
     const { data: userB, error: errorB } = await supabaseAdmin.auth.admin.createUser({
-      email: 'usuario.b@gestion.com',
-      password: 'contraseñab',
+      email: 'b@solu.mx',
+      password: 'Passw0rd!B',
       email_confirm: true,
       user_metadata: {
         user_type: 'tipo_b',
-        full_name: 'Usuario B'
+        full_name: 'Usuario B - Seguimiento'
       }
     })
 
