@@ -8,35 +8,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Map, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { signIn, user } = useAuth();
+  const {
+    signIn,
+    user
+  } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     if (user) {
       navigate('/dashboard');
     }
   }, [user, navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     if (!email || !password) {
       setError('Por favor complete todos los campos');
       setLoading(false);
       return;
     }
-
-    const { error: signInError } = await signIn(email, password);
-
+    const {
+      error: signInError
+    } = await signIn(email, password);
     if (signInError) {
       setError('Credenciales incorrectas. Verifique su email y contraseña.');
       toast({
@@ -50,12 +51,9 @@ const Login = () => {
         description: "Inicio de sesión exitoso"
       });
     }
-    
     setLoading(false);
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo y branding */}
         <div className="text-center space-y-4">
@@ -80,62 +78,31 @@ const Login = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
+              {error && <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+                </Alert>}
               
               <div className="space-y-2">
                 <Label htmlFor="email">Correo Electrónico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="usuario@empresa.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  className="h-11"
-                />
+                <Input id="email" type="email" placeholder="usuario@empresa.com" value={email} onChange={e => setEmail(e.target.value)} disabled={loading} className="h-11" />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  className="h-11"
-                />
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} disabled={loading} className="h-11" />
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-11" 
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
+              <Button type="submit" className="w-full h-11" disabled={loading}>
+                {loading ? <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Iniciando sesión...
-                  </>
-                ) : (
-                  'Iniciar Sesión'
-                )}
+                  </> : 'Iniciar Sesión'}
               </Button>
 
               {/* Botón de registro deshabilitado */}
               <div className="pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full h-11" 
-                  disabled
-                >
+                <Button type="button" variant="outline" className="w-full h-11" disabled>
                   Registrar Cuenta
                   <span className="ml-2 text-xs text-muted-foreground">(Próximamente)</span>
                 </Button>
@@ -149,13 +116,9 @@ const Login = () => {
 
         {/* Footer con información adicional */}
         <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Sistema desarrollado para Adrian Reyes y Diego Rosales
-          </p>
+          
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Login;
