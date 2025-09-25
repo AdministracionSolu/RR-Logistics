@@ -17,7 +17,7 @@ const Index = () => {
             <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">About</a>
             <a href="#solutions" className="text-sm font-medium hover:text-primary transition-colors">Solutions</a>
             <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
-            <a href="#contact" className="text-sm font-medium hover:text-primary transition-colors">Contact</a>
+            
           </nav>
 
           <Link to="/login">
