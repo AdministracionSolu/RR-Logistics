@@ -72,8 +72,8 @@ const CreateTestUsers = () => {
             )}
           </Button>
           <div className="mt-2 text-xs text-muted-foreground">
-            <p>• Usuario A: usuario.a@gestion.com / contraeñaa</p>
-            <p>• Usuario B: usuario.b@gestion.com / contraseñab</p>
+            <p>• Usuario A: a@solu.mx / Passw0rd!A</p>
+            <p>• Usuario B: b@solu.mx / Passw0rd!B</p>
           </div>
         </CardContent>
       </Card>
