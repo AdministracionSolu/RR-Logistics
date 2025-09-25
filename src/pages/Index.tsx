@@ -305,83 +305,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Client Success Stories
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Trusted by leading logistics companies across Mexico
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            <Card className="border-0 bg-gradient-to-br from-card to-muted/30 shadow-lg">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex text-accent">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
-                </div>
-                <p className="text-muted-foreground">
-                  "RR Logistics transformó completamente nuestra operación. La visibilidad 
-                  en tiempo real nos ha permitido reducir costos significativamente."
-                </p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">CA</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Cliente A</div>
-                    <div className="text-sm text-muted-foreground">Director de Operaciones</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 bg-gradient-to-br from-card to-muted/30 shadow-lg">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex text-accent">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
-                </div>
-                <p className="text-muted-foreground">
-                  "La implementación fue muy sencilla y el soporte técnico es excepcional. 
-                  Recomiendo RR Logistics a cualquier empresa de transporte."
-                </p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">CB</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Cliente B</div>
-                    <div className="text-sm text-muted-foreground">Gerente General</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 bg-gradient-to-br from-card to-muted/30 shadow-lg">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex text-accent">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
-                </div>
-                <p className="text-muted-foreground">
-                  "Los dashboards en tiempo real nos dan la información que necesitamos 
-                  para tomar decisiones rápidas y efectivas."
-                </p>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">CC</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Cliente C</div>
-                    <div className="text-sm text-muted-foreground">Director de Logística</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Call to Action */}
       <section className="py-24 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
@@ -398,9 +322,7 @@ const Index = () => {
                   Log In <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10">
-                Contact Sales
-              </Button>
+              
             </div>
           </div>
         </div>
