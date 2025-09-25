@@ -38,27 +38,41 @@ const SpotEmbed = () => {
   }
 
   return (
-    <iframe
-      src={spotUrl}
-      title="SPOT live map"
-      loading="lazy"
-      referrerPolicy="no-referrer"
-      style={{ border: 0, width: '100%', height: 'calc(100vh - 64px)' }}
-      allowFullScreen
-      onError={handleIframeError}
-      onLoad={(e) => {
-        // Check if iframe loaded correctly
-        try {
-          const iframe = e.currentTarget;
-          // If we can't access the contentWindow, it might be blocked
-          if (!iframe.contentWindow) {
+    <div 
+      style={{ 
+        height: 'calc(100vh - 64px)', 
+        overflow: 'hidden', 
+        position: 'relative',
+        width: '100%'
+      }}
+    >
+      <iframe
+        src={spotUrl}
+        title="SPOT live map"
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        style={{ 
+          border: 0, 
+          width: '100%', 
+          height: 'calc(100vh - 64px + 80px)', // Extra height to push bottom bar out of view
+          marginTop: '-20px' // Push content up to hide any top elements if needed
+        }}
+        allowFullScreen
+        onError={handleIframeError}
+        onLoad={(e) => {
+          // Check if iframe loaded correctly
+          try {
+            const iframe = e.currentTarget;
+            // If we can't access the contentWindow, it might be blocked
+            if (!iframe.contentWindow) {
+              setHasError(true);
+            }
+          } catch (error) {
             setHasError(true);
           }
-        } catch (error) {
-          setHasError(true);
-        }
-      }}
-    />
+        }}
+      />
+    </div>
   );
 };
 
