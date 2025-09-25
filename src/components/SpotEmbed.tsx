@@ -55,7 +55,7 @@ const SpotEmbed = () => {
           border: 0, 
           width: '100%', 
           height: 'calc(100vh - 64px + 80px)', // Extra height to push bottom bar out of view
-          marginTop: '-20px' // Push content up to hide any top elements if needed
+          marginBottom: '-80px' // Push bottom content down to hide the yellow bar
         }}
         allowFullScreen
         onError={handleIframeError}
