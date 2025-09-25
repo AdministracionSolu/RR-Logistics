@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
+import Index from "./pages/Index";
 import Login from "./pages/Login";
 import DashboardA from "./pages/DashboardA";
 import DashboardB from "./pages/DashboardB";
@@ -78,7 +79,7 @@ const App = () => (
                 </div>
               </ProtectedRoute>
             } />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Index />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
