@@ -2,24 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Truck, 
-  Satellite, 
-  Monitor, 
-  Code, 
-  MapPin, 
-  Shield, 
-  BarChart3,
-  CheckCircle,
-  Star,
-  ArrowRight,
-  Menu,
-  X
-} from 'lucide-react';
-
+import { Truck, Satellite, Monitor, Code, MapPin, Shield, BarChart3, CheckCircle, Star, ArrowRight, Menu, X } from 'lucide-react';
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4 mx-auto max-w-7xl">
@@ -335,9 +320,7 @@ const Index = () => {
             <Card className="border-0 bg-gradient-to-br from-card to-muted/30 shadow-lg">
               <CardContent className="p-6 space-y-4">
                 <div className="flex text-accent">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
                 </div>
                 <p className="text-muted-foreground">
                   "RR Logistics transformó completamente nuestra operación. La visibilidad 
@@ -358,9 +341,7 @@ const Index = () => {
             <Card className="border-0 bg-gradient-to-br from-card to-muted/30 shadow-lg">
               <CardContent className="p-6 space-y-4">
                 <div className="flex text-accent">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
                 </div>
                 <p className="text-muted-foreground">
                   "La implementación fue muy sencilla y el soporte técnico es excepcional. 
@@ -381,9 +362,7 @@ const Index = () => {
             <Card className="border-0 bg-gradient-to-br from-card to-muted/30 shadow-lg">
               <CardContent className="p-6 space-y-4">
                 <div className="flex text-accent">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
                 </div>
                 <p className="text-muted-foreground">
                   "Los dashboards en tiempo real nos dan la información que necesitamos 
@@ -408,9 +387,7 @@ const Index = () => {
       <section className="py-24 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
         <div className="container mx-auto max-w-7xl px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Empieza a transformar tu operación logística hoy mismo
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Empieza a transformar tu operación hoy mismo</h2>
             <p className="text-xl text-primary-foreground/90">
               Únete a las empresas líderes que ya confían en RR Logistics para 
               modernizar sus operaciones de transporte y logística en México.
@@ -478,8 +455,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
