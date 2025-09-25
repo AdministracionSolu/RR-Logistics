@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +22,7 @@ const CreateTestUsers = () => {
       const result = await response.json();
 
       if (result.success) {
+        localStorage.setItem('seededUsers', 'true');
         toast({
           title: "Usuarios creados exitosamente",
           description: `Usuario A: ${result.users.userA}, Usuario B: ${result.users.userB}`,
@@ -43,6 +44,13 @@ const CreateTestUsers = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem('seededUsers')) {
+      createUsers();
+    }
+  }, []);
+
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
