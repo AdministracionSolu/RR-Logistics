@@ -245,15 +245,7 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-accent flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold mb-1">Optimización de Rutas y Costos</h3>
-                    <p className="text-muted-foreground">
-                      Algoritmos inteligentes para eficiencia operativa máxima
-                    </p>
-                  </div>
-                </div>
+                
 
                 <div className="flex items-start space-x-4">
                   <CheckCircle className="h-6 w-6 text-accent flex-shrink-0 mt-0.5" />
@@ -331,9 +323,7 @@ const Index = () => {
                 </div>
                 <span className="text-xl font-bold">RR Logistics</span>
               </div>
-              <p className="text-muted-foreground">
-                Smart solutions for transport and logistics in Mexico.
-              </p>
+              
             </div>
 
             <div className="space-y-4">
@@ -345,14 +335,7 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="font-semibold">Soporte</h3>
-              <div className="space-y-2">
-                <a href="#contact" className="block text-muted-foreground hover:text-foreground transition-colors">Contacto</a>
-                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Centro de Ayuda</a>
-                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Documentación</a>
-              </div>
-            </div>
+            
 
             
           </div>
