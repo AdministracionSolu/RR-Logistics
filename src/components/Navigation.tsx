@@ -2,14 +2,26 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Calendar, Map, Upload, History, AlertTriangle, Bot } from 'lucide-react';
+import { LayoutDashboard, Calendar, Map, Upload, History, AlertTriangle, Bot, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const Navigation = () => {
   const location = useLocation();
+  const { profile, signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Sesión cerrada",
+      description: "Ha cerrado sesión exitosamente"
+    });
+  };
 
   const navItems = [
     {
-      href: '/',
+      href: '/dashboard-a',
       label: 'Dashboard',
       icon: LayoutDashboard,
       description: 'Vista general de la flota'
@@ -65,11 +77,21 @@ const Navigation = () => {
           })}
         </div>
 
-        {/* Last update - hidden on mobile */}
-        <div className="hidden lg:flex items-center space-x-2">
-          <div className="text-xs text-muted-foreground">
-            Última actualización: {new Date().toLocaleTimeString('es-MX')}
+        {/* User info and logout */}
+        <div className="flex items-center space-x-2">
+          <div className="hidden md:flex flex-col items-end">
+            <span className="text-xs font-medium">{profile?.full_name || profile?.email}</span>
+            <span className="text-xs text-muted-foreground">Usuario A</span>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="flex items-center gap-1"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline text-xs">Salir</span>
+          </Button>
         </div>
       </div>
     </nav>
