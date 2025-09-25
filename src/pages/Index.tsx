@@ -165,9 +165,7 @@ const Index = () => {
                   <Satellite className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold">Rastreo Satelital</h3>
-                <p className="text-muted-foreground">
-                  Monitoreo GPS en tiempo real de toda tu flotilla con precisión y confiabilidad.
-                </p>
+                <p className="text-muted-foreground">Monitoreo en tiempo real de toda tu flotilla con precisión y confiabilidad.</p>
               </CardContent>
             </Card>
 
