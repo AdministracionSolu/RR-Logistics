@@ -137,17 +137,17 @@ serve(async (req) => {
       .update({
         status: 'error',
         end_time: new Date().toISOString(),
-        error_message: error.message,
+        error_message: error instanceof Error ? error.message : String(error),
         execution_details: {
-          error: error.message,
-          stack: error.stack
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
         }
       })
       .eq('execution_id', executionId);
 
     return new Response(JSON.stringify({
       success: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       executionId
     }), {
       status: 500,
