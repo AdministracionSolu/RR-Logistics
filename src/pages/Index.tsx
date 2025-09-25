@@ -14,14 +14,14 @@ const Index = () => {
           </div>
           
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">About</a>
-            <a href="#solutions" className="text-sm font-medium hover:text-primary transition-colors">Solutions</a>
-            <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
+            <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">Nosotros</a>
+            <a href="#solutions" className="text-sm font-medium hover:text-primary transition-colors">Soluciones</a>
+            <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Características</a>
             
           </nav>
 
           <Link to="/login">
-            <Button className="hidden md:flex">Log In</Button>
+            <Button className="hidden md:flex">Iniciar Sesión</Button>
           </Link>
 
           <Button variant="ghost" size="sm" className="md:hidden">
@@ -49,7 +49,7 @@ const Index = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/login">
                   <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-white text-primary hover:bg-white/90">
-                    Log In <ArrowRight className="ml-2 h-4 w-4" />
+                    Iniciar Sesión <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 
@@ -88,7 +88,7 @@ const Index = () => {
             <div className="space-y-6">
               <div className="space-y-3">
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  About RR Logistics
+                  Acerca de RR Logistics
                 </h2>
                 <p className="text-xl text-muted-foreground">Innovando en la industria</p>
               </div>
@@ -102,11 +102,11 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-6 pt-6">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">500+</div>
-                  <div className="text-sm text-muted-foreground">Vehicles Tracked</div>
+                  <div className="text-sm text-muted-foreground">Vehículos Rastreados</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary">50+</div>
-                  <div className="text-sm text-muted-foreground">Happy Clients</div>
+                  <div className="text-sm text-muted-foreground">Clientes Satisfechos</div>
                 </div>
               </div>
             </div>
@@ -128,15 +128,15 @@ const Index = () => {
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <Truck className="h-5 w-5 text-primary" />
-                      <span className="text-sm">Fleet Management Active</span>
+                      <span className="text-sm">Gestión de Flotilla Activa</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <MapPin className="h-5 w-5 text-accent" />
-                      <span className="text-sm">Real-time Location Tracking</span>
+                      <span className="text-sm">Rastreo de Ubicación en Tiempo Real</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Shield className="h-5 w-5 text-primary" />
-                      <span className="text-sm">Security Monitoring</span>
+                      <span className="text-sm">Monitoreo de Seguridad</span>
                     </div>
                   </div>
                 </CardContent>
@@ -151,10 +151,10 @@ const Index = () => {
         <div className="container mx-auto max-w-7xl px-4">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Our Solutions
+              Nuestras Soluciones
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive technology solutions for modern logistics operations
+              Soluciones tecnológicas integrales para operaciones logísticas modernas
             </p>
           </div>
 
@@ -176,7 +176,7 @@ const Index = () => {
                 <div className="mx-auto w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
                   <Code className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="text-xl font-semibold">Hardware Integration</h3>
+                <h3 className="text-xl font-semibold">Integración de Hardware</h3>
                 <p className="text-muted-foreground">
                   Integración de sensores y dispositivos IoT para monitoreo avanzado.
                 </p>
@@ -217,10 +217,10 @@ const Index = () => {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  Key Benefits
+                  Beneficios Clave
                 </h2>
                 <p className="text-xl text-muted-foreground">
-                  Transform your logistics operations with our advanced features
+                  Transforma tus operaciones logísticas con nuestras características avanzadas
                 </p>
               </div>
 
@@ -274,19 +274,19 @@ const Index = () => {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="text-center space-y-2">
                       <div className="text-2xl font-bold text-accent">24/7</div>
-                      <div className="text-sm text-muted-foreground">Monitoring</div>
+                      <div className="text-sm text-muted-foreground">Monitoreo</div>
                     </div>
                     <div className="text-center space-y-2">
                       <div className="text-2xl font-bold text-primary">99.9%</div>
-                      <div className="text-sm text-muted-foreground">Uptime</div>
+                      <div className="text-sm text-muted-foreground">Disponibilidad</div>
                     </div>
                     <div className="text-center space-y-2">
                       <div className="text-2xl font-bold text-accent">-30%</div>
-                      <div className="text-sm text-muted-foreground">Costs</div>
+                      <div className="text-sm text-muted-foreground">Costos</div>
                     </div>
                     <div className="text-center space-y-2">
                       <div className="text-2xl font-bold text-primary">+40%</div>
-                      <div className="text-sm text-muted-foreground">Efficiency</div>
+                      <div className="text-sm text-muted-foreground">Eficiencia</div>
                     </div>
                   </div>
                 </CardContent>
@@ -311,7 +311,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/login">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-white text-primary hover:bg-white/90">
-                  Log In <ArrowRight className="ml-2 h-4 w-4" />
+                  Iniciar Sesión <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               
@@ -337,20 +337,20 @@ const Index = () => {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold">Company</h3>
+              <h3 className="font-semibold">Empresa</h3>
               <div className="space-y-2">
-                <a href="#about" className="block text-muted-foreground hover:text-foreground transition-colors">About</a>
-                <a href="#solutions" className="block text-muted-foreground hover:text-foreground transition-colors">Solutions</a>
-                <a href="#features" className="block text-muted-foreground hover:text-foreground transition-colors">Features</a>
+                <a href="#about" className="block text-muted-foreground hover:text-foreground transition-colors">Nosotros</a>
+                <a href="#solutions" className="block text-muted-foreground hover:text-foreground transition-colors">Soluciones</a>
+                <a href="#features" className="block text-muted-foreground hover:text-foreground transition-colors">Características</a>
               </div>
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold">Support</h3>
+              <h3 className="font-semibold">Soporte</h3>
               <div className="space-y-2">
-                <a href="#contact" className="block text-muted-foreground hover:text-foreground transition-colors">Contact</a>
-                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Help Center</a>
-                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Documentation</a>
+                <a href="#contact" className="block text-muted-foreground hover:text-foreground transition-colors">Contacto</a>
+                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Centro de Ayuda</a>
+                <a href="#" className="block text-muted-foreground hover:text-foreground transition-colors">Documentación</a>
               </div>
             </div>
 
