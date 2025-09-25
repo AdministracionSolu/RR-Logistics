@@ -102,15 +102,7 @@ const Login = () => {
               </Button>
 
               {/* Botón de registro deshabilitado */}
-              <div className="pt-4">
-                <Button type="button" variant="outline" className="w-full h-11" disabled>
-                  Registrar Cuenta
-                  <span className="ml-2 text-xs text-muted-foreground">(Próximamente)</span>
-                </Button>
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                  Los accesos se gestionan internamente
-                </p>
-              </div>
+              
             </form>
           </CardContent>
         </Card>
