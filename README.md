@@ -1,4 +1,4 @@
-# RR Logistics - Sistema de Gestión de Flotilla
+# RR Logistics - Por Adrian Reyes y Diego Rosales
 
 Sistema profesional de monitoreo y gestión de flotilla con dashboards personalizados y seguimiento GPS en tiempo real para operaciones logísticas eficientes.
 
@@ -126,7 +126,6 @@ Para configurar una nueva URL de embed:
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Crear Pull Request
 
-## Licencia
 
 Este proyecto es propietario de RR Logistics. Todos los derechos reservados.
 
