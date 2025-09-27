@@ -1,69 +1,135 @@
-# Gestión Flotilla - Sistema de Monitoreo
+# RR Logistics - Sistema de Gestión de Flotilla
 
-Sistema de gestión y monitoreo de flotilla con dashboards específicos por usuario y seguimiento GPS en tiempo real.
+Sistema profesional de monitoreo y gestión de flotilla con dashboards personalizados y seguimiento GPS en tiempo real para operaciones logísticas eficientes.
 
-## Credenciales de Usuario (Desarrollo)
+## Características Principales
 
-### Usuario A - Gestión Completa
-- **Email:** a@solu.mx
-- **Password:** Passw0rd!A
-- **Acceso:** Dashboard completo con casetas, alertas, rastro y saldo actual
+- **Monitoreo GPS en Tiempo Real**: Seguimiento continuo de vehículos con tecnología SPOT GPS
+- **Dashboards Personalizados**: Interfaces adaptadas según el tipo de usuario y permisos
+- **Sistema de Alertas**: Notificaciones automáticas para eventos críticos
+- **Gestión de Casetas**: Control y seguimiento de pagos de peaje
+- **Reportes y Analytics**: Análisis detallado de rutas y rendimiento de flotilla
+- **Control de Acceso**: Sistema robusto de autenticación y autorización
 
-### Usuario B - Solo Seguimiento
-- **Email:** b@solu.mx  
-- **Password:** Passw0rd!B
-- **Acceso:** Dashboard con mapa SPOT GPS únicamente
+## Arquitectura Técnica
 
-## Cómo Ejecutar Localmente
+- **Frontend**: React 18 + TypeScript + Tailwind CSS
+- **Backend**: Supabase (Autenticación, Base de Datos, Edge Functions)
+- **Mapas**: Mapbox GL + Integración SPOT GPS
+- **Estado**: React Query para gestión de datos
+- **UI**: Sistema de componentes personalizado con Radix UI
 
-1. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
+## Instalación y Configuración
 
-2. **Configurar variables de entorno:**
-   - El proyecto ya está configurado con Supabase
-   - Las credenciales están en los secrets de Supabase
+### Prerrequisitos
+- Node.js 18+ o Bun
+- Cuenta de Supabase configurada
+- Token de Mapbox (opcional para funciones avanzadas)
 
-3. **Ejecutar en desarrollo:**
-   ```bash
-   npm run dev
-   ```
+### Instalación
+```bash
+# Clonar el repositorio
+git clone [URL_DEL_REPOSITORIO]
+cd rr-logistics-system
 
-4. **Crear usuarios de prueba:**
-   - Ir a `/login`
-   - Usar el botón "Crear Usuarios de Prueba"
-   - Esto creará ambos usuarios automáticamente
+# Instalar dependencias
+npm install
+# o usando Bun
+bun install
+```
+
+### Variables de Entorno
+```bash
+# Configurar variables de entorno
+cp .env.example .env
+
+# Editar .env con las credenciales correspondientes:
+# - Supabase URL y API Key
+# - Mapbox Token (si se requiere)
+```
+
+### Ejecutar en Desarrollo
+```bash
+npm run dev
+# o
+bun dev
+```
+
+El sistema estará disponible en `http://localhost:8080`
 
 ## Estructura de Usuarios
 
-- **Tipo A (`tipo_a`)**: Acceso completo al sistema de gestión
-- **Tipo B (`tipo_b`)**: Solo acceso al mapa de seguimiento GPS
+### Administrador Completo (Tipo A)
+- Acceso completo al sistema de gestión
+- Dashboard con casetas, alertas, rastro y saldo
+- Administración de eventos y configuración de bots
+- **Credenciales de desarrollo**: a@solu.mx / Passw0rd!A
 
-## Configuración del Mapa SPOT
+### Usuario de Seguimiento (Tipo B)  
+- Acceso limitado solo al mapa de seguimiento GPS
+- Dashboard simplificado con vista SPOT GPS
+- **Credenciales de desarrollo**: b@solu.mx / Passw0rd!B
 
-El mapa GPS está incrustado desde: `https://maps.findmespot.com/s/K16M`
+## Rutas del Sistema
 
-**Para cambiar la URL del embed:**
-1. Editar el archivo `src/components/SpotEmbed.tsx`
-2. Modificar la variable `spotUrl` con la nueva URL
-3. El sistema incluye fallback automático si el mapa no se puede cargar
+- `/` → Página principal con información corporativa
+- `/login` → Autenticación de usuarios
+- `/dashboard-a` → Panel completo (Tipo A únicamente)
+- `/dashboard-b` → Panel de seguimiento (Tipo B únicamente)
+- `/eventos` → Gestión de eventos (Tipo A únicamente)
+- `/bot-admin` → Administración de bots (Tipo A únicamente)
 
-## Arquitectura
+## Seguridad
 
-- **Frontend:** React + TypeScript + Tailwind CSS
-- **Backend:** Supabase (Auth, Database, Edge Functions)
-- **Autenticación:** Supabase Auth con roles personalizados
-- **Mapas:** Mapbox GL para Dashboard A, SPOT GPS para Dashboard B
+- Autenticación basada en Supabase Auth
+- Rutas protegidas con verificación de roles
+- Row Level Security (RLS) en base de datos
+- Validación de tipos con TypeScript
+- Sanitización de datos de entrada
 
-## Rutas Protegidas
+## Desarrollo
 
-- `/` → Redirige a `/login`
-- `/login` → Página de inicio de sesión
-- `/dashboard-a` → Solo usuarios tipo A
-- `/dashboard-b` → Solo usuarios tipo B
-- `/eventos` → Solo usuarios tipo A
-- `/bot-admin` → Solo usuarios tipo A
+### Estructura del Proyecto
+```
+src/
+├── components/          # Componentes reutilizables
+│   ├── ui/             # Sistema de componentes base
+│   └── ...             # Componentes específicos
+├── hooks/              # Hooks personalizados
+├── pages/              # Páginas principales
+├── integrations/       # Integraciones externas
+└── lib/                # Utilidades y configuración
+```
 
-Todos los dashboards requieren autenticación y verifican permisos automáticamente.
+### Comandos Disponibles
+```bash
+npm run dev          # Servidor de desarrollo
+npm run build        # Construcción para producción
+npm run preview      # Vista previa de producción
+npm run lint         # Análisis de código
+```
 
+## Integración GPS
+
+El sistema integra mapas SPOT GPS desde `https://maps.findmespot.com/s/K16M`
+
+Para configurar una nueva URL de embed:
+1. Editar `src/components/SpotEmbed.tsx`
+2. Actualizar la variable `spotUrl`
+3. El sistema incluye fallback automático para errores de carga
+
+## Contribución
+
+1. Fork del repositorio
+2. Crear rama para feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit de cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crear Pull Request
+
+## Licencia
+
+Este proyecto es propietario de RR Logistics. Todos los derechos reservados.
+
+## Soporte
+
+Para soporte técnico o consultas sobre el sistema, contactar al equipo de desarrollo.
