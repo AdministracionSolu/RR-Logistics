@@ -57,16 +57,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         // Fetch profile when user signs in
         if (session?.user) {
-          setTimeout(async () => {
-            const profileData = await fetchProfile(session.user.id);
-            setProfile(profileData);
-            setLoading(false);
+          setTimeout(() => {
+            fetchProfile(session.user.id).then((profileData) => {
+              setProfile(profileData);
+              setLoading(false);
+            });
           }, 0);
         } else {
           setProfile(null);
@@ -103,17 +104,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      // Clear local session tokens to avoid server dependency (prevents 403 loop)
+      // Clear local session tokens to avoid server dependency (prevents 403)
       await supabase.auth.signOut({ scope: 'local' });
     } catch (error) {
       console.error('Error during local signOut:', error);
     } finally {
-      // Ensure local state is cleared and navigate to login
+      // Ensure local state is cleared; ProtectedRoute will redirect
       setUser(null);
       setSession(null);
       setProfile(null);
       setLoading(false);
-      window.location.href = '/login';
     }
   };
 

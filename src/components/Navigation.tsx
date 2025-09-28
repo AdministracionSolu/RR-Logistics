@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Calendar, Map, Bot, LogOut } from 'lucide-react';
@@ -10,6 +10,7 @@ const Navigation = () => {
   const location = useLocation();
   const { profile, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -17,6 +18,7 @@ const Navigation = () => {
       title: "Sesión cerrada",
       description: "Ha cerrado sesión exitosamente"
     });
+    navigate('/login', { replace: true });
   };
 
   const navItems = [

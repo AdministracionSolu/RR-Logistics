@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { LogOut, Map } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SpotEmbed from '@/components/SpotEmbed';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardB = () => {
   const { profile, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -15,6 +17,7 @@ const DashboardB = () => {
       title: "Sesión cerrada",
       description: "Ha cerrado sesión exitosamente"
     });
+    navigate('/login', { replace: true });
   };
 
   // Verificar que el usuario tenga acceso a este dashboard
