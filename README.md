@@ -28,19 +28,6 @@
 
 El sistema estará disponible en `http://localhost:8080`
 
-## Estructura de Usuarios
-
-### Administrador Completo (Tipo A)
-- Acceso completo al sistema de gestión
-- Dashboard con casetas, alertas, rastro y saldo
-- Administración de eventos y configuración de bots
-- **Credenciales de desarrollo**: a@solu.mx / Passw0rd!A
-
-### Usuario de Seguimiento (Tipo B)  
-- Acceso limitado solo al mapa de seguimiento GPS
-- Dashboard simplificado con vista SPOT GPS
-- **Credenciales de desarrollo**: b@solu.mx / Passw0rd!B
-
 ## Rutas del Sistema
 
 - `/` → Página principal con información corporativa
