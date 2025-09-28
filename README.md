@@ -3,8 +3,8 @@
 
 ## Características Principales
 
-- **Monitoreo GPS en Tiempo Real**: Seguimiento continuo de vehículos con tecnología SPOT GPS
-- **Dashboards Personalizados**: Interfaces adaptadas según el tipo de usuario y permisos
+- **Monitoreo GPS en Tiempo Real**: Seguimiento continuo de activos
+- **Dashboards Personalizados**: Interfaces adaptadas
 - **Sistema de Alertas**: Notificaciones automáticas para eventos críticos
 - **Gestión de Casetas**: Control y seguimiento de pagos de peaje
 - **Reportes y Analytics**: Análisis detallado de rutas y rendimiento de flotilla
