@@ -25,34 +25,6 @@
 - Cuenta de Supabase configurada
 - Token de Mapbox (opcional para funciones avanzadas)
 
-### Instalación
-```bash
-# Clonar el repositorio
-git clone [URL_DEL_REPOSITORIO]
-cd rr-logistics-system
-
-# Instalar dependencias
-npm install
-# o usando Bun
-bun install
-```
-
-### Variables de Entorno
-```bash
-# Configurar variables de entorno
-cp .env.example .env
-
-# Editar .env con las credenciales correspondientes:
-# - Supabase URL y API Key
-# - Mapbox Token (si se requiere)
-```
-
-### Ejecutar en Desarrollo
-```bash
-npm run dev
-# o
-bun dev
-```
 
 El sistema estará disponible en `http://localhost:8080`
 
@@ -108,26 +80,7 @@ npm run preview      # Vista previa de producción
 npm run lint         # Análisis de código
 ```
 
-## Integración GPS
-
-El sistema integra mapas SPOT GPS desde `https://maps.findmespot.com/s/K16M`
-
-Para configurar una nueva URL de embed:
-1. Editar `src/components/SpotEmbed.tsx`
-2. Actualizar la variable `spotUrl`
-3. El sistema incluye fallback automático para errores de carga
-
-## Contribución
-
-1. Fork del repositorio
-2. Crear rama para feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit de cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear Pull Request
 
 
 Este proyecto es propietario de RR Logistics. Todos los derechos reservados.
 
-## Soporte
-
-Para soporte técnico o consultas sobre el sistema, contactar al equipo de desarrollo.
