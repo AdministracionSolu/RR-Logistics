@@ -103,18 +103,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      // Try to sign out from Supabase
-      await supabase.auth.signOut();
+      // Clear local session tokens to avoid server dependency (prevents 403 loop)
+      await supabase.auth.signOut({ scope: 'local' });
     } catch (error) {
-      console.error('Error during signOut:', error);
+      console.error('Error during local signOut:', error);
     } finally {
-      // Always clear local state and redirect, even if server logout fails
+      // Ensure local state is cleared and navigate to login
       setUser(null);
       setSession(null);
       setProfile(null);
       setLoading(false);
-      
-      // Force navigation to login page
       window.location.href = '/login';
     }
   };
