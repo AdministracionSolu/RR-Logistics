@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Map, AlertCircle } from 'lucide-react';
+import { Loader2, Map, AlertCircle, Home } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import CreateTestUsers from '@/components/CreateTestUsers';
 const Login = () => {
@@ -56,6 +56,19 @@ const Login = () => {
   };
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
+        {/* Home button */}
+        <div className="flex justify-start mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <Home className="h-4 w-4" />
+            Inicio
+          </Button>
+        </div>
+
         {/* Logo y branding */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
