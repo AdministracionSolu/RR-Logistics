@@ -3,7 +3,7 @@
 
 ## Características Principales
 
-- **Monitoreo GPS en Tiempo Real**: Seguimiento continuo de activos
+- **Monitoreo en Tiempo Real**: Seguimiento continuo de activos
 - **Dashboards Personalizados**: Interfaces adaptadas
 - **Sistema de Alertas**: Notificaciones automáticas para eventos críticos
 - **Gestión de Casetas**: Control y seguimiento de pagos de peaje
