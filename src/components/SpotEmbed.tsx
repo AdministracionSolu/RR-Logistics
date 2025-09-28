@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ExternalLink, AlertTriangle } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const SpotEmbed = () => {
   const [hasError, setHasError] = useState(false);
+  const isMobile = useIsMobile();
   const spotUrl = 'https://maps.findmespot.com/s/K16M';
 
   const handleIframeError = () => {
@@ -53,9 +55,10 @@ const SpotEmbed = () => {
         referrerPolicy="no-referrer"
         style={{ 
           border: 0, 
-          width: 'calc(100% + 60px)', // Extra width to push left menu out of view
-          height: 'calc(100vh - 64px + 80px)', // Extra height to push bottom bar out of view
-          marginLeft: '-60px', // Push left content (hamburger menu) out of view
+          width: isMobile ? 'calc(100% + 80px)' : 'calc(100% + 60px)', // Extra width to push left menu out of view
+          height: isMobile ? 'calc(100vh - 64px + 120px)' : 'calc(100vh - 64px + 80px)', // Extra height to push header/bottom out of view
+          marginLeft: isMobile ? '-80px' : '-60px', // Push left content out of view
+          marginTop: isMobile ? '-80px' : '0px', // Push SPOT header out of view on mobile
           marginBottom: '-80px' // Push bottom content down to hide the yellow bar
         }}
         allowFullScreen
@@ -71,20 +74,6 @@ const SpotEmbed = () => {
           } catch (error) {
             setHasError(true);
           }
-        }}
-      />
-      
-      {/* Overlay to hide any remaining left menu elements */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '50px',
-          height: '100%',
-          backgroundColor: 'transparent',
-          pointerEvents: 'none',
-          zIndex: 10
         }}
       />
     </div>
