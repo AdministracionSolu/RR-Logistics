@@ -53,8 +53,9 @@ const SpotEmbed = () => {
         referrerPolicy="no-referrer"
         style={{ 
           border: 0, 
-          width: '100%', 
+          width: 'calc(100% + 60px)', // Extra width to push left menu out of view
           height: 'calc(100vh - 64px + 80px)', // Extra height to push bottom bar out of view
+          marginLeft: '-60px', // Push left content (hamburger menu) out of view
           marginBottom: '-80px' // Push bottom content down to hide the yellow bar
         }}
         allowFullScreen
@@ -70,6 +71,20 @@ const SpotEmbed = () => {
           } catch (error) {
             setHasError(true);
           }
+        }}
+      />
+      
+      {/* Overlay to hide any remaining left menu elements */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '50px',
+          height: '100%',
+          backgroundColor: 'transparent',
+          pointerEvents: 'none',
+          zIndex: 10
         }}
       />
     </div>
