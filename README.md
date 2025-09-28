@@ -1,6 +1,5 @@
 # RR Logistics - Por Adrian Reyes y Diego Rosales
 
-Sistema profesional de monitoreo y gestión de flotilla con dashboards personalizados y seguimiento GPS en tiempo real para operaciones logísticas eficientes.
 
 ## Características Principales
 
