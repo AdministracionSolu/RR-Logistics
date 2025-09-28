@@ -14,7 +14,6 @@
 
 - **Frontend**: React 18 + TypeScript + Tailwind CSS
 - **Backend**: Supabase (Autenticación, Base de Datos, Edge Functions)
-- **Mapas**: Mapbox GL + Integración SPOT GPS
 - **Estado**: React Query para gestión de datos
 - **UI**: Sistema de componentes personalizado con Radix UI
 
