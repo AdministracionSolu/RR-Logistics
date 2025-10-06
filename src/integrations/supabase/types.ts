@@ -265,6 +265,42 @@ export type Database = {
         }
         Relationships: []
       }
+      checkpoints: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: number
+          lat: number
+          lng: number
+          name: string
+          radius_m: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: number
+          lat: number
+          lng: number
+          name: string
+          radius_m?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: number
+          lat?: number
+          lng?: number
+          name?: string
+          radius_m?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conductores: {
         Row: {
           created_at: string
@@ -383,6 +419,45 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string
+          id: number
+          lat: number
+          lng: number
+          meta: Json | null
+          ref_id: number | null
+          ref_type: string | null
+          ts: string
+          type: string
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          lat: number
+          lng: number
+          meta?: Json | null
+          ref_id?: number | null
+          ref_type?: string | null
+          ts: string
+          type: string
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          lat?: number
+          lng?: number
+          meta?: Json | null
+          ref_id?: number | null
+          ref_type?: string | null
+          ts?: string
+          type?: string
+          unit_id?: string
+        }
+        Relationships: []
+      }
       movimiento_rastros: {
         Row: {
           camion_id: string
@@ -437,6 +512,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notify_rules: {
+        Row: {
+          channel: Json
+          conditions: Json | null
+          created_at: string
+          enabled: boolean
+          id: number
+          name: string
+          target_id: number
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          channel: Json
+          conditions?: Json | null
+          created_at?: string
+          enabled?: boolean
+          id?: number
+          name: string
+          target_id: number
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          channel?: Json
+          conditions?: Json | null
+          created_at?: string
+          enabled?: boolean
+          id?: number
+          name?: string
+          target_id?: number
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      positions: {
+        Row: {
+          altitude: number | null
+          created_at: string
+          id: number
+          lat: number
+          lng: number
+          processed: boolean
+          raw: Json
+          ts: string
+          unit_id: string
+        }
+        Insert: {
+          altitude?: number | null
+          created_at?: string
+          id?: number
+          lat: number
+          lng: number
+          processed?: boolean
+          raw: Json
+          ts: string
+          unit_id: string
+        }
+        Update: {
+          altitude?: number | null
+          created_at?: string
+          id?: number
+          lat?: number
+          lng?: number
+          processed?: boolean
+          raw?: Json
+          ts?: string
+          unit_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -503,6 +650,36 @@ export type Database = {
           nombre?: string
           origen?: string
           tiempo_estimado_hrs?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sectors: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: number
+          name: string
+          polygon: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: number
+          name: string
+          polygon: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: number
+          name?: string
+          polygon?: Json
           updated_at?: string
         }
         Relationships: []
@@ -642,6 +819,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      unit_states: {
+        Row: {
+          entered_at: string | null
+          id: number
+          is_inside: boolean
+          last_seen: string | null
+          ref_id: number
+          ref_type: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          entered_at?: string | null
+          id?: number
+          is_inside?: boolean
+          last_seen?: string | null
+          ref_id: number
+          ref_type: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          entered_at?: string | null
+          id?: number
+          is_inside?: boolean
+          last_seen?: string | null
+          ref_id?: number
+          ref_type?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
