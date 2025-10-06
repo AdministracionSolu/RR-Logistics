@@ -32,6 +32,7 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [trucks, setTrucks] = useState<any[]>([]);
+  const [sectors, setSectors] = useState<any[]>([]);
   const [selectedTruckMarker, setSelectedTruckMarker] = useState<mapboxgl.Marker | null>(null);
   const [simulationMarker, setSimulationMarker] = useState<mapboxgl.Marker | null>(null);
   const [simulationStartDate, setSimulationStartDate] = useState<Date | undefined>(undefined);
@@ -53,6 +54,11 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
 
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+    // Load sectors once map style is loaded
+    map.current.on('load', () => {
+      loadSectors();
+    });
+
     // Cargar camiones
     loadTrucks();
 
@@ -68,12 +74,175 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
       )
       .subscribe();
 
+    // Subscribe to sectors changes
+    const sectorsSubscription = supabase
+      .channel('sectors_changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'sectors' },
+        () => {
+          loadSectors();
+        }
+      )
+      .subscribe();
+
     return () => {
       map.current?.remove();
       subscription.unsubscribe();
+      sectorsSubscription.unsubscribe();
       simulation.cleanup();
     };
   }, [mapboxToken]);
+
+  const loadSectors = async () => {
+    try {
+      const { data: sectorsData, error } = await supabase
+        .from('sectors')
+        .select('*')
+        .eq('enabled', true);
+
+      if (error) {
+        console.error('Error loading sectors:', error);
+        return;
+      }
+
+      setSectors(sectorsData || []);
+      
+      // Draw sectors on map
+      if (map.current && sectorsData) {
+        drawSectors(sectorsData);
+      }
+    } catch (error) {
+      console.error('Error loading sectors:', error);
+    }
+  };
+
+  const drawSectors = (sectorsData: any[]) => {
+    if (!map.current) return;
+
+    // Remove existing sector layers
+    sectorsData.forEach(sector => {
+      const fillLayerId = `sector-fill-${sector.id}`;
+      const outlineLayerId = `sector-outline-${sector.id}`;
+      const labelLayerId = `sector-label-${sector.id}`;
+      
+      if (map.current!.getLayer(fillLayerId)) {
+        map.current!.removeLayer(fillLayerId);
+      }
+      if (map.current!.getLayer(outlineLayerId)) {
+        map.current!.removeLayer(outlineLayerId);
+      }
+      if (map.current!.getLayer(labelLayerId)) {
+        map.current!.removeLayer(labelLayerId);
+      }
+      if (map.current!.getSource(`sector-${sector.id}`)) {
+        map.current!.removeSource(`sector-${sector.id}`);
+      }
+    });
+
+    // Draw each sector
+    sectorsData.forEach(sector => {
+      const sourceId = `sector-${sector.id}`;
+      
+      // Add source
+      map.current!.addSource(sourceId, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {
+            name: sector.name,
+            id: sector.id
+          },
+          geometry: sector.polygon
+        }
+      });
+
+      // Add fill layer (semi-transparent)
+      map.current!.addLayer({
+        id: `sector-fill-${sector.id}`,
+        type: 'fill',
+        source: sourceId,
+        paint: {
+          'fill-color': '#3b82f6',
+          'fill-opacity': 0.15
+        }
+      });
+
+      // Add outline layer
+      map.current!.addLayer({
+        id: `sector-outline-${sector.id}`,
+        type: 'line',
+        source: sourceId,
+        paint: {
+          'line-color': '#2563eb',
+          'line-width': 2,
+          'line-opacity': 0.8
+        }
+      });
+
+      // Calculate center point for label
+      const coordinates = sector.polygon.coordinates[0];
+      const centerLng = coordinates.reduce((sum: number, coord: number[]) => sum + coord[0], 0) / coordinates.length;
+      const centerLat = coordinates.reduce((sum: number, coord: number[]) => sum + coord[1], 0) / coordinates.length;
+
+      // Add label source
+      map.current!.addSource(`sector-label-${sector.id}`, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {
+            name: sector.name
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [centerLng, centerLat]
+          }
+        }
+      });
+
+      // Add label layer
+      map.current!.addLayer({
+        id: `sector-label-${sector.id}`,
+        type: 'symbol',
+        source: `sector-label-${sector.id}`,
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+          'text-size': 12,
+          'text-offset': [0, 0],
+          'text-anchor': 'center'
+        },
+        paint: {
+          'text-color': '#1e40af',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 2
+        }
+      });
+
+      // Add click handler for popup
+      map.current!.on('click', `sector-fill-${sector.id}`, (e) => {
+        const coordinates = [centerLng, centerLat] as [number, number];
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(`
+            <div class="p-3">
+              <h3 class="font-bold text-lg">${sector.name}</h3>
+              <p class="text-sm text-gray-600">Checkpoint poligonal</p>
+              <p class="text-xs mt-2">El sistema detecta entrada/salida de unidades en esta zona</p>
+            </div>
+          `)
+          .addTo(map.current!);
+      });
+
+      // Change cursor on hover
+      map.current!.on('mouseenter', `sector-fill-${sector.id}`, () => {
+        map.current!.getCanvas().style.cursor = 'pointer';
+      });
+      
+      map.current!.on('mouseleave', `sector-fill-${sector.id}`, () => {
+        map.current!.getCanvas().style.cursor = '';
+      });
+    });
+  };
 
   const loadTrucks = async () => {
     try {
