@@ -118,17 +118,31 @@ serve(async (req) => {
     let eventsCreated = 0;
 
     for (const pos of positions) {
-      // Process checkpoints
+    // Process checkpoints
       if (checkpoints) {
         for (const checkpoint of checkpoints) {
-          const distance = haversine(
-            parseFloat(pos.lat),
-            parseFloat(pos.lng),
-            parseFloat(checkpoint.lat),
-            parseFloat(checkpoint.lng)
-          );
+          let isInside = false;
 
-          const isInside = distance <= checkpoint.radius_m;
+          // Check geometry type
+          if (checkpoint.geometry_type === 'circle') {
+            // Circular checkpoint
+            const distance = haversine(
+              parseFloat(pos.lat),
+              parseFloat(pos.lng),
+              parseFloat(checkpoint.lat),
+              parseFloat(checkpoint.lng)
+            );
+            isInside = distance <= checkpoint.radius_m;
+          } else if (checkpoint.geometry_type === 'polygon') {
+            // Polygonal checkpoint
+            const polygon = checkpoint.polygon?.coordinates?.[0] || checkpoint.polygon;
+            if (polygon) {
+              isInside = pointInPolygon(
+                [parseFloat(pos.lng), parseFloat(pos.lat)],
+                polygon
+              );
+            }
+          }
 
           // Get current state
           const { data: state } = await supabase
@@ -149,7 +163,10 @@ serve(async (req) => {
               lat: pos.lat,
               lng: pos.lng,
               ts: pos.ts,
-              meta: { checkpoint_name: checkpoint.name, distance },
+              meta: { 
+                checkpoint_name: checkpoint.name, 
+                geometry_type: checkpoint.geometry_type 
+              },
             });
 
             // Update state
@@ -173,7 +190,10 @@ serve(async (req) => {
               lat: pos.lat,
               lng: pos.lng,
               ts: pos.ts,
-              meta: { checkpoint_name: checkpoint.name, distance },
+              meta: { 
+                checkpoint_name: checkpoint.name, 
+                geometry_type: checkpoint.geometry_type 
+              },
             });
 
             // Update state

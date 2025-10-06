@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/integrations/supabase/client';
 import { useRouteSimulation } from '@/hooks/useRouteSimulation';
 import SimulationControls from '@/components/SimulationControls';
+import { drawCheckpoints } from '@/components/gestion/drawCheckpointsHelper';
 
 interface FleetMapProps {
   mapboxToken: string;
@@ -33,6 +34,7 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [trucks, setTrucks] = useState<any[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
+  const [checkpoints, setCheckpoints] = useState<any[]>([]);
   const [selectedTruckMarker, setSelectedTruckMarker] = useState<mapboxgl.Marker | null>(null);
   const [simulationMarker, setSimulationMarker] = useState<mapboxgl.Marker | null>(null);
   const [simulationStartDate, setSimulationStartDate] = useState<Date | undefined>(undefined);
@@ -54,9 +56,10 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
 
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    // Load sectors once map style is loaded
+    // Load sectors and checkpoints once map style is loaded
     map.current.on('load', () => {
       loadSectors();
+      loadCheckpoints();
     });
 
     // Cargar camiones
@@ -85,10 +88,22 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
       )
       .subscribe();
 
+    // Subscribe to checkpoints changes
+    const checkpointsSubscription = supabase
+      .channel('checkpoints_changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'checkpoints' },
+        () => {
+          loadCheckpoints();
+        }
+      )
+      .subscribe();
+
     return () => {
       map.current?.remove();
       subscription.unsubscribe();
       sectorsSubscription.unsubscribe();
+      checkpointsSubscription.unsubscribe();
       simulation.cleanup();
     };
   }, [mapboxToken]);
@@ -113,6 +128,29 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
       }
     } catch (error) {
       console.error('Error loading sectors:', error);
+    }
+  };
+
+  const loadCheckpoints = async () => {
+    try {
+      const { data: checkpointsData, error } = await supabase
+        .from('checkpoints')
+        .select('*')
+        .eq('enabled', true);
+
+      if (error) {
+        console.error('Error loading checkpoints:', error);
+        return;
+      }
+
+      setCheckpoints(checkpointsData || []);
+      
+      // Draw checkpoints on map
+      if (map.current && checkpointsData) {
+        drawCheckpoints(map.current, checkpointsData);
+      }
+    } catch (error) {
+      console.error('Error loading checkpoints:', error);
     }
   };
 
@@ -226,8 +264,8 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
           .setHTML(`
             <div class="p-3">
               <h3 class="font-bold text-lg">${sector.name}</h3>
-              <p class="text-sm text-gray-600">Checkpoint poligonal</p>
-              <p class="text-xs mt-2">El sistema detecta entrada/salida de unidades en esta zona</p>
+              <p class="text-sm text-gray-600">Sector (Ruta de Camiones)</p>
+              <p class="text-xs mt-2">Define la ruta operativa de los camiones</p>
             </div>
           `)
           .addTo(map.current!);

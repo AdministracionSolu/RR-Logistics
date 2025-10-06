@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Circle, Pentagon } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -26,9 +28,11 @@ import {
 interface Checkpoint {
   id: number;
   name: string;
-  lat: number;
-  lng: number;
-  radius_m: number;
+  lat: number | null;
+  lng: number | null;
+  radius_m: number | null;
+  polygon: any;
+  geometry_type: 'circle' | 'polygon';
   enabled: boolean;
   created_at: string;
 }
@@ -37,11 +41,13 @@ const CheckpointsManager = () => {
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [geometryType, setGeometryType] = useState<'circle' | 'polygon'>('circle');
   const [formData, setFormData] = useState({
     name: '',
     lat: '',
     lng: '',
     radius_m: '100',
+    polygon: '',
     enabled: true,
   });
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -55,7 +61,10 @@ const CheckpointsManager = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCheckpoints(data || []);
+      setCheckpoints(data?.map(cp => ({
+        ...cp,
+        geometry_type: cp.geometry_type as 'circle' | 'polygon'
+      })) || []);
     } catch (error) {
       console.error('Error loading checkpoints:', error);
       toast({
@@ -76,13 +85,34 @@ const CheckpointsManager = () => {
     e.preventDefault();
 
     try {
-      const checkpointData = {
+      let checkpointData: any = {
         name: formData.name,
-        lat: parseFloat(formData.lat),
-        lng: parseFloat(formData.lng),
-        radius_m: parseInt(formData.radius_m),
+        geometry_type: geometryType,
         enabled: formData.enabled,
       };
+
+      if (geometryType === 'circle') {
+        checkpointData.lat = parseFloat(formData.lat);
+        checkpointData.lng = parseFloat(formData.lng);
+        checkpointData.radius_m = parseInt(formData.radius_m);
+        checkpointData.polygon = null;
+      } else {
+        // Parse polygon coordinates
+        try {
+          const polygon = JSON.parse(formData.polygon);
+          checkpointData.polygon = polygon;
+          checkpointData.lat = null;
+          checkpointData.lng = null;
+          checkpointData.radius_m = null;
+        } catch (parseError) {
+          toast({
+            title: 'Error',
+            description: 'El formato del polígono no es válido. Use formato GeoJSON',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
 
       if (editingId) {
         const { error } = await supabase
@@ -124,11 +154,13 @@ const CheckpointsManager = () => {
 
   const handleEdit = (checkpoint: Checkpoint) => {
     setEditingId(checkpoint.id);
+    setGeometryType(checkpoint.geometry_type);
     setFormData({
       name: checkpoint.name,
-      lat: checkpoint.lat.toString(),
-      lng: checkpoint.lng.toString(),
-      radius_m: checkpoint.radius_m.toString(),
+      lat: checkpoint.lat?.toString() || '',
+      lng: checkpoint.lng?.toString() || '',
+      radius_m: checkpoint.radius_m?.toString() || '100',
+      polygon: checkpoint.polygon ? JSON.stringify(checkpoint.polygon, null, 2) : '',
       enabled: checkpoint.enabled,
     });
     setDialogOpen(true);
@@ -167,8 +199,10 @@ const CheckpointsManager = () => {
       lat: '',
       lng: '',
       radius_m: '100',
+      polygon: '',
       enabled: true,
     });
+    setGeometryType('circle');
     setEditingId(null);
   };
 
@@ -176,10 +210,15 @@ const CheckpointsManager = () => {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Gestión de Checkpoints
-          </CardTitle>
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Gestión de Checkpoints
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Puntos de interés específicos (circulares o áreas poligonales)
+            </p>
+          </div>
           <Dialog open={dialogOpen} onOpenChange={(open) => {
             setDialogOpen(open);
             if (!open) resetForm();
@@ -206,40 +245,86 @@ const CheckpointsManager = () => {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="lat">Latitud</Label>
-                    <Input
-                      id="lat"
-                      type="number"
-                      step="any"
-                      value={formData.lat}
-                      onChange={(e) => setFormData({ ...formData, lat: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lng">Longitud</Label>
-                    <Input
-                      id="lng"
-                      type="number"
-                      step="any"
-                      value={formData.lng}
-                      onChange={(e) => setFormData({ ...formData, lng: e.target.value })}
-                      required
-                    />
-                  </div>
+
+                <div className="space-y-3">
+                  <Label>Tipo de Geometría</Label>
+                  <RadioGroup 
+                    value={geometryType} 
+                    onValueChange={(value) => setGeometryType(value as 'circle' | 'polygon')}
+                    disabled={!!editingId}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="circle" id="circle" />
+                      <Label htmlFor="circle" className="flex items-center gap-2 font-normal cursor-pointer">
+                        <Circle className="h-4 w-4" />
+                        Punto Circular
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="polygon" id="polygon" />
+                      <Label htmlFor="polygon" className="flex items-center gap-2 font-normal cursor-pointer">
+                        <Pentagon className="h-4 w-4" />
+                        Área Poligonal
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="radius">Radio (metros)</Label>
-                  <Input
-                    id="radius"
-                    type="number"
-                    value={formData.radius_m}
-                    onChange={(e) => setFormData({ ...formData, radius_m: e.target.value })}
-                    required
-                  />
-                </div>
+
+                {geometryType === 'circle' ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="lat">Latitud</Label>
+                        <Input
+                          id="lat"
+                          type="number"
+                          step="any"
+                          value={formData.lat}
+                          onChange={(e) => setFormData({ ...formData, lat: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lng">Longitud</Label>
+                        <Input
+                          id="lng"
+                          type="number"
+                          step="any"
+                          value={formData.lng}
+                          onChange={(e) => setFormData({ ...formData, lng: e.target.value })}
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="radius">Radio (metros)</Label>
+                      <Input
+                        id="radius"
+                        type="number"
+                        value={formData.radius_m}
+                        onChange={(e) => setFormData({ ...formData, radius_m: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="polygon">Polígono (GeoJSON)</Label>
+                    <Textarea
+                      id="polygon"
+                      value={formData.polygon}
+                      onChange={(e) => setFormData({ ...formData, polygon: e.target.value })}
+                      placeholder='{"type":"Polygon","coordinates":[[[lng,lat],[lng,lat],...]]}'
+                      rows={6}
+                      required
+                      className="font-mono text-xs"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Use formato GeoJSON. Ejemplo: Polygon con array de coordenadas [lng, lat]
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="enabled"
@@ -275,8 +360,8 @@ const CheckpointsManager = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead className="hidden md:table-cell">Coordenadas</TableHead>
-              <TableHead className="hidden sm:table-cell">Radio (m)</TableHead>
+              <TableHead className="hidden sm:table-cell">Tipo</TableHead>
+              <TableHead className="hidden md:table-cell">Detalles</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -285,10 +370,27 @@ const CheckpointsManager = () => {
             {checkpoints.map((checkpoint) => (
               <TableRow key={checkpoint.id}>
                 <TableCell className="font-medium">{checkpoint.name}</TableCell>
-                <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                  {checkpoint.lat.toFixed(4)}, {checkpoint.lng.toFixed(4)}
+                <TableCell className="hidden sm:table-cell">
+                  <div className="flex items-center gap-2">
+                    {checkpoint.geometry_type === 'circle' ? (
+                      <>
+                        <Circle className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm">Circular</span>
+                      </>
+                    ) : (
+                      <>
+                        <Pentagon className="h-4 w-4 text-purple-600" />
+                        <span className="text-sm">Polígono</span>
+                      </>
+                    )}
+                  </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">{checkpoint.radius_m}</TableCell>
+                <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                  {checkpoint.geometry_type === 'circle' 
+                    ? `${checkpoint.lat?.toFixed(4)}, ${checkpoint.lng?.toFixed(4)} (${checkpoint.radius_m}m)`
+                    : 'Área poligonal'
+                  }
+                </TableCell>
                 <TableCell>
                   {checkpoint.enabled ? (
                     <span className="text-green-600">Activo</span>

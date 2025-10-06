@@ -270,33 +270,39 @@ export type Database = {
           created_at: string
           created_by: string | null
           enabled: boolean
+          geometry_type: string
           id: number
-          lat: number
-          lng: number
+          lat: number | null
+          lng: number | null
           name: string
-          radius_m: number
+          polygon: Json | null
+          radius_m: number | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           created_by?: string | null
           enabled?: boolean
+          geometry_type?: string
           id?: number
-          lat: number
-          lng: number
+          lat?: number | null
+          lng?: number | null
           name: string
-          radius_m?: number
+          polygon?: Json | null
+          radius_m?: number | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           created_by?: string | null
           enabled?: boolean
+          geometry_type?: string
           id?: number
-          lat?: number
-          lng?: number
+          lat?: number | null
+          lng?: number | null
           name?: string
-          radius_m?: number
+          polygon?: Json | null
+          radius_m?: number | null
           updated_at?: string
         }
         Relationships: []
