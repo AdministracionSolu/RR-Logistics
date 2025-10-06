@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import DashboardA from "./pages/DashboardA";
 import DashboardB from "./pages/DashboardB";
+import Gestion from "./pages/Gestion";
 import Eventos from "./pages/Eventos";
 import BotAdmin from "./pages/BotAdmin";
 import NotFound from "./pages/NotFound";
@@ -59,6 +60,11 @@ const App = () => (
             <Route path="/dashboard-b" element={
               <ProtectedRoute allowedUserTypes={['tipo_b']}>
                 <DashboardB />
+              </ProtectedRoute>
+            } />
+            <Route path="/gestion" element={
+              <ProtectedRoute allowedUserTypes={['tipo_b']}>
+                <Gestion />
               </ProtectedRoute>
             } />
             <Route path="/eventos" element={

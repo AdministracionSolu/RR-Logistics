@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { LogOut, Map } from 'lucide-react';
+import { LogOut, Map, Activity } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SpotEmbed from '@/components/SpotEmbed';
 import { useNavigate } from 'react-router-dom';
@@ -47,9 +47,18 @@ const DashboardB = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground hidden md:inline">
               Bienvenido, {profile?.full_name || profile?.email}
             </span>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => navigate('/gestion')}
+              className="flex items-center gap-2"
+            >
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">Gestión</span>
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -57,7 +66,7 @@ const DashboardB = () => {
               className="flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
-              Cerrar Sesión
+              <span className="hidden sm:inline">Cerrar Sesión</span>
             </Button>
           </div>
         </div>
