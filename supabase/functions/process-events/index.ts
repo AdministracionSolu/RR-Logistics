@@ -36,6 +36,42 @@ function pointInPolygon(point: [number, number], polygon: number[][]): boolean {
   return inside;
 }
 
+// Helper to create event and trigger notification
+async function createEventWithNotification(
+  supabase: any,
+  eventData: any
+): Promise<void> {
+  const { data: newEvent, error: eventError } = await supabase
+    .from('events')
+    .insert(eventData)
+    .select()
+    .single();
+
+  if (eventError) {
+    console.error('Error creating event:', eventError);
+    return;
+  }
+
+  if (newEvent) {
+    console.log(`Created event: ${eventData.type} for unit ${eventData.unit_id}`);
+    
+    // Trigger notification asynchronously
+    try {
+      const { error: notifyError } = await supabase.functions.invoke('send-notification', {
+        body: { event_id: newEvent.id }
+      });
+      
+      if (notifyError) {
+        console.error(`Failed to trigger notification for event ${newEvent.id}:`, notifyError);
+      } else {
+        console.log(`Notification triggered for event ${newEvent.id}`);
+      }
+    } catch (notifyError) {
+      console.error(`Error invoking send-notification:`, notifyError);
+    }
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -105,7 +141,7 @@ serve(async (req) => {
 
           if (isInside && (!state || !state.is_inside)) {
             // Enter event
-            await supabase.from('events').insert({
+            await createEventWithNotification(supabase, {
               unit_id: pos.unit_id,
               type: 'checkpoint_enter',
               ref_id: checkpoint.id,
@@ -127,10 +163,9 @@ serve(async (req) => {
             });
 
             eventsCreated++;
-            console.log(`Created checkpoint_enter for ${pos.unit_id} at ${checkpoint.name}`);
           } else if (!isInside && state?.is_inside) {
             // Exit event
-            await supabase.from('events').insert({
+            await createEventWithNotification(supabase, {
               unit_id: pos.unit_id,
               type: 'checkpoint_exit',
               ref_id: checkpoint.id,
@@ -152,7 +187,6 @@ serve(async (req) => {
             });
 
             eventsCreated++;
-            console.log(`Created checkpoint_exit for ${pos.unit_id} from ${checkpoint.name}`);
           } else if (isInside && state?.is_inside && state.entered_at) {
             // Check for dwell
             const dwellMinutes =
@@ -172,7 +206,7 @@ serve(async (req) => {
                 .single();
 
               if (!recentDwell) {
-                await supabase.from('events').insert({
+                await createEventWithNotification(supabase, {
                   unit_id: pos.unit_id,
                   type: 'dwell',
                   ref_id: checkpoint.id,
@@ -184,7 +218,6 @@ serve(async (req) => {
                 });
 
                 eventsCreated++;
-                console.log(`Created dwell event for ${pos.unit_id} at ${checkpoint.name}`);
               }
             }
 
@@ -222,7 +255,7 @@ serve(async (req) => {
 
             if (isInside && (!state || !state.is_inside)) {
               // Enter event
-              await supabase.from('events').insert({
+              await createEventWithNotification(supabase, {
                 unit_id: pos.unit_id,
                 type: 'sector_enter',
                 ref_id: sector.id,
@@ -244,10 +277,9 @@ serve(async (req) => {
               });
 
               eventsCreated++;
-              console.log(`Created sector_enter for ${pos.unit_id} in ${sector.name}`);
             } else if (!isInside && state?.is_inside) {
               // Exit event
-              await supabase.from('events').insert({
+              await createEventWithNotification(supabase, {
                 unit_id: pos.unit_id,
                 type: 'sector_exit',
                 ref_id: sector.id,
@@ -269,7 +301,6 @@ serve(async (req) => {
               });
 
               eventsCreated++;
-              console.log(`Created sector_exit for ${pos.unit_id} from ${sector.name}`);
             }
           } catch (err) {
             console.error(`Error processing sector ${sector.name}:`, err);
