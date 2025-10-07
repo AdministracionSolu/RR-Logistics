@@ -33,9 +33,25 @@ interface Sector {
 }
 
 // Componente separado para renderizar sectores en el mapa
+const toPositions = (polygon: any): [number, number][] | null => {
+  try {
+    if (!polygon || polygon.type !== 'Polygon' || !Array.isArray(polygon.coordinates) || !Array.isArray(polygon.coordinates[0])) return null;
+    const ring = polygon.coordinates[0].filter((coord: any) =>
+      Array.isArray(coord) &&
+      coord.length >= 2 &&
+      Number.isFinite(Number(coord[0])) &&
+      Number.isFinite(Number(coord[1]))
+    );
+    if (ring.length < 3) return null;
+    return ring.map((coord: number[]) => [Number(coord[1]), Number(coord[0])] as [number, number]);
+  } catch {
+    return null;
+  }
+};
+
 const SectorPolygons = ({ sectors }: { sectors: Sector[] }) => {
   const validSectors = useMemo(
-    () => sectors.filter((s) => s.enabled && s.polygon?.coordinates?.[0]),
+    () => sectors.filter((s) => s.enabled && toPositions(s.polygon)),
     [sectors]
   );
 
@@ -44,9 +60,8 @@ const SectorPolygons = ({ sectors }: { sectors: Sector[] }) => {
   return (
     <>
       {validSectors.map((sector) => {
-        const positions: [number, number][] = sector.polygon.coordinates[0].map(
-          (coord: number[]) => [coord[1], coord[0]] as [number, number]
-        );
+        const positions = toPositions(sector.polygon);
+        if (!positions) return null;
         return (
           <Polygon
             key={`sector-${sector.id}`}

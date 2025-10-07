@@ -44,6 +44,23 @@ const truckIcon = L.divIcon({
   popupAnchor: [0, -15],
 });
 
+// Helper: safely convert GeoJSON Polygon to Leaflet positions
+const toPositions = (polygon: any): [number, number][] | null => {
+  try {
+    if (!polygon || polygon.type !== 'Polygon' || !Array.isArray(polygon.coordinates) || !Array.isArray(polygon.coordinates[0])) return null;
+    const ring = polygon.coordinates[0].filter((coord: any) =>
+      Array.isArray(coord) &&
+      coord.length >= 2 &&
+      Number.isFinite(Number(coord[0])) &&
+      Number.isFinite(Number(coord[1]))
+    );
+    if (ring.length < 3) return null;
+    return ring.map((coord: number[]) => [Number(coord[1]), Number(coord[0])] as [number, number]);
+  } catch {
+    return null;
+  }
+};
+
 // Component to handle map updates
 const MapUpdater = ({ center }: { center: [number, number] }) => {
   const map = useMap();
@@ -241,10 +258,8 @@ const FleetMap = () => {
 
         {/* Render Sectors */}
         {sectors.map((sector) => {
-          if (!sector.polygon?.coordinates?.[0]) return null;
-          const positions: [number, number][] = sector.polygon.coordinates[0].map(
-            (coord: number[]) => [coord[1], coord[0]]
-          );
+          const positions = toPositions(sector.polygon);
+          if (!positions) return null;
           return (
             <Polygon
               key={sector.id}
@@ -291,10 +306,9 @@ const FleetMap = () => {
                 </Popup>
               </Circle>
             );
-          } else if (checkpoint.geometry_type === 'polygon' && checkpoint.polygon?.coordinates?.[0]) {
-            const positions: [number, number][] = checkpoint.polygon.coordinates[0].map(
-              (coord: number[]) => [coord[1], coord[0]]
-            );
+          } else if (checkpoint.geometry_type === 'polygon') {
+            const positions = toPositions(checkpoint.polygon);
+            if (!positions) return null;
             return (
               <Polygon
                 key={checkpoint.id}
