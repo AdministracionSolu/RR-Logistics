@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, Polygon, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,20 +60,17 @@ const toPositions = (polygon: any): [number, number][] | null => {
   }
 };
 
-// Component to handle map updates
-const MapUpdater = ({ center }: { center: [number, number] }) => {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
-  return null;
-};
 
 const FleetMap = () => {
+  const [isClient, setIsClient] = useState(false);
   const [trucks, setTrucks] = useState<TruckLocation[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [checkpoints, setCheckpoints] = useState<any[]>([]);
   const [mapCenter, setMapCenter] = useState<[number, number]>([19.4326, -99.1332]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const {
     isPlaying,
@@ -240,9 +237,18 @@ const FleetMap = () => {
     startSimulation();
   };
 
+  if (!isClient) {
+    return (
+      <div className="w-full h-full min-h-[400px] rounded-lg bg-muted flex items-center justify-center">
+        <p className="text-muted-foreground">Cargando mapa...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full">
       <MapContainer
+        key={`${mapCenter[0]}-${mapCenter[1]}`}
         center={mapCenter}
         zoom={10}
         className="w-full h-full rounded-lg"
@@ -252,7 +258,6 @@ const FleetMap = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapUpdater center={mapCenter} />
 
         {/* Render Sectors */}
         {sectors.map((sector) => {
