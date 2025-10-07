@@ -1,14 +1,14 @@
-import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { LogOut, Map, Activity, MapPin, Box, Bell } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import EventsPanel from '@/components/gestion/EventsPanel';
 import CheckpointsManager from '@/components/gestion/CheckpointsManager';
 import SectorsManager from '@/components/gestion/SectorsManager';
 import NotifyRulesManager from '@/components/gestion/NotifyRulesManager';
+import FleetMap from '@/components/FleetMap';
 
 const Gestion = () => {
   const { profile, signOut } = useAuth();
@@ -39,83 +39,111 @@ const Gestion = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center space-x-4">
+        <div className="container flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/dashboard-b')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5 sm:gap-2"
             >
-              <Map className="h-4 w-4" />
-              Volver al Mapa
+              <Map className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">Volver</span>
             </Button>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-md">
-                <Activity className="h-5 w-5 text-primary-foreground" />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-md">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
               </div>
-              <h1 className="text-lg font-semibold">Gestión</h1>
+              <h1 className="text-base sm:text-lg font-semibold">Gestión</h1>
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-muted-foreground hidden sm:inline">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline">
               {profile?.full_name || profile?.email}
             </span>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Cerrar Sesión</span>
+              <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline text-xs sm:text-sm">Cerrar Sesión</span>
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="container mx-auto p-4 md:p-6">
-        <Tabs defaultValue="events" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="events" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">Eventos</span>
-            </TabsTrigger>
-            <TabsTrigger value="checkpoints" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">Checkpoints</span>
-            </TabsTrigger>
-            <TabsTrigger value="sectors" className="flex items-center gap-2">
-              <Box className="h-4 w-4" />
-              <span className="hidden sm:inline">Sectores</span>
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Notificaciones</span>
-            </TabsTrigger>
-          </TabsList>
+      {/* Map Section */}
+      <section className="w-full h-[40vh] sm:h-[45vh] md:h-[50vh] border-b">
+        <FleetMap />
+      </section>
 
-          <TabsContent value="events" className="space-y-4">
-            <EventsPanel />
-          </TabsContent>
+      {/* Management Sections */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="container mx-auto p-3 sm:p-4 md:p-6">
+          <Accordion type="multiple" defaultValue={["eventos"]} className="w-full space-y-3 sm:space-y-4">
+            <AccordionItem value="eventos" className="border rounded-lg bg-card shadow-sm">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-blue-500/10 rounded-md">
+                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold">Eventos</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <EventsPanel />
+              </AccordionContent>
+            </AccordionItem>
 
-          <TabsContent value="checkpoints" className="space-y-4">
-            <CheckpointsManager />
-          </TabsContent>
+            <AccordionItem value="checkpoints" className="border rounded-lg bg-card shadow-sm">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold">Checkpoints</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <CheckpointsManager />
+              </AccordionContent>
+            </AccordionItem>
 
-          <TabsContent value="sectors" className="space-y-4">
-            <SectorsManager />
-          </TabsContent>
+            <AccordionItem value="sectores" className="border rounded-lg bg-card shadow-sm">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-purple-500/10 rounded-md">
+                    <Box className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold">Sectores</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <SectorsManager />
+              </AccordionContent>
+            </AccordionItem>
 
-          <TabsContent value="notifications" className="space-y-4">
-            <NotifyRulesManager />
-          </TabsContent>
-        </Tabs>
+            <AccordionItem value="notificaciones" className="border rounded-lg bg-card shadow-sm">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-amber-500/10 rounded-md">
+                    <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold">Notificaciones</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <NotifyRulesManager />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
       </main>
     </div>
   );
