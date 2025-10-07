@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import SimulationControls from './SimulationControls';
 import { useRouteSimulation } from '@/hooks/useRouteSimulation';
+import MapErrorBoundary from './MapErrorBoundary';
 
 interface TruckLocation {
   id: string;
@@ -225,7 +226,8 @@ const FleetMap = () => {
 
   return (
     <div className="relative w-full h-full">
-      <MapContainer
+      <MapErrorBoundary>
+        <MapContainer
         center={mapCenter}
         zoom={10}
         className="w-full h-full rounded-lg"
@@ -315,22 +317,24 @@ const FleetMap = () => {
         })}
 
         {/* Render Trucks */}
-        {trucks.map((truck) => (
-          truck.lat && truck.lng && (
-            <div key={truck.id}>
+        {trucks.map((truck) => {
+          if (!truck.lat || !truck.lng) return null;
+          return (
+            <>
               {/* Truck trail */}
               {truck.trail && truck.trail.length > 1 && (
-              <Polyline
-                positions={truck.trail.map(p => [p.lat, p.lng] as [number, number])}
-                pathOptions={{
-                  color: '#3b82f6',
-                  weight: 3,
-                  opacity: 0.7,
-                }}
-              />
+                <Polyline
+                  key={`trail-${truck.id}`}
+                  positions={truck.trail.map(p => [p.lat, p.lng] as [number, number])}
+                  pathOptions={{
+                    color: '#3b82f6',
+                    weight: 3,
+                    opacity: 0.7,
+                  }}
+                />
               )}
               {/* Truck marker */}
-              <Marker position={[truck.lat, truck.lng]} icon={truckIcon}>
+              <Marker key={`marker-${truck.id}`} position={[truck.lat, truck.lng]} icon={truckIcon}>
                 <Popup>
                   <div className="space-y-2 min-w-[200px]">
                     <strong className="text-lg">{truck.placas}</strong>
@@ -352,9 +356,9 @@ const FleetMap = () => {
                   </div>
                 </Popup>
               </Marker>
-            </div>
-          )
-        ))}
+            </>
+          );
+        })}
 
         {/* Simulation route */}
         {routePoints && routePoints.length > 0 && (
@@ -370,6 +374,7 @@ const FleetMap = () => {
           </>
         )}
       </MapContainer>
+      </MapErrorBoundary>
 
       {selectedTruck && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000]">

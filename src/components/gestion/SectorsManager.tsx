@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Polygon, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import MapErrorBoundary from '../MapErrorBoundary';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,7 @@ const SectorsManager = () => {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     polygon: '',
@@ -76,6 +78,10 @@ const SectorsManager = () => {
   });
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const loadSectors = async () => {
     setLoading(true);
@@ -369,18 +375,24 @@ const SectorsManager = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[500px]">
-            {sectors.length > 0 ? (
-              <MapContainer
-                center={[26.9, -105.8]}
-                zoom={8}
-                className="w-full h-full rounded-lg"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <SectorPolygons sectors={sectors} />
-              </MapContainer>
+            {!isClient ? (
+              <div className="flex items-center justify-center h-full bg-muted rounded-lg">
+                <p className="text-muted-foreground">Cargando mapa...</p>
+              </div>
+            ) : sectors.length > 0 ? (
+              <MapErrorBoundary>
+                <MapContainer
+                  center={[26.9, -105.8]}
+                  zoom={8}
+                  className="w-full h-full rounded-lg"
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <SectorPolygons sectors={sectors} />
+                </MapContainer>
+              </MapErrorBoundary>
             ) : (
               <div className="flex items-center justify-center h-full bg-muted rounded-lg">
                 <p className="text-muted-foreground">No hay sectores para mostrar</p>
