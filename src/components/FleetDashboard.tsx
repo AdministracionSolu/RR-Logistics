@@ -3,12 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import FleetMap from './FleetMap';
-interface FleetDashboardProps {
-  mapboxToken: string;
-}
-const FleetDashboard = ({
-  mapboxToken
-}: FleetDashboardProps) => {
+const FleetDashboard = () => {
   const [stats, setStats] = useState({
     totalTrucks: 0,
     activeTrucks: 0,
@@ -126,7 +121,7 @@ const FleetDashboard = ({
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-96">
-                <FleetMap mapboxToken={mapboxToken} />
+                <FleetMap />
               </div>
             </CardContent>
           </Card>

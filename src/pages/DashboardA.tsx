@@ -1,22 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ExpandedFleetDashboard from '@/components/ExpandedFleetDashboard';
-import MapboxTokenInput from '@/components/MapboxTokenInput';
 import { useAuth } from '@/hooks/useAuth';
 
 const DashboardA = () => {
-  const [mapboxToken, setMapboxToken] = useState<string>('');
   const { profile } = useAuth();
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('mapboxToken');
-    if (savedToken) {
-      setMapboxToken(savedToken);
-    }
-  }, []);
-
-  const handleTokenSubmit = (token: string) => {
-    setMapboxToken(token);
-  };
 
   // Verificar que el usuario tenga acceso a este dashboard
   if (profile?.user_type !== 'tipo_a') {
@@ -32,11 +19,7 @@ const DashboardA = () => {
     );
   }
 
-  if (!mapboxToken) {
-    return <MapboxTokenInput onTokenSubmit={handleTokenSubmit} />;
-  }
-
-  return <ExpandedFleetDashboard mapboxToken={mapboxToken} />;
+  return <ExpandedFleetDashboard />;
 };
 
 export default DashboardA;

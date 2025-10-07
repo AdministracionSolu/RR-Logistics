@@ -1,17 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Polygon, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, Trash2, Edit, MapPin, RefreshCw } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { Plus, Edit, Trash2, Box, RefreshCw, MapPin } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface Sector {
   id: number;
@@ -26,17 +34,14 @@ interface Sector {
 const SectorsManager = () => {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingSector, setEditingSector] = useState<Sector | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     polygon: '',
     enabled: true,
   });
+  const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
 
   const loadSectors = async () => {
     setLoading(true);
@@ -51,9 +56,9 @@ const SectorsManager = () => {
     } catch (error) {
       console.error('Error loading sectors:', error);
       toast({
-        title: "Error",
-        description: "No se pudieron cargar los sectores",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudieron cargar los sectores',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -62,150 +67,55 @@ const SectorsManager = () => {
 
   useEffect(() => {
     loadSectors();
-    
-    // Load mapbox token from localStorage
-    const token = localStorage.getItem('mapbox_token');
-    if (token) {
-      setMapboxToken(token);
-    }
   }, []);
-
-  useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || sectors.length === 0) return;
-
-    if (!map.current) {
-      mapboxgl.accessToken = mapboxToken;
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [-105.8, 26.9],
-        zoom: 8,
-      });
-
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    }
-
-    map.current.on('load', () => {
-      // Remove existing layers and sources
-      if (map.current?.getLayer('sectors-fill')) {
-        map.current.removeLayer('sectors-fill');
-      }
-      if (map.current?.getLayer('sectors-outline')) {
-        map.current.removeLayer('sectors-outline');
-      }
-      if (map.current?.getSource('sectors')) {
-        map.current.removeSource('sectors');
-      }
-
-      const geojson: any = {
-        type: 'FeatureCollection',
-        features: sectors.filter(s => s.enabled).map(sector => ({
-          type: 'Feature',
-          properties: { name: sector.name, id: sector.id },
-          geometry: sector.polygon,
-        })),
-      };
-
-      map.current?.addSource('sectors', {
-        type: 'geojson',
-        data: geojson,
-      });
-
-      map.current?.addLayer({
-        id: 'sectors-fill',
-        type: 'fill',
-        source: 'sectors',
-        paint: {
-          'fill-color': '#3b82f6',
-          'fill-opacity': 0.2,
-        },
-      });
-
-      map.current?.addLayer({
-        id: 'sectors-outline',
-        type: 'line',
-        source: 'sectors',
-        paint: {
-          'line-color': '#3b82f6',
-          'line-width': 2,
-        },
-      });
-
-      // Add click event for popups
-      map.current?.on('click', 'sectors-fill', (e: any) => {
-        if (e.features && e.features[0]) {
-          const feature = e.features[0];
-          new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(`<strong>${feature.properties.name}</strong>`)
-            .addTo(map.current!);
-        }
-      });
-
-      // Change cursor on hover
-      map.current?.on('mouseenter', 'sectors-fill', () => {
-        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
-      });
-
-      map.current?.on('mouseleave', 'sectors-fill', () => {
-        if (map.current) map.current.getCanvas().style.cursor = '';
-      });
-    });
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, [mapboxToken, sectors]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      let polygonData;
+      let polygon;
       try {
-        polygonData = JSON.parse(formData.polygon);
-      } catch {
+        polygon = JSON.parse(formData.polygon);
+        if (polygon.type !== 'Polygon' || !polygon.coordinates) {
+          throw new Error('Formato inválido');
+        }
+      } catch (parseError) {
         toast({
-          title: "Error",
-          description: "Formato de polígono inválido. Debe ser JSON válido.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'El formato del polígono no es válido. Use formato GeoJSON',
+          variant: 'destructive',
         });
         return;
       }
 
-      if (editingSector) {
+      const sectorData = {
+        name: formData.name,
+        polygon: polygon,
+        enabled: formData.enabled,
+      };
+
+      if (editingId) {
         const { error } = await supabase
           .from('sectors')
-          .update({
-            name: formData.name,
-            polygon: polygonData,
-            enabled: formData.enabled,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingSector.id);
+          .update({ ...sectorData, updated_at: new Date().toISOString() })
+          .eq('id', editingId);
 
         if (error) throw error;
 
         toast({
-          title: "Éxito",
-          description: "Sector actualizado correctamente",
+          title: 'Sector actualizado',
+          description: 'El sector se actualizó correctamente',
         });
       } else {
         const { error } = await supabase
           .from('sectors')
-          .insert({
-            name: formData.name,
-            polygon: polygonData,
-            enabled: formData.enabled,
-          });
+          .insert([sectorData]);
 
         if (error) throw error;
 
         toast({
-          title: "Éxito",
-          description: "Sector creado correctamente",
+          title: 'Sector creado',
+          description: 'El sector se creó correctamente',
         });
       }
 
@@ -215,15 +125,15 @@ const SectorsManager = () => {
     } catch (error) {
       console.error('Error saving sector:', error);
       toast({
-        title: "Error",
-        description: "No se pudo guardar el sector",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo guardar el sector',
+        variant: 'destructive',
       });
     }
   };
 
   const handleEdit = (sector: Sector) => {
-    setEditingSector(sector);
+    setEditingId(sector.id);
     setFormData({
       name: sector.name,
       polygon: JSON.stringify(sector.polygon, null, 2),
@@ -233,7 +143,7 @@ const SectorsManager = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de eliminar este sector?')) return;
+    if (!confirm('¿Está seguro de eliminar este sector?')) return;
 
     try {
       const { error } = await supabase
@@ -244,57 +154,45 @@ const SectorsManager = () => {
       if (error) throw error;
 
       toast({
-        title: "Éxito",
-        description: "Sector eliminado correctamente",
+        title: 'Sector eliminado',
+        description: 'El sector se eliminó correctamente',
       });
+
       loadSectors();
     } catch (error) {
       console.error('Error deleting sector:', error);
       toast({
-        title: "Error",
-        description: "No se pudo eliminar el sector",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo eliminar el sector',
+        variant: 'destructive',
       });
     }
   };
 
   const resetForm = () => {
-    setEditingSector(null);
     setFormData({
       name: '',
       polygon: '',
       enabled: true,
     });
+    setEditingId(null);
   };
 
   return (
     <div className="space-y-4">
-      {!mapboxToken && (
-        <Card className="border-yellow-500">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-2">
-              Necesitas un token de Mapbox para visualizar los sectores en el mapa.
-            </p>
-            <Input
-              placeholder="Ingresa tu token de Mapbox"
-              value={mapboxToken}
-              onChange={(e) => {
-                setMapboxToken(e.target.value);
-                localStorage.setItem('mapbox_token', e.target.value);
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Sectores (Rutas de Camiones)
-              </CardTitle>
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Box className="h-5 w-5" />
+                  Sectores (Rutas de Camiones)
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Áreas geográficas para detección de eventos
+                </p>
+              </div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -304,12 +202,12 @@ const SectorsManager = () => {
                 >
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 </Button>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <Dialog open={dialogOpen} onOpenChange={(open) => {
+                  setDialogOpen(open);
+                  if (!open) resetForm();
+                }}>
                   <DialogTrigger asChild>
-                    <Button onClick={() => {
-                      resetForm();
-                      setDialogOpen(true);
-                    }}>
+                    <Button>
                       <Plus className="h-4 w-4 mr-2" />
                       Nuevo Sector
                     </Button>
@@ -317,11 +215,11 @@ const SectorsManager = () => {
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
                       <DialogTitle>
-                        {editingSector ? 'Editar Sector' : 'Nuevo Sector'}
+                        {editingId ? 'Editar Sector' : 'Nuevo Sector'}
                       </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      <div>
+                      <div className="space-y-2">
                         <Label htmlFor="name">Nombre del Sector</Label>
                         <Input
                           id="name"
@@ -332,17 +230,18 @@ const SectorsManager = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="space-y-2">
                         <Label htmlFor="polygon">Polígono (GeoJSON)</Label>
-                        <textarea
+                        <Textarea
                           id="polygon"
-                          className="w-full min-h-[200px] p-2 border rounded-md font-mono text-sm"
                           value={formData.polygon}
                           onChange={(e) => setFormData({ ...formData, polygon: e.target.value })}
-                          placeholder='{"type": "Polygon", "coordinates": [[[-105.7, 26.9], ...]]}'
+                          placeholder='{"type":"Polygon","coordinates":[[[lng,lat],[lng,lat],...]]}'
+                          rows={8}
                           required
+                          className="font-mono text-xs"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground">
                           Formato GeoJSON. Coordenadas en [longitud, latitud].
                         </p>
                       </div>
@@ -351,17 +250,26 @@ const SectorsManager = () => {
                         <Switch
                           id="enabled"
                           checked={formData.enabled}
-                          onCheckedChange={(checked) => setFormData({ ...formData, enabled: checked })}
+                          onCheckedChange={(checked) =>
+                            setFormData({ ...formData, enabled: checked })
+                          }
                         />
                         <Label htmlFor="enabled">Sector activo</Label>
                       </div>
 
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setDialogOpen(false);
+                            resetForm();
+                          }}
+                        >
                           Cancelar
                         </Button>
                         <Button type="submit">
-                          {editingSector ? 'Actualizar' : 'Crear'} Sector
+                          {editingId ? 'Actualizar' : 'Crear'} Sector
                         </Button>
                       </div>
                     </form>
@@ -391,7 +299,7 @@ const SectorsManager = () => {
                             </Badge>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            ID: {sector.id} • Creado: {new Date(sector.created_at).toLocaleDateString()}
+                            ID: {sector.id} • Creado: {new Date(sector.created_at).toLocaleDateString('es-MX')}
                           </p>
                         </div>
                         <div className="flex gap-2">
@@ -421,16 +329,46 @@ const SectorsManager = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Mapa de Sectores</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Mapa de Sectores
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            {mapboxToken ? (
-              <div ref={mapContainer} className="w-full h-[500px] rounded-lg" />
-            ) : (
-              <div className="flex items-center justify-center h-[500px] bg-muted rounded-lg">
-                <p className="text-muted-foreground">Configura tu token de Mapbox para ver el mapa</p>
-              </div>
-            )}
+          <CardContent className="h-[500px]">
+            <MapContainer
+              center={[-105.8, 26.9]}
+              zoom={8}
+              className="w-full h-full rounded-lg"
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {sectors
+                .filter((s) => s.enabled)
+                .map((sector) => {
+                  if (!sector.polygon?.coordinates?.[0]) return null;
+                  const positions: [number, number][] = sector.polygon.coordinates[0].map(
+                    (coord: number[]) => [coord[1], coord[0]]
+                  );
+                  return (
+                    <Polygon
+                      key={sector.id}
+                      positions={positions}
+                      pathOptions={{
+                        color: '#3b82f6',
+                        fillColor: '#3b82f6',
+                        fillOpacity: 0.2,
+                        weight: 2,
+                      }}
+                    >
+                      <Popup>
+                        <strong>{sector.name}</strong>
+                      </Popup>
+                    </Polygon>
+                  );
+                })}
+            </MapContainer>
           </CardContent>
         </Card>
       </div>

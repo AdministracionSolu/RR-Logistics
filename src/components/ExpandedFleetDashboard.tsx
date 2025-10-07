@@ -46,7 +46,7 @@ interface AlertItem {
   minutos_sin_cruce?: number;
 }
 
-const ExpandedFleetDashboard = ({ mapboxToken }: { mapboxToken: string }) => {
+const ExpandedFleetDashboard = () => {
   const [stats, setStats] = useState<FleetStats>({
     totalTrucks: 0,
     activeTrucks: 0,
@@ -374,7 +374,7 @@ const ExpandedFleetDashboard = ({ mapboxToken }: { mapboxToken: string }) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="h-[320px] sm:h-[420px] lg:h-[520px] p-2 sm:p-4">
-                  <FleetMap mapboxToken={mapboxToken} />
+                  <FleetMap />
                 </CardContent>
               </Card>
             </div>
