@@ -316,47 +316,48 @@ const FleetMap = () => {
           return null;
         })}
 
-        {/* Render Trucks */}
+        {/* Render Truck Trails */}
+        {trucks.map((truck) => {
+          if (!truck.lat || !truck.lng || !truck.trail || truck.trail.length <= 1) return null;
+          return (
+            <Polyline
+              key={`trail-${truck.id}`}
+              positions={truck.trail.map(p => [p.lat, p.lng] as [number, number])}
+              pathOptions={{
+                color: '#3b82f6',
+                weight: 3,
+                opacity: 0.7,
+              }}
+            />
+          );
+        })}
+
+        {/* Render Truck Markers */}
         {trucks.map((truck) => {
           if (!truck.lat || !truck.lng) return null;
           return (
-            <>
-              {/* Truck trail */}
-              {truck.trail && truck.trail.length > 1 && (
-                <Polyline
-                  key={`trail-${truck.id}`}
-                  positions={truck.trail.map(p => [p.lat, p.lng] as [number, number])}
-                  pathOptions={{
-                    color: '#3b82f6',
-                    weight: 3,
-                    opacity: 0.7,
-                  }}
-                />
-              )}
-              {/* Truck marker */}
-              <Marker key={`marker-${truck.id}`} position={[truck.lat, truck.lng]} icon={truckIcon}>
-                <Popup>
-                  <div className="space-y-2 min-w-[200px]">
-                    <strong className="text-lg">{truck.placas}</strong>
-                    <div className="text-sm space-y-1">
-                      <p><strong>Modelo:</strong> {truck.modelo || 'N/A'}</p>
-                      <p><strong>TAG:</strong> {truck.tag_id}</p>
-                      <p><strong>Última caseta:</strong> {truck.caseta_nombre || 'N/A'}</p>
-                      <p><strong>Último cruce:</strong> {truck.ultimo_cruce_timestamp ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX') : 'Sin cruces recientes'}</p>
-                      <p><strong>Saldo:</strong> ${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
-                      <p><strong>Gasto hoy:</strong> ${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => startTruckSimulation(truck)}
-                      className="w-full mt-2"
-                    >
-                      🚛 Simular Recorrido
-                    </Button>
+            <Marker key={`marker-${truck.id}`} position={[truck.lat, truck.lng]} icon={truckIcon}>
+              <Popup>
+                <div className="space-y-2 min-w-[200px]">
+                  <strong className="text-lg">{truck.placas}</strong>
+                  <div className="text-sm space-y-1">
+                    <p><strong>Modelo:</strong> {truck.modelo || 'N/A'}</p>
+                    <p><strong>TAG:</strong> {truck.tag_id}</p>
+                    <p><strong>Última caseta:</strong> {truck.caseta_nombre || 'N/A'}</p>
+                    <p><strong>Último cruce:</strong> {truck.ultimo_cruce_timestamp ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX') : 'Sin cruces recientes'}</p>
+                    <p><strong>Saldo:</strong> ${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
+                    <p><strong>Gasto hoy:</strong> ${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
                   </div>
-                </Popup>
-              </Marker>
-            </>
+                  <Button
+                    size="sm"
+                    onClick={() => startTruckSimulation(truck)}
+                    className="w-full mt-2"
+                  >
+                    🚛 Simular Recorrido
+                  </Button>
+                </div>
+              </Popup>
+            </Marker>
           );
         })}
 

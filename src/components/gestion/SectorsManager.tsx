@@ -39,6 +39,8 @@ const SectorPolygons = ({ sectors }: { sectors: Sector[] }) => {
     [sectors]
   );
 
+  if (validSectors.length === 0) return null;
+
   return (
     <>
       {validSectors.map((sector) => {
