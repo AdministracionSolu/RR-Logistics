@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Polygon, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -30,6 +30,40 @@ interface Sector {
   updated_at: string;
   created_by: string | null;
 }
+
+// Componente separado para renderizar sectores en el mapa
+const SectorPolygons = ({ sectors }: { sectors: Sector[] }) => {
+  const validSectors = useMemo(
+    () => sectors.filter((s) => s.enabled && s.polygon?.coordinates?.[0]),
+    [sectors]
+  );
+
+  return (
+    <>
+      {validSectors.map((sector) => {
+        const positions: [number, number][] = sector.polygon.coordinates[0].map(
+          (coord: number[]) => [coord[1], coord[0]] as [number, number]
+        );
+        return (
+          <Polygon
+            key={`sector-${sector.id}`}
+            positions={positions}
+            pathOptions={{
+              color: '#3b82f6',
+              fillColor: '#3b82f6',
+              fillOpacity: 0.2,
+              weight: 2,
+            }}
+          >
+            <Popup>
+              <strong>{sector.name}</strong>
+            </Popup>
+          </Polygon>
+        );
+      })}
+    </>
+  );
+};
 
 const SectorsManager = () => {
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -335,39 +369,23 @@ const SectorsManager = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[500px]">
-            <MapContainer
-              center={[26.9, -105.8]}
-              zoom={8}
-              className="w-full h-full rounded-lg"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {sectors
-                .filter((s) => s.enabled && s.polygon?.coordinates?.[0])
-                .map((sector) => {
-                  const positions: [number, number][] = sector.polygon.coordinates[0].map(
-                    (coord: number[]) => [coord[1], coord[0]] as [number, number]
-                  );
-                  return (
-                    <Polygon
-                      key={sector.id}
-                      positions={positions}
-                      pathOptions={{
-                        color: '#3b82f6',
-                        fillColor: '#3b82f6',
-                        fillOpacity: 0.2,
-                        weight: 2,
-                      }}
-                    >
-                      <Popup>
-                        <strong>{sector.name}</strong>
-                      </Popup>
-                    </Polygon>
-                  );
-                })}
-            </MapContainer>
+            {sectors.length > 0 ? (
+              <MapContainer
+                center={[26.9, -105.8]}
+                zoom={8}
+                className="w-full h-full rounded-lg"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <SectorPolygons sectors={sectors} />
+              </MapContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full bg-muted rounded-lg">
+                <p className="text-muted-foreground">No hay sectores para mostrar</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
