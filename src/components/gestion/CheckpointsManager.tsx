@@ -360,8 +360,6 @@ const CheckpointsManager = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead className="hidden sm:table-cell">Tipo</TableHead>
-              <TableHead className="hidden md:table-cell">Detalles</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -370,27 +368,6 @@ const CheckpointsManager = () => {
             {checkpoints.map((checkpoint) => (
               <TableRow key={checkpoint.id}>
                 <TableCell className="font-medium">{checkpoint.name}</TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  <div className="flex items-center gap-2">
-                    {checkpoint.geometry_type === 'circle' ? (
-                      <>
-                        <Circle className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm">Circular</span>
-                      </>
-                    ) : (
-                      <>
-                        <Pentagon className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm">Polígono</span>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                  {checkpoint.geometry_type === 'circle' 
-                    ? `${checkpoint.lat?.toFixed(4)}, ${checkpoint.lng?.toFixed(4)} (${checkpoint.radius_m}m)`
-                    : 'Área poligonal'
-                  }
-                </TableCell>
                 <TableCell>
                   {checkpoint.enabled ? (
                     <span className="text-green-600">Activo</span>
