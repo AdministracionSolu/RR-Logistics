@@ -6,7 +6,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import SimulationControls from './SimulationControls';
 import { useRouteSimulation } from '@/hooks/useRouteSimulation';
-import MapErrorBoundary from './MapErrorBoundary';
 
 interface TruckLocation {
   id: string;
@@ -243,8 +242,7 @@ const FleetMap = () => {
 
   return (
     <div className="relative w-full h-full">
-      <MapErrorBoundary>
-        <MapContainer
+      <MapContainer
         center={mapCenter}
         zoom={10}
         className="w-full h-full rounded-lg"
@@ -389,7 +387,6 @@ const FleetMap = () => {
           </>
         )}
       </MapContainer>
-      </MapErrorBoundary>
 
       {selectedTruck && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000]">
