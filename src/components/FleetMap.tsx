@@ -205,15 +205,16 @@ const FleetMap = ({ mapboxToken }: FleetMapProps) => {
         }
       });
 
-      // Add outline layer
+      // Add outline layer with dashed lines
       map.current!.addLayer({
         id: `sector-outline-${sector.id}`,
         type: 'line',
         source: sourceId,
         paint: {
-          'line-color': '#2563eb',
+          'line-color': '#3b82f6',
           'line-width': 2,
-          'line-opacity': 0.8
+          'line-opacity': 0.9,
+          'line-dasharray': [2, 2]
         }
       });
 
