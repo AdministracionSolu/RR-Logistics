@@ -336,7 +336,7 @@ const SectorsManager = () => {
           </CardHeader>
           <CardContent className="h-[500px]">
             <MapContainer
-              center={[-105.8, 26.9]}
+              center={[26.9, -105.8]}
               zoom={8}
               className="w-full h-full rounded-lg"
             >
@@ -345,11 +345,10 @@ const SectorsManager = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               {sectors
-                .filter((s) => s.enabled)
+                .filter((s) => s.enabled && s.polygon?.coordinates?.[0])
                 .map((sector) => {
-                  if (!sector.polygon?.coordinates?.[0]) return null;
                   const positions: [number, number][] = sector.polygon.coordinates[0].map(
-                    (coord: number[]) => [coord[1], coord[0]]
+                    (coord: number[]) => [coord[1], coord[0]] as [number, number]
                   );
                   return (
                     <Polygon
