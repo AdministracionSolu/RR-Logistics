@@ -292,20 +292,35 @@ const FleetMap = () => {
     layersRef.current = [];
     markersRef.current = [];
 
+    // Sector colors mapping
+    const sectorColors: Record<string, string> = {
+      'Sector Ciudad': '#4ABFF2',
+      'Sector Carretera': '#E54848',
+      'Sector San Francisco del Oro': '#4ADE80',
+      'Sector Mina': '#A855F7',
+    };
+
     // Add sectors
     sectors.forEach(sector => {
       const positions = toPositions(sector.polygon);
       if (!positions) return;
       
+      const color = sectorColors[sector.name] || '#3b82f6';
+      
       const polygon = L.polygon(positions, {
-        color: '#3b82f6',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.15,
-        weight: 2,
-        dashArray: '5, 5',
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.25,
+        weight: 3,
+        opacity: 0.8,
       }).addTo(mapInstanceRef.current!);
       
-      polygon.bindPopup(`<strong>${sector.name}</strong><br/>Sector (Ruta de Camiones)`);
+      polygon.bindPopup(`
+        <div style="padding: 8px;">
+          <strong style="color: ${color}; font-size: 1.1em;">${sector.name}</strong>
+          <p style="margin: 4px 0 0 0; font-size: 0.9em;">Zona de monitoreo activo</p>
+        </div>
+      `);
       layersRef.current.push(polygon);
     });
 

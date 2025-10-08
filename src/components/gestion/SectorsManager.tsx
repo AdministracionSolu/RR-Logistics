@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, Box, RefreshCw, MapPin } from 'lucide-react';
+import SectorRefreshButton from './SectorRefreshButton';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -114,6 +115,14 @@ const SectorsManager = () => {
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
+    // Sector colors
+    const sectorColors: Record<string, string> = {
+      'Sector Ciudad': '#4ABFF2',
+      'Sector Carretera': '#E54848',
+      'Sector San Francisco del Oro': '#4ADE80',
+      'Sector Mina': '#A855F7',
+    };
+
     // Clear existing layers
     layersRef.current.forEach(layer => layer.remove());
     layersRef.current = [];
@@ -123,14 +132,22 @@ const SectorsManager = () => {
       const positions = toPositions(sector.polygon);
       if (!positions) return;
       
+      const color = sectorColors[sector.name] || '#3b82f6';
+      
       const polygon = L.polygon(positions, {
-        color: '#3b82f6',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.2,
-        weight: 2,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.25,
+        weight: 3,
+        opacity: 0.8,
       }).addTo(mapInstanceRef.current!);
       
-      polygon.bindPopup(`<strong>${sector.name}</strong>`);
+      polygon.bindPopup(`
+        <div style="padding: 8px;">
+          <strong style="color: ${color}; font-size: 1.1em;">${sector.name}</strong>
+          <p style="margin: 4px 0 0 0; font-size: 0.9em;">Zona de monitoreo</p>
+        </div>
+      `);
       layersRef.current.push(polygon);
     });
   }, [sectors]);
@@ -260,6 +277,7 @@ const SectorsManager = () => {
                 </p>
               </div>
               <div className="flex gap-2">
+                <SectorRefreshButton onRefresh={loadSectors} />
                 <Button
                   variant="outline"
                   size="sm"
