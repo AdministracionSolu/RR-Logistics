@@ -109,6 +109,13 @@ const EventsPanel = () => {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  const getUnitDisplayName = (unitId: string) => {
+    const unitNames: Record<string, string> = {
+      '0-5066561': 'Unidad RR Logistics',
+    };
+    return unitNames[unitId] || unitId;
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -194,7 +201,7 @@ const EventsPanel = () => {
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             {getEventBadge(event.type)}
-                            <span className="font-semibold text-sm">{event.unit_id}</span>
+                            <span className="font-semibold text-sm">{getUnitDisplayName(event.unit_id)}</span>
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {event.meta?.checkpoint_name || event.meta?.sector_name || `${event.ref_type} #${event.ref_id}`}
