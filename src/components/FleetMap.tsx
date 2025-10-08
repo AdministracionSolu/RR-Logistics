@@ -392,27 +392,41 @@ const FleetMap = () => {
 
     // Add checkpoints
     checkpoints.forEach(checkpoint => {
-      if (checkpoint.geometry_type === 'circle' && checkpoint.lat && checkpoint.lng) {
+      if (checkpoint.geometry_type === 'circle' && checkpoint.lat && checkpoint.lng && checkpoint.radius_m) {
         const circle = L.circle([checkpoint.lat, checkpoint.lng], {
-          radius: checkpoint.radius_m || 100,
-          color: '#10b981',
-          fillColor: '#10b981',
+          color: '#DB4436',
+          fillColor: '#DB4436',
           fillOpacity: 0.2,
+          radius: checkpoint.radius_m,
+          weight: 2,
         }).addTo(mapInstanceRef.current!);
-        
-        circle.bindPopup(`<strong>${checkpoint.name}</strong><br/>Checkpoint Circular<br/>Radio: ${checkpoint.radius_m}m`);
+
+        circle.bindPopup(`
+          <div style="padding: 8px;">
+            <strong style="font-size: 1.1em;">${checkpoint.name}</strong>
+            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #DB4436;">CheckPoint (${checkpoint.radius_m}m)</p>
+          </div>
+        `);
+
         layersRef.current.push(circle);
-      } else if (checkpoint.geometry_type === 'polygon') {
+      } else if (checkpoint.geometry_type === 'polygon' && checkpoint.polygon) {
         const positions = toPositions(checkpoint.polygon);
         if (!positions) return;
-        
+
         const polygon = L.polygon(positions, {
-          color: '#10b981',
-          fillColor: '#10b981',
+          color: '#DB4436',
+          fillColor: '#DB4436',
           fillOpacity: 0.2,
+          weight: 2,
         }).addTo(mapInstanceRef.current!);
-        
-        polygon.bindPopup(`<strong>${checkpoint.name}</strong><br/>Checkpoint Poligonal`);
+
+        polygon.bindPopup(`
+          <div style="padding: 8px;">
+            <strong style="font-size: 1.1em;">${checkpoint.name}</strong>
+            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #DB4436;">CheckPoint (polígono)</p>
+          </div>
+        `);
+
         layersRef.current.push(polygon);
       }
     });
@@ -455,6 +469,45 @@ const FleetMap = () => {
       marker.bindPopup(popupContent);
       markersRef.current.push(marker);
     });
+
+    // Center map on all data points
+    const allPoints: [number, number][] = [];
+
+    // Add truck locations
+    trucks.forEach(truck => {
+      if (truck.lat && truck.lng) {
+        allPoints.push([truck.lat, truck.lng]);
+      }
+    });
+
+    // Add checkpoint locations
+    checkpoints.forEach(checkpoint => {
+      if (checkpoint.lat && checkpoint.lng) {
+        allPoints.push([checkpoint.lat, checkpoint.lng]);
+      }
+    });
+
+    // Add sector points
+    sectors.forEach(sector => {
+      const positions = toPositions(sector.polygon);
+      if (positions) {
+        positions.forEach(pos => allPoints.push(pos));
+      }
+    });
+
+    // Add route points
+    routes.forEach(route => {
+      if (route.line_geometry?.coordinates) {
+        route.line_geometry.coordinates.forEach((coord: number[]) => {
+          allPoints.push([coord[1], coord[0]]);
+        });
+      }
+    });
+
+    if (allPoints.length > 0) {
+      const bounds = L.latLngBounds(allPoints);
+      mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
+    }
   }, [trucks, sectors, checkpoints, routes]);
 
   // Update simulation route
