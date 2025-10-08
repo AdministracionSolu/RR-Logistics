@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, Box, RefreshCw, MapPin, Check } from 'lucide-react';
 import SectorRefreshButton from './SectorRefreshButton';
 import SectorQAPanel from './SectorQAPanel';
+import CreateMonterreyRoute from './CreateMonterreyRoute';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -126,6 +127,7 @@ const SectorsManager = () => {
       'Sector Carretera': '#E54848',
       'Sector San Francisco del Oro': '#4ADE80',
       'Sector Mina': '#A855F7',
+      'Sector Prueba Monterrey': '#1267FF',
     };
 
     // Clear existing layers
@@ -162,7 +164,72 @@ const SectorsManager = () => {
       `);
       layersRef.current.push(polygon);
     });
+
+    // Load and render routes with markers
+    loadAndRenderRoutes();
   }, [sectors]);
+
+  // Load and render routes on the map
+  const loadAndRenderRoutes = async () => {
+    if (!mapInstanceRef.current) return;
+
+    try {
+      const { data: routes, error } = await supabase
+        .from('routes')
+        .select('*');
+
+      if (error) throw error;
+
+      routes?.forEach((route: any) => {
+        if (!route.line_geometry?.coordinates) return;
+
+        const coords = route.line_geometry.coordinates;
+        const latlngs: [number, number][] = coords.map((coord: number[]) => 
+          [coord[1], coord[0]] as [number, number]
+        );
+
+        // Draw the route line
+        const polyline = L.polyline(latlngs, {
+          color: route.line_geometry.color || '#1267FF',
+          weight: route.line_geometry.weight || 5,
+          opacity: 0.8,
+        }).addTo(mapInstanceRef.current!);
+
+        polyline.bindPopup(`
+          <div style="padding: 8px;">
+            <strong style="font-size: 1.1em;">${route.name}</strong>
+          </div>
+        `);
+
+        layersRef.current.push(polyline);
+
+        // Add markers if specified
+        if (route.line_geometry.markers) {
+          route.line_geometry.markers.forEach((marker: any) => {
+            const markerIcon = L.divIcon({
+              className: 'custom-marker',
+              html: `<div style="background: ${marker.color || '#1267FF'}; color: white; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-size: 12px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${marker.label}</div>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            });
+
+            const leafletMarker = L.marker([marker.lat, marker.lng], { icon: markerIcon })
+              .addTo(mapInstanceRef.current!);
+
+            layersRef.current.push(leafletMarker);
+          });
+        }
+
+        // Auto-fit bounds to show the entire route
+        if (latlngs.length > 0) {
+          const bounds = L.latLngBounds(latlngs);
+          mapInstanceRef.current!.fitBounds(bounds, { padding: [50, 50] });
+        }
+      });
+    } catch (error) {
+      console.error('Error loading routes:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -357,6 +424,7 @@ const SectorsManager = () => {
                 </p>
               </div>
               <div className="flex gap-2">
+                <CreateMonterreyRoute />
                 <SectorRefreshButton onRefresh={loadSectors} />
                 <Button
                   variant="outline"
