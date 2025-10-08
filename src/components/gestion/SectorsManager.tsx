@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -48,46 +48,14 @@ const toPositions = (polygon: any): [number, number][] | null => {
   }
 };
 
-const SectorPolygons = ({ sectors, rl }: { sectors: Sector[]; rl: any }) => {
-  const validSectors = useMemo(
-    () => sectors.filter((s) => s.enabled && toPositions(s.polygon)),
-    [sectors]
-  );
-
-  if (validSectors.length === 0) return null;
-
-  return (
-    <>
-      {validSectors.map((sector) => {
-        const positions = toPositions(sector.polygon);
-        if (!positions) return null;
-        return (
-          <rl.Polygon
-            key={`sector-${sector.id}`}
-            positions={positions}
-            pathOptions={{
-              color: '#3b82f6',
-              fillColor: '#3b82f6',
-              fillOpacity: 0.2,
-              weight: 2,
-            }}
-          >
-            <rl.Popup>
-              <strong>{sector.name}</strong>
-            </rl.Popup>
-          </rl.Polygon>
-        );
-      })}
-    </>
-  );
-};
-
 const SectorsManager = () => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const layersRef = useRef<L.Layer[]>([]);
+  
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const [rl, setRl] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     polygon: '',
@@ -96,9 +64,24 @@ const SectorsManager = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  // Initialize map
   useEffect(() => {
-    setIsClient(true);
-    import('react-leaflet').then((module) => setRl(module));
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    const map = L.map(mapRef.current).setView([26.9, -105.8], 8);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    mapInstanceRef.current = map;
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, []);
 
   const loadSectors = async () => {
@@ -126,6 +109,31 @@ const SectorsManager = () => {
   useEffect(() => {
     loadSectors();
   }, []);
+
+  // Update map when sectors change
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Clear existing layers
+    layersRef.current.forEach(layer => layer.remove());
+    layersRef.current = [];
+
+    // Add sectors to map
+    sectors.filter(s => s.enabled).forEach(sector => {
+      const positions = toPositions(sector.polygon);
+      if (!positions) return;
+      
+      const polygon = L.polygon(positions, {
+        color: '#3b82f6',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.2,
+        weight: 2,
+      }).addTo(mapInstanceRef.current!);
+      
+      polygon.bindPopup(`<strong>${sector.name}</strong>`);
+      layersRef.current.push(polygon);
+    });
+  }, [sectors]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -393,27 +401,7 @@ const SectorsManager = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[500px]">
-            {!isClient || !rl ? (
-              <div className="flex items-center justify-center h-full bg-muted rounded-lg">
-                <p className="text-muted-foreground">Cargando mapa...</p>
-              </div>
-            ) : sectors.length > 0 ? (
-              <rl.MapContainer
-                center={[26.9, -105.8]}
-                zoom={8}
-                className="w-full h-full rounded-lg"
-              >
-                <rl.TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <SectorPolygons sectors={sectors} rl={rl} />
-              </rl.MapContainer>
-            ) : (
-              <div className="flex items-center justify-center h-full bg-muted rounded-lg">
-                <p className="text-muted-foreground">No hay sectores para mostrar</p>
-              </div>
-            )}
+            <div ref={mapRef} className="w-full h-full rounded-lg" />
           </CardContent>
         </Card>
       </div>

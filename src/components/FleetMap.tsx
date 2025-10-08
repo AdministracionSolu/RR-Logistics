@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,16 +61,34 @@ const toPositions = (polygon: any): [number, number][] | null => {
 
 
 const FleetMap = () => {
-  const [isClient, setIsClient] = useState(false);
-  const [rl, setRl] = useState<any>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+  const layersRef = useRef<L.Layer[]>([]);
+  
   const [trucks, setTrucks] = useState<TruckLocation[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [checkpoints, setCheckpoints] = useState<any[]>([]);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([19.4326, -99.1332]);
+  const [mapCenter] = useState<[number, number]>([19.4326, -99.1332]);
 
+  // Initialize map
   useEffect(() => {
-    setIsClient(true);
-    import('react-leaflet').then((module) => setRl(module));
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    const map = L.map(mapRef.current).setView(mapCenter, 10);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    mapInstanceRef.current = map;
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, []);
 
   const {
@@ -221,8 +239,8 @@ const FleetMap = () => {
       setTrucks(trucksWithLocations);
 
       // Center map on first truck if available
-      if (trucksWithLocations.length > 0 && trucksWithLocations[0].lat && trucksWithLocations[0].lng) {
-        setMapCenter([trucksWithLocations[0].lat, trucksWithLocations[0].lng]);
+      if (trucksWithLocations.length > 0 && trucksWithLocations[0].lat && trucksWithLocations[0].lng && mapInstanceRef.current) {
+        mapInstanceRef.current.setView([trucksWithLocations[0].lat, trucksWithLocations[0].lng], 10);
       }
     } catch (error) {
       console.error('Error loading trucks:', error);
@@ -238,161 +256,128 @@ const FleetMap = () => {
     startSimulation();
   };
 
-  if (!isClient || !rl) {
-    return (
-      <div className="w-full h-full min-h-[400px] rounded-lg bg-muted flex items-center justify-center">
-        <p className="text-muted-foreground">Cargando mapa...</p>
-      </div>
-    );
-  }
+  // Update map layers when data changes
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Clear existing layers
+    layersRef.current.forEach(layer => layer.remove());
+    markersRef.current.forEach(marker => marker.remove());
+    layersRef.current = [];
+    markersRef.current = [];
+
+    // Add sectors
+    sectors.forEach(sector => {
+      const positions = toPositions(sector.polygon);
+      if (!positions) return;
+      
+      const polygon = L.polygon(positions, {
+        color: '#3b82f6',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.15,
+        weight: 2,
+        dashArray: '5, 5',
+      }).addTo(mapInstanceRef.current!);
+      
+      polygon.bindPopup(`<strong>${sector.name}</strong><br/>Sector (Ruta de Camiones)`);
+      layersRef.current.push(polygon);
+    });
+
+    // Add checkpoints
+    checkpoints.forEach(checkpoint => {
+      if (checkpoint.geometry_type === 'circle' && checkpoint.lat && checkpoint.lng) {
+        const circle = L.circle([checkpoint.lat, checkpoint.lng], {
+          radius: checkpoint.radius_m || 100,
+          color: '#10b981',
+          fillColor: '#10b981',
+          fillOpacity: 0.2,
+        }).addTo(mapInstanceRef.current!);
+        
+        circle.bindPopup(`<strong>${checkpoint.name}</strong><br/>Checkpoint Circular<br/>Radio: ${checkpoint.radius_m}m`);
+        layersRef.current.push(circle);
+      } else if (checkpoint.geometry_type === 'polygon') {
+        const positions = toPositions(checkpoint.polygon);
+        if (!positions) return;
+        
+        const polygon = L.polygon(positions, {
+          color: '#10b981',
+          fillColor: '#10b981',
+          fillOpacity: 0.2,
+        }).addTo(mapInstanceRef.current!);
+        
+        polygon.bindPopup(`<strong>${checkpoint.name}</strong><br/>Checkpoint Poligonal`);
+        layersRef.current.push(polygon);
+      }
+    });
+
+    // Add truck trails
+    trucks.forEach(truck => {
+      if (!truck.lat || !truck.lng || !truck.trail || truck.trail.length <= 1) return;
+      
+      const trail = L.polyline(truck.trail.map(p => [p.lat, p.lng] as L.LatLngExpression), {
+        color: '#3b82f6',
+        weight: 3,
+        opacity: 0.7,
+      }).addTo(mapInstanceRef.current!);
+      
+      layersRef.current.push(trail);
+    });
+
+    // Add truck markers
+    trucks.forEach(truck => {
+      if (!truck.lat || !truck.lng) return;
+      
+      const marker = L.marker([truck.lat, truck.lng], { icon: truckIcon })
+        .addTo(mapInstanceRef.current!);
+      
+      const popupContent = `
+        <div style="min-width: 200px;">
+          <strong style="font-size: 1.1em;">${truck.placas}</strong>
+          <div style="margin-top: 8px; font-size: 0.9em;">
+            <p><strong>Modelo:</strong> ${truck.modelo || 'N/A'}</p>
+            <p><strong>TAG:</strong> ${truck.tag_id}</p>
+            <p><strong>Última caseta:</strong> ${truck.caseta_nombre || 'N/A'}</p>
+            <p><strong>Último cruce:</strong> ${truck.ultimo_cruce_timestamp ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX') : 'Sin cruces recientes'}</p>
+            <p><strong>Saldo:</strong> $${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
+            <p><strong>Gasto hoy:</strong> $${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
+          </div>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+      markersRef.current.push(marker);
+    });
+  }, [trucks, sectors, checkpoints]);
+
+  // Update simulation route
+  useEffect(() => {
+    if (!mapInstanceRef.current || !routePoints || routePoints.length === 0) return;
+
+    // Remove old simulation layers
+    const simLayers = layersRef.current.filter(l => (l as any)._isSimulation);
+    simLayers.forEach(l => l.remove());
+    layersRef.current = layersRef.current.filter(l => !(l as any)._isSimulation);
+
+    // Add completed route
+    const completedRoute = L.polyline(
+      routePoints.slice(0, currentPointIndex + 1).map(p => [p.lat, p.lng] as L.LatLngExpression),
+      { color: '#22c55e', weight: 3 }
+    ).addTo(mapInstanceRef.current);
+    (completedRoute as any)._isSimulation = true;
+    layersRef.current.push(completedRoute);
+
+    // Add pending route
+    const pendingRoute = L.polyline(
+      routePoints.slice(currentPointIndex).map(p => [p.lat, p.lng] as L.LatLngExpression),
+      { color: '#94a3b8', weight: 2, dashArray: '5, 5' }
+    ).addTo(mapInstanceRef.current);
+    (pendingRoute as any)._isSimulation = true;
+    layersRef.current.push(pendingRoute);
+  }, [routePoints, currentPointIndex]);
 
   return (
     <div className="relative w-full h-full">
-      <rl.MapContainer
-        key={`${mapCenter[0]}-${mapCenter[1]}`}
-        center={mapCenter}
-        zoom={10}
-        className="w-full h-full rounded-lg"
-        style={{ minHeight: '400px' }}
-      >
-        <rl.TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {/* Render Sectors */}
-        {sectors.map((sector) => {
-          const positions = toPositions(sector.polygon);
-          if (!positions) return null;
-          return (
-            <rl.Polygon
-              key={sector.id}
-              positions={positions}
-              pathOptions={{
-                color: '#3b82f6',
-                fillColor: '#3b82f6',
-                fillOpacity: 0.15,
-                weight: 2,
-                dashArray: '5, 5',
-              }}
-            >
-              <rl.Popup>
-                <div className="p-2">
-                  <strong className="text-lg">{sector.name}</strong>
-                  <br />
-                  <span className="text-sm text-muted-foreground">Sector (Ruta de Camiones)</span>
-                </div>
-              </rl.Popup>
-            </rl.Polygon>
-          );
-        })}
-
-        {/* Render Checkpoints */}
-        {checkpoints.map((checkpoint) => {
-          if (checkpoint.geometry_type === 'circle' && checkpoint.lat && checkpoint.lng) {
-            return (
-              <rl.Circle
-                key={checkpoint.id}
-                center={[checkpoint.lat, checkpoint.lng]}
-                radius={checkpoint.radius_m || 100}
-                pathOptions={{
-                  color: '#10b981',
-                  fillColor: '#10b981',
-                  fillOpacity: 0.2,
-                }}
-              >
-                <rl.Popup>
-                  <strong>{checkpoint.name}</strong>
-                  <br />
-                  Checkpoint Circular
-                  <br />
-                  Radio: {checkpoint.radius_m}m
-                </rl.Popup>
-              </rl.Circle>
-            );
-          } else if (checkpoint.geometry_type === 'polygon') {
-            const positions = toPositions(checkpoint.polygon);
-            if (!positions) return null;
-            return (
-              <rl.Polygon
-                key={checkpoint.id}
-                positions={positions}
-                pathOptions={{
-                  color: '#10b981',
-                  fillColor: '#10b981',
-                  fillOpacity: 0.2,
-                }}
-              >
-                <rl.Popup>
-                  <strong>{checkpoint.name}</strong>
-                  <br />
-                  Checkpoint Poligonal
-                </rl.Popup>
-              </rl.Polygon>
-            );
-          }
-          return null;
-        })}
-
-        {/* Render Truck Trails */}
-        {trucks.map((truck) => {
-          if (!truck.lat || !truck.lng || !truck.trail || truck.trail.length <= 1) return null;
-          return (
-            <rl.Polyline
-              key={`trail-${truck.id}`}
-              positions={truck.trail.map(p => [p.lat, p.lng] as [number, number])}
-              pathOptions={{
-                color: '#3b82f6',
-                weight: 3,
-                opacity: 0.7,
-              }}
-            />
-          );
-        })}
-
-        {/* Render Truck Markers */}
-        {trucks.map((truck) => {
-          if (!truck.lat || !truck.lng) return null;
-          return (
-            <rl.Marker key={`marker-${truck.id}`} position={[truck.lat, truck.lng]} icon={truckIcon}>
-              <rl.Popup>
-                <div className="space-y-2 min-w-[200px]">
-                  <strong className="text-lg">{truck.placas}</strong>
-                  <div className="text-sm space-y-1">
-                    <p><strong>Modelo:</strong> {truck.modelo || 'N/A'}</p>
-                    <p><strong>TAG:</strong> {truck.tag_id}</p>
-                    <p><strong>Última caseta:</strong> {truck.caseta_nombre || 'N/A'}</p>
-                    <p><strong>Último cruce:</strong> {truck.ultimo_cruce_timestamp ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX') : 'Sin cruces recientes'}</p>
-                    <p><strong>Saldo:</strong> ${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
-                    <p><strong>Gasto hoy:</strong> ${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={() => startTruckSimulation(truck)}
-                    className="w-full mt-2"
-                  >
-                    🚛 Simular Recorrido
-                  </Button>
-                </div>
-              </rl.Popup>
-            </rl.Marker>
-          );
-        })}
-
-        {/* Simulation route */}
-        {routePoints && routePoints.length > 0 && (
-          <>
-            <rl.Polyline
-              positions={routePoints.slice(0, currentPointIndex + 1).map((p) => [p.lat, p.lng] as [number, number])}
-              pathOptions={{ color: '#22c55e', weight: 3 }}
-            />
-            <rl.Polyline
-              positions={routePoints.slice(currentPointIndex).map((p) => [p.lat, p.lng] as [number, number])}
-              pathOptions={{ color: '#94a3b8', weight: 2, dashArray: '5, 5' }}
-            />
-          </>
-        )}
-      </rl.MapContainer>
+      <div ref={mapRef} className="w-full h-full rounded-lg" style={{ minHeight: '400px' }} />
 
       {selectedTruck && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000]">
