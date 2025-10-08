@@ -627,6 +627,41 @@ export type Database = {
         }
         Relationships: []
       }
+      routes: {
+        Row: {
+          created_at: string
+          id: number
+          line_geometry: Json
+          name: string
+          sector_id: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          line_geometry: Json
+          name: string
+          sector_id?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          line_geometry?: Json
+          name?: string
+          sector_id?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routes_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rutas: {
         Row: {
           activa: boolean | null
@@ -666,32 +701,77 @@ export type Database = {
         }
         Relationships: []
       }
+      sector_history: {
+        Row: {
+          action: string
+          changed_by: string | null
+          created_at: string
+          id: number
+          new_geometry: Json | null
+          old_geometry: Json | null
+          parameters: Json | null
+          sector_id: number
+        }
+        Insert: {
+          action: string
+          changed_by?: string | null
+          created_at?: string
+          id?: number
+          new_geometry?: Json | null
+          old_geometry?: Json | null
+          parameters?: Json | null
+          sector_id: number
+        }
+        Update: {
+          action?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: number
+          new_geometry?: Json | null
+          old_geometry?: Json | null
+          parameters?: Json | null
+          sector_id?: number
+        }
+        Relationships: []
+      }
       sectors: {
         Row: {
+          buffer_m: number | null
+          color: string | null
           created_at: string
           created_by: string | null
           enabled: boolean
           id: number
+          is_proposed: boolean | null
           name: string
           polygon: Json
+          source: string | null
           updated_at: string
         }
         Insert: {
+          buffer_m?: number | null
+          color?: string | null
           created_at?: string
           created_by?: string | null
           enabled?: boolean
           id?: number
+          is_proposed?: boolean | null
           name: string
           polygon: Json
+          source?: string | null
           updated_at?: string
         }
         Update: {
+          buffer_m?: number | null
+          color?: string | null
           created_at?: string
           created_by?: string | null
           enabled?: boolean
           id?: number
+          is_proposed?: boolean | null
           name?: string
           polygon?: Json
+          source?: string | null
           updated_at?: string
         }
         Relationships: []

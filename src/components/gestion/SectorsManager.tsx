@@ -9,8 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Box, RefreshCw, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, Box, RefreshCw, MapPin, Check } from 'lucide-react';
 import SectorRefreshButton from './SectorRefreshButton';
+import SectorQAPanel from './SectorQAPanel';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,10 @@ interface Sector {
   created_at: string;
   updated_at: string;
   created_by: string | null;
+  source?: string;
+  buffer_m?: number;
+  color?: string;
+  is_proposed?: boolean;
 }
 
 // Componente separado para renderizar sectores en el mapa
@@ -127,25 +132,32 @@ const SectorsManager = () => {
     layersRef.current.forEach(layer => layer.remove());
     layersRef.current = [];
 
-    // Add sectors to map
-    sectors.filter(s => s.enabled).forEach(sector => {
+    // Add all sectors to map (both current and proposed)
+    sectors.forEach(sector => {
       const positions = toPositions(sector.polygon);
       if (!positions) return;
       
-      const color = sectorColors[sector.name] || '#3b82f6';
+      const baseName = sector.name.replace(' (Propuesta)', '');
+      const color = sector.color || sectorColors[baseName] || '#3b82f6';
+      const isProposed = sector.is_proposed || sector.name.includes('(Propuesta)');
       
       const polygon = L.polygon(positions, {
         color: color,
         fillColor: color,
-        fillOpacity: 0.25,
-        weight: 3,
-        opacity: 0.8,
+        fillOpacity: isProposed ? 0.15 : 0.25,
+        weight: isProposed ? 2 : 3,
+        opacity: isProposed ? 0.6 : 0.8,
+        dashArray: isProposed ? '5, 10' : undefined,
       }).addTo(mapInstanceRef.current!);
       
       polygon.bindPopup(`
         <div style="padding: 8px;">
           <strong style="color: ${color}; font-size: 1.1em;">${sector.name}</strong>
-          <p style="margin: 4px 0 0 0; font-size: 0.9em;">Zona de monitoreo</p>
+          ${isProposed ? '<p style="margin: 2px 0; font-size: 0.8em; color: #f59e0b;">⚠️ Propuesta</p>' : ''}
+          <p style="margin: 4px 0 0 0; font-size: 0.9em;">
+            ${sector.source === 'osm' ? '📍 OSM' : '🗺️ Mapbox'} · 
+            Buffer: ${sector.buffer_m || 250}m
+          </p>
         </div>
       `);
       layersRef.current.push(polygon);
@@ -261,9 +273,77 @@ const SectorsManager = () => {
     setEditingId(null);
   };
 
+  const handleApproveSector = async (sectorId: number) => {
+    try {
+      const { data: proposed } = await supabase
+        .from('sectors')
+        .select('*')
+        .eq('id', sectorId)
+        .single();
+
+      if (!proposed) return;
+
+      const originalName = proposed.name.replace(' (Propuesta)', '');
+      const { data: original } = await supabase
+        .from('sectors')
+        .select('*')
+        .eq('name', originalName)
+        .eq('is_proposed', false)
+        .single();
+
+      if (original) {
+        await supabase.from('sector_history').insert({
+          sector_id: original.id,
+          changed_by: (await supabase.auth.getUser()).data.user?.email,
+          action: 'replace',
+          old_geometry: original.polygon,
+          new_geometry: proposed.polygon,
+          parameters: { buffer_m: proposed.buffer_m, source: proposed.source },
+        });
+
+        await supabase
+          .from('sectors')
+          .update({
+            polygon: proposed.polygon,
+            buffer_m: proposed.buffer_m,
+            source: proposed.source,
+            color: proposed.color,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', original.id);
+
+        await supabase.from('sectors').delete().eq('id', sectorId);
+      } else {
+        await supabase
+          .from('sectors')
+          .update({
+            name: originalName,
+            is_proposed: false,
+            enabled: true,
+          })
+          .eq('id', sectorId);
+      }
+
+      toast({
+        title: 'Sector aprobado',
+        description: 'La geometría propuesta se aplicó correctamente',
+      });
+
+      loadSectors();
+    } catch (error) {
+      console.error('Error approving sector:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo aprobar el sector',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-4">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -373,7 +453,10 @@ const SectorsManager = () => {
               ) : (
                 <div className="space-y-3">
                   {sectors.map((sector) => (
-                    <Card key={sector.id} className="p-4">
+                    <Card 
+                      key={sector.id} 
+                      className={`p-4 ${sector.is_proposed || sector.name.includes('(Propuesta)') ? 'border-orange-500 border-2' : ''}`}
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -381,12 +464,27 @@ const SectorsManager = () => {
                             <Badge variant={sector.enabled ? 'default' : 'secondary'}>
                               {sector.enabled ? 'Activo' : 'Inactivo'}
                             </Badge>
+                            {(sector.is_proposed || sector.name.includes('(Propuesta)')) && (
+                              <Badge variant="outline" className="border-orange-500 text-orange-600">
+                                Propuesta
+                              </Badge>
+                            )}
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            ID: {sector.id} • Creado: {new Date(sector.created_at).toLocaleDateString('es-MX')}
+                            ID: {sector.id} • {sector.source === 'osm' ? '📍 OSM' : '🗺️ Mapbox'} • 
+                            Buffer: {sector.buffer_m || 250}m
                           </p>
                         </div>
                         <div className="flex gap-2">
+                          {(sector.is_proposed || sector.name.includes('(Propuesta)')) && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => handleApproveSector(sector.id)}
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -411,17 +509,22 @@ const SectorsManager = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Mapa de Sectores
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-[500px]">
-            <div ref={mapRef} className="w-full h-full rounded-lg" />
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Mapa de Sectores
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="h-[500px]">
+              <div ref={mapRef} className="w-full h-full rounded-lg" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <SectorQAPanel onRefresh={loadSectors} />
+        </div>
       </div>
     </div>
   );

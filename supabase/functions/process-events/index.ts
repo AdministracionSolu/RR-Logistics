@@ -254,6 +254,8 @@ serve(async (req) => {
 
       // Process sectors
       if (sectors) {
+        let currentSectorId = null;
+        
         for (const sector of sectors) {
           try {
             const polygon = sector.polygon?.coordinates?.[0] || sector.polygon;
@@ -273,6 +275,10 @@ serve(async (req) => {
               .eq('ref_id', sector.id)
               .single();
 
+            if (isInside) {
+              currentSectorId = sector.id;
+            }
+
             if (isInside && (!state || !state.is_inside)) {
               // Enter event
               await createEventWithNotification(supabase, {
@@ -285,6 +291,41 @@ serve(async (req) => {
                 ts: pos.ts,
                 meta: { sector_name: sector.name },
               });
+
+              // Check for sector transition
+              const { data: allStates } = await supabase
+                .from('unit_states')
+                .select('*')
+                .eq('unit_id', pos.unit_id)
+                .eq('ref_type', 'sector')
+                .eq('is_inside', true);
+
+              if (allStates && allStates.length > 0) {
+                const previousSector = allStates.find((s) => s.ref_id !== sector.id);
+                if (previousSector) {
+                  // Transition event
+                  const { data: prevSectorData } = await supabase
+                    .from('sectors')
+                    .select('name')
+                    .eq('id', previousSector.ref_id)
+                    .single();
+
+                  await createEventWithNotification(supabase, {
+                    unit_id: pos.unit_id,
+                    type: 'sector_transition',
+                    ref_id: sector.id,
+                    ref_type: 'sector',
+                    lat: pos.lat,
+                    lng: pos.lng,
+                    ts: pos.ts,
+                    meta: {
+                      from_sector: prevSectorData?.name,
+                      to_sector: sector.name,
+                      from_sector_id: previousSector.ref_id,
+                    },
+                  });
+                }
+              }
 
               // Update state
               await supabase.from('unit_states').upsert({
@@ -324,6 +365,61 @@ serve(async (req) => {
             }
           } catch (err) {
             console.error(`Error processing sector ${sector.name}:`, err);
+          }
+        }
+
+        // Check for deviation if in a sector with route
+        if (currentSectorId) {
+          const { data: route } = await supabase
+            .from('routes')
+            .select('*')
+            .eq('sector_id', currentSectorId)
+            .single();
+
+          if (route && route.line_geometry) {
+            // Calculate distance to route line (simple approximation)
+            const coords = route.line_geometry.coordinates || route.line_geometry;
+            let minDist = Infinity;
+
+            for (const coord of coords) {
+              const dist = haversine(
+                parseFloat(pos.lat),
+                parseFloat(pos.lng),
+                coord[1],
+                coord[0]
+              );
+              minDist = Math.min(minDist, dist);
+            }
+
+            // Deviation threshold: 300m
+            if (minDist > 300) {
+              // Check if we haven't recently created a deviation alert
+              const { data: recentDev } = await supabase
+                .from('events')
+                .select('id')
+                .eq('unit_id', pos.unit_id)
+                .eq('type', 'deviation_alert')
+                .gte('ts', new Date(Date.now() - 5 * 60000).toISOString())
+                .single();
+
+              if (!recentDev) {
+                await createEventWithNotification(supabase, {
+                  unit_id: pos.unit_id,
+                  type: 'deviation_alert',
+                  ref_id: currentSectorId,
+                  ref_type: 'sector',
+                  lat: pos.lat,
+                  lng: pos.lng,
+                  ts: pos.ts,
+                  meta: {
+                    distance_from_route_m: Math.round(minDist),
+                    threshold_m: 300,
+                  },
+                });
+
+                eventsCreated++;
+              }
+            }
           }
         }
       }
