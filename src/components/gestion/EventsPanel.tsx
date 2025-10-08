@@ -5,10 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, MapPin, Box, Clock } from 'lucide-react';
+import { RefreshCw, MapPin, Box, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { format, startOfDay, endOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
+import DateRangePicker from '@/components/DateRangePicker';
 
 interface Event {
   id: number;
@@ -28,6 +29,8 @@ const EventsPanel = () => {
   const [loading, setLoading] = useState(true);
   const [filterUnit, setFilterUnit] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
 
   const loadEvents = async () => {
     setLoading(true);
@@ -44,6 +47,14 @@ const EventsPanel = () => {
 
       if (filterType !== 'all') {
         query = query.eq('type', filterType);
+      }
+
+      if (startDate) {
+        query = query.gte('ts', startOfDay(startDate).toISOString());
+      }
+
+      if (endDate) {
+        query = query.lte('ts', endOfDay(endDate).toISOString());
       }
 
       const { data, error } = await query;
@@ -79,7 +90,7 @@ const EventsPanel = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [filterUnit, filterType]);
+  }, [filterUnit, filterType, startDate, endDate]);
 
   const getEventIcon = (refType: string) => {
     return refType === 'checkpoint' ? <MapPin className="h-4 w-4" /> : <Box className="h-4 w-4" />;
@@ -118,25 +129,52 @@ const EventsPanel = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <Input
-              placeholder="Filtrar por unidad..."
-              value={filterUnit}
-              onChange={(e) => setFilterUnit(e.target.value)}
-            />
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo de evento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los eventos</SelectItem>
-                <SelectItem value="checkpoint_enter">Entrada Checkpoint</SelectItem>
-                <SelectItem value="checkpoint_exit">Salida Checkpoint</SelectItem>
-                <SelectItem value="sector_enter">Entrada Sector</SelectItem>
-                <SelectItem value="sector_exit">Salida Sector</SelectItem>
-                <SelectItem value="dwell">Dwell</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                placeholder="Filtrar por unidad..."
+                value={filterUnit}
+                onChange={(e) => setFilterUnit(e.target.value)}
+              />
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Tipo de evento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los eventos</SelectItem>
+                  <SelectItem value="checkpoint_enter">Entrada Checkpoint</SelectItem>
+                  <SelectItem value="checkpoint_exit">Salida Checkpoint</SelectItem>
+                  <SelectItem value="sector_enter">Entrada Sector</SelectItem>
+                  <SelectItem value="sector_exit">Salida Sector</SelectItem>
+                  <SelectItem value="dwell">Dwell</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <DateRangePicker
+                startDate={startDate}
+                endDate={endDate}
+                onDateRangeChange={(start, end) => {
+                  setStartDate(start);
+                  setEndDate(end);
+                }}
+                className="flex-1"
+              />
+              {(startDate || endDate) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setStartDate(undefined);
+                    setEndDate(undefined);
+                  }}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Limpiar fechas
+                </Button>
+              )}
+            </div>
           </div>
 
           <ScrollArea className="h-[500px] pr-4">
