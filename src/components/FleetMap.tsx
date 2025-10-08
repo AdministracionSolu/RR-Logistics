@@ -246,18 +246,16 @@ const FleetMap = () => {
     );
   }
 
-  const { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, Polygon } = rl;
-
   return (
     <div className="relative w-full h-full">
-      <MapContainer
+      <rl.MapContainer
         key={`${mapCenter[0]}-${mapCenter[1]}`}
         center={mapCenter}
         zoom={10}
         className="w-full h-full rounded-lg"
         style={{ minHeight: '400px' }}
       >
-        <TileLayer
+        <rl.TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
@@ -267,7 +265,7 @@ const FleetMap = () => {
           const positions = toPositions(sector.polygon);
           if (!positions) return null;
           return (
-            <Polygon
+            <rl.Polygon
               key={sector.id}
               positions={positions}
               pathOptions={{
@@ -278,14 +276,14 @@ const FleetMap = () => {
                 dashArray: '5, 5',
               }}
             >
-              <Popup>
+              <rl.Popup>
                 <div className="p-2">
                   <strong className="text-lg">{sector.name}</strong>
                   <br />
                   <span className="text-sm text-muted-foreground">Sector (Ruta de Camiones)</span>
                 </div>
-              </Popup>
-            </Polygon>
+              </rl.Popup>
+            </rl.Polygon>
           );
         })}
 
@@ -293,7 +291,7 @@ const FleetMap = () => {
         {checkpoints.map((checkpoint) => {
           if (checkpoint.geometry_type === 'circle' && checkpoint.lat && checkpoint.lng) {
             return (
-              <Circle
+              <rl.Circle
                 key={checkpoint.id}
                 center={[checkpoint.lat, checkpoint.lng]}
                 radius={checkpoint.radius_m || 100}
@@ -303,20 +301,20 @@ const FleetMap = () => {
                   fillOpacity: 0.2,
                 }}
               >
-                <Popup>
+                <rl.Popup>
                   <strong>{checkpoint.name}</strong>
                   <br />
                   Checkpoint Circular
                   <br />
                   Radio: {checkpoint.radius_m}m
-                </Popup>
-              </Circle>
+                </rl.Popup>
+              </rl.Circle>
             );
           } else if (checkpoint.geometry_type === 'polygon') {
             const positions = toPositions(checkpoint.polygon);
             if (!positions) return null;
             return (
-              <Polygon
+              <rl.Polygon
                 key={checkpoint.id}
                 positions={positions}
                 pathOptions={{
@@ -325,12 +323,12 @@ const FleetMap = () => {
                   fillOpacity: 0.2,
                 }}
               >
-                <Popup>
+                <rl.Popup>
                   <strong>{checkpoint.name}</strong>
                   <br />
                   Checkpoint Poligonal
-                </Popup>
-              </Polygon>
+                </rl.Popup>
+              </rl.Polygon>
             );
           }
           return null;
@@ -340,7 +338,7 @@ const FleetMap = () => {
         {trucks.map((truck) => {
           if (!truck.lat || !truck.lng || !truck.trail || truck.trail.length <= 1) return null;
           return (
-            <Polyline
+            <rl.Polyline
               key={`trail-${truck.id}`}
               positions={truck.trail.map(p => [p.lat, p.lng] as [number, number])}
               pathOptions={{
@@ -356,8 +354,8 @@ const FleetMap = () => {
         {trucks.map((truck) => {
           if (!truck.lat || !truck.lng) return null;
           return (
-            <Marker key={`marker-${truck.id}`} position={[truck.lat, truck.lng]} icon={truckIcon}>
-              <Popup>
+            <rl.Marker key={`marker-${truck.id}`} position={[truck.lat, truck.lng]} icon={truckIcon}>
+              <rl.Popup>
                 <div className="space-y-2 min-w-[200px]">
                   <strong className="text-lg">{truck.placas}</strong>
                   <div className="text-sm space-y-1">
@@ -376,25 +374,25 @@ const FleetMap = () => {
                     🚛 Simular Recorrido
                   </Button>
                 </div>
-              </Popup>
-            </Marker>
+              </rl.Popup>
+            </rl.Marker>
           );
         })}
 
         {/* Simulation route */}
         {routePoints && routePoints.length > 0 && (
           <>
-            <Polyline
+            <rl.Polyline
               positions={routePoints.slice(0, currentPointIndex + 1).map((p) => [p.lat, p.lng] as [number, number])}
               pathOptions={{ color: '#22c55e', weight: 3 }}
             />
-            <Polyline
+            <rl.Polyline
               positions={routePoints.slice(currentPointIndex).map((p) => [p.lat, p.lng] as [number, number])}
               pathOptions={{ color: '#94a3b8', weight: 2, dashArray: '5, 5' }}
             />
           </>
         )}
-      </MapContainer>
+      </rl.MapContainer>
 
       {selectedTruck && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000]">

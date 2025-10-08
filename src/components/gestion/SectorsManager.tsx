@@ -56,15 +56,13 @@ const SectorPolygons = ({ sectors, rl }: { sectors: Sector[]; rl: any }) => {
 
   if (validSectors.length === 0) return null;
 
-  const { Polygon, Popup } = rl;
-
   return (
     <>
       {validSectors.map((sector) => {
         const positions = toPositions(sector.polygon);
         if (!positions) return null;
         return (
-          <Polygon
+          <rl.Polygon
             key={`sector-${sector.id}`}
             positions={positions}
             pathOptions={{
@@ -74,10 +72,10 @@ const SectorPolygons = ({ sectors, rl }: { sectors: Sector[]; rl: any }) => {
               weight: 2,
             }}
           >
-            <Popup>
+            <rl.Popup>
               <strong>{sector.name}</strong>
-            </Popup>
-          </Polygon>
+            </rl.Popup>
+          </rl.Polygon>
         );
       })}
     </>
