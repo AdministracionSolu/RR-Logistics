@@ -455,8 +455,7 @@ const FleetMap = () => {
         <div style="min-width: 200px;">
           <strong style="font-size: 1.1em;">${truck.placas}</strong>
           <div style="margin-top: 8px; font-size: 0.9em;">
-            <p><strong>Modelo:</strong> ${truck.modelo || 'N/A'}</p>
-            ${truck.spot_unit_id ? `<p><strong>SPOT:</strong> ${truck.spot_unit_id}</p>` : ''}
+            <p><strong>Modelo:</strong> RR Logistics 2025</p>
             ${truck.tag_id ? `<p><strong>TAG:</strong> ${truck.tag_id}</p>` : ''}
             ${truck.caseta_nombre ? `<p><strong>Última caseta:</strong> ${truck.caseta_nombre}</p>` : ''}
             ${truck.ultimo_cruce_timestamp ? `<p><strong>Último cruce:</strong> ${new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX')}</p>` : ''}
