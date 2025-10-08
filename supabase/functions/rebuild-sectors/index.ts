@@ -69,6 +69,18 @@ const SECTOR_DEFINITIONS: SectorDefinition[] = [
     ],
     bufferMeters: 0.2, // 200m
   },
+  {
+    id: 5,
+    name: "Sector Monterrey",
+    color: "#10b981", // Verde
+    waypoints: [
+      [-100.363, 25.686],
+      [-100.350, 25.690],
+      [-100.340, 25.695],
+      [-100.330, 25.700],
+    ],
+    bufferMeters: 0.5, // 500m buffer para cubrir bien la ruta
+  },
 ];
 
 // Overpass API queries for real geometry
@@ -245,23 +257,58 @@ serve(async (req) => {
           }
         }
 
-        // Insert as proposed version
-        const { data: newSector, error } = await supabase
+        // Check if sector already exists
+        const { data: existingSector } = await supabase
           .from('sectors')
-          .insert({
-            name: `${sector.name} (Propuesta)`,
-            polygon: polygon,
-            enabled: false,
-            is_proposed: mark_as_proposed,
-            source: source,
-            buffer_m: buffer_m,
-            color: sector.color,
-          })
-          .select()
-          .single();
+          .select('id')
+          .eq('name', sector.name)
+          .maybeSingle();
+
+        let newSector;
+        let error;
+
+        if (existingSector) {
+          // Update existing sector
+          console.log(`Updating existing sector: ${sector.name}`);
+          const result = await supabase
+            .from('sectors')
+            .update({
+              polygon: polygon,
+              enabled: true,
+              source: source,
+              buffer_m: buffer_m,
+              color: sector.color,
+              is_proposed: false,
+            })
+            .eq('id', existingSector.id)
+            .select()
+            .single();
+          
+          newSector = result.data;
+          error = result.error;
+        } else {
+          // Insert new sector
+          console.log(`Creating new sector: ${sector.name}`);
+          const result = await supabase
+            .from('sectors')
+            .insert({
+              name: sector.name,
+              polygon: polygon,
+              enabled: true,
+              is_proposed: false,
+              source: source,
+              buffer_m: buffer_m,
+              color: sector.color,
+            })
+            .select()
+            .single();
+          
+          newSector = result.data;
+          error = result.error;
+        }
 
         if (error) {
-          console.error(`Error inserting ${sector.name}:`, error);
+          console.error(`Error upserting ${sector.name}:`, error);
           throw error;
         }
 
