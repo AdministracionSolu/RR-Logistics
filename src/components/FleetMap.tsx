@@ -70,6 +70,7 @@ const FleetMap = () => {
   const [trucks, setTrucks] = useState<TruckLocation[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [checkpoints, setCheckpoints] = useState<any[]>([]);
+  const [routes, setRoutes] = useState<any[]>([]);
 
   // Initialize map
   useEffect(() => {
@@ -109,6 +110,7 @@ const FleetMap = () => {
     loadTrucks();
     loadSectors();
     loadCheckpoints();
+    loadRoutes();
 
     const trucksChannel = supabase
       .channel('ubicaciones_tiempo_real_changes')
@@ -138,11 +140,19 @@ const FleetMap = () => {
       })
       .subscribe();
 
+    const routesChannel = supabase
+      .channel('routes_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'routes' }, () => {
+        loadRoutes();
+      })
+      .subscribe();
+
     return () => {
       trucksChannel.unsubscribe();
       positionsChannel.unsubscribe();
       sectorsChannel.unsubscribe();
       checkpointsChannel.unsubscribe();
+      routesChannel.unsubscribe();
       cleanup();
     };
   }, [cleanup]);
@@ -170,6 +180,18 @@ const FleetMap = () => {
       setCheckpoints(data || []);
     } catch (error) {
       console.error('Error loading checkpoints:', error);
+    }
+  };
+
+  const loadRoutes = async () => {
+    try {
+      const { data } = await supabase
+        .from('routes')
+        .select('*');
+
+      setRoutes(data || []);
+    } catch (error) {
+      console.error('Error loading routes:', error);
     }
   };
 
@@ -298,6 +320,7 @@ const FleetMap = () => {
       'Sector Carretera': '#E54848',
       'Sector San Francisco del Oro': '#4ADE80',
       'Sector Mina': '#A855F7',
+      'Sector Prueba Monterrey': '#1267FF',
     };
 
     // Add sectors
@@ -305,7 +328,7 @@ const FleetMap = () => {
       const positions = toPositions(sector.polygon);
       if (!positions) return;
       
-      const color = sectorColors[sector.name] || '#3b82f6';
+      const color = sectorColors[sector.name] || sector.color || '#3b82f6';
       
       const polygon = L.polygon(positions, {
         color: color,
@@ -322,6 +345,49 @@ const FleetMap = () => {
         </div>
       `);
       layersRef.current.push(polygon);
+    });
+
+    // Add routes
+    routes.forEach(route => {
+      if (!route.line_geometry?.coordinates) return;
+
+      const coords = route.line_geometry.coordinates;
+      const latlngs: [number, number][] = coords.map((coord: number[]) => 
+        [coord[1], coord[0]] as [number, number]
+      );
+
+      // Draw the route line
+      const polyline = L.polyline(latlngs, {
+        color: route.line_geometry.color || '#1267FF',
+        weight: route.line_geometry.weight || 5,
+        opacity: 0.8,
+      }).addTo(mapInstanceRef.current!);
+
+      polyline.bindPopup(`
+        <div style="padding: 8px;">
+          <strong style="font-size: 1.1em;">${route.name}</strong>
+          <p style="margin: 4px 0 0 0; font-size: 0.9em; color: ${route.line_geometry.color || '#1267FF'};">Ruta de referencia</p>
+        </div>
+      `);
+
+      layersRef.current.push(polyline);
+
+      // Add markers if specified
+      if (route.line_geometry.markers) {
+        route.line_geometry.markers.forEach((marker: any) => {
+          const markerIcon = L.divIcon({
+            className: 'custom-route-marker',
+            html: `<div style="background: ${marker.color || '#1267FF'}; color: white; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${marker.label}</div>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          });
+
+          const leafletMarker = L.marker([marker.lat, marker.lng], { icon: markerIcon })
+            .addTo(mapInstanceRef.current!);
+
+          layersRef.current.push(leafletMarker);
+        });
+      }
     });
 
     // Add checkpoints
@@ -389,7 +455,7 @@ const FleetMap = () => {
       marker.bindPopup(popupContent);
       markersRef.current.push(marker);
     });
-  }, [trucks, sectors, checkpoints]);
+  }, [trucks, sectors, checkpoints, routes]);
 
   // Update simulation route
   useEffect(() => {
