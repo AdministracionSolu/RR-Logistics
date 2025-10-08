@@ -10,7 +10,8 @@ interface TruckLocation {
   id: string;
   placas: string;
   modelo: string;
-  tag_id: string;
+  tag_id: string | null;
+  spot_unit_id: string | null;
   saldo_actual: number;
   gasto_dia_actual: number;
   ultimo_cruce_timestamp: string | null;
@@ -181,13 +182,14 @@ const FleetMap = () => {
           placas,
           modelo,
           tag_id,
+          spot_unit_id,
           saldo_actual,
           gasto_dia_actual,
           ultimo_cruce_timestamp,
           estado
         `)
         .eq('estado', 'activo')
-        .not('tag_id', 'is', null);
+        .or('tag_id.not.is.null,spot_unit_id.not.is.null');
 
       if (!trucksData) return;
 
@@ -195,16 +197,18 @@ const FleetMap = () => {
 
       for (const truck of trucksData) {
         // First try to get latest position from API (positions table)
+        // Use spot_unit_id if available, otherwise fallback to tag_id
+        const unitId = truck.spot_unit_id || truck.tag_id;
         const { data: apiPosition } = await supabase
           .from('positions')
           .select('lat, lng, ts')
-          .eq('unit_id', truck.tag_id)
+          .eq('unit_id', unitId)
           .order('ts', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        // If no API position, fallback to toll events
-        const { data: latestEvent } = await supabase
+        // If no API position, fallback to toll events (only if truck has tag_id)
+        const { data: latestEvent } = truck.tag_id ? await supabase
           .from('toll_events')
           .select(`
             fecha_hora,
@@ -218,10 +222,10 @@ const FleetMap = () => {
           .eq('tag_id', truck.tag_id)
           .order('fecha_hora', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle() : { data: null };
 
-        // Get trail from both sources
-        const { data: trailData } = await supabase
+        // Get trail from toll events (only if truck has tag_id)
+        const { data: trailData } = truck.tag_id ? await supabase
           .from('toll_events')
           .select(`
             fecha_hora,
@@ -234,7 +238,7 @@ const FleetMap = () => {
           .eq('tag_id', truck.tag_id)
           .gte('fecha_hora', new Date().toISOString().split('T')[0])
           .order('fecha_hora', { ascending: false })
-          .limit(5);
+          .limit(5) : { data: null };
 
         // Prioritize API position over toll events
         const lat = apiPosition?.lat || latestEvent?.casetas_autopista?.lat;
@@ -357,11 +361,12 @@ const FleetMap = () => {
           <strong style="font-size: 1.1em;">${truck.placas}</strong>
           <div style="margin-top: 8px; font-size: 0.9em;">
             <p><strong>Modelo:</strong> ${truck.modelo || 'N/A'}</p>
-            <p><strong>TAG:</strong> ${truck.tag_id}</p>
-            <p><strong>Última caseta:</strong> ${truck.caseta_nombre || 'N/A'}</p>
-            <p><strong>Último cruce:</strong> ${truck.ultimo_cruce_timestamp ? new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX') : 'Sin cruces recientes'}</p>
-            <p><strong>Saldo:</strong> $${truck.saldo_actual?.toFixed(2) || '0.00'}</p>
-            <p><strong>Gasto hoy:</strong> $${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>
+            ${truck.spot_unit_id ? `<p><strong>SPOT:</strong> ${truck.spot_unit_id}</p>` : ''}
+            ${truck.tag_id ? `<p><strong>TAG:</strong> ${truck.tag_id}</p>` : ''}
+            ${truck.caseta_nombre ? `<p><strong>Última caseta:</strong> ${truck.caseta_nombre}</p>` : ''}
+            ${truck.ultimo_cruce_timestamp ? `<p><strong>Último cruce:</strong> ${new Date(truck.ultimo_cruce_timestamp).toLocaleString('es-MX')}</p>` : ''}
+            ${truck.tag_id ? `<p><strong>Saldo:</strong> $${truck.saldo_actual?.toFixed(2) || '0.00'}</p>` : ''}
+            ${truck.tag_id ? `<p><strong>Gasto hoy:</strong> $${truck.gasto_dia_actual?.toFixed(2) || '0.00'}</p>` : ''}
           </div>
         </div>
       `;

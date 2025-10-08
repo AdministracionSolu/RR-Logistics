@@ -150,6 +150,7 @@ export type Database = {
           placas: string
           ruta_asignada_id: string | null
           saldo_actual: number | null
+          spot_unit_id: string | null
           tag_id: string | null
           ubicacion_actual_lat: number | null
           ubicacion_actual_lng: number | null
@@ -173,6 +174,7 @@ export type Database = {
           placas: string
           ruta_asignada_id?: string | null
           saldo_actual?: number | null
+          spot_unit_id?: string | null
           tag_id?: string | null
           ubicacion_actual_lat?: number | null
           ubicacion_actual_lng?: number | null
@@ -196,6 +198,7 @@ export type Database = {
           placas?: string
           ruta_asignada_id?: string | null
           saldo_actual?: number | null
+          spot_unit_id?: string | null
           tag_id?: string | null
           ubicacion_actual_lat?: number | null
           ubicacion_actual_lng?: number | null
