@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,6 +62,7 @@ const toPositions = (polygon: any): [number, number][] | null => {
 
 const FleetMap = () => {
   const [isClient, setIsClient] = useState(false);
+  const [rl, setRl] = useState<any>(null);
   const [trucks, setTrucks] = useState<TruckLocation[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [checkpoints, setCheckpoints] = useState<any[]>([]);
@@ -70,6 +70,7 @@ const FleetMap = () => {
 
   useEffect(() => {
     setIsClient(true);
+    import('react-leaflet').then((module) => setRl(module));
   }, []);
 
   const {
@@ -237,13 +238,15 @@ const FleetMap = () => {
     startSimulation();
   };
 
-  if (!isClient) {
+  if (!isClient || !rl) {
     return (
       <div className="w-full h-full min-h-[400px] rounded-lg bg-muted flex items-center justify-center">
         <p className="text-muted-foreground">Cargando mapa...</p>
       </div>
     );
   }
+
+  const { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, Polygon } = rl;
 
   return (
     <div className="relative w-full h-full">

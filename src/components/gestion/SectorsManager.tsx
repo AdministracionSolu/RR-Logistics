@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from 'react';
-import { MapContainer, TileLayer, Polygon, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -49,13 +48,15 @@ const toPositions = (polygon: any): [number, number][] | null => {
   }
 };
 
-const SectorPolygons = ({ sectors }: { sectors: Sector[] }) => {
+const SectorPolygons = ({ sectors, rl }: { sectors: Sector[]; rl: any }) => {
   const validSectors = useMemo(
     () => sectors.filter((s) => s.enabled && toPositions(s.polygon)),
     [sectors]
   );
 
   if (validSectors.length === 0) return null;
+
+  const { Polygon, Popup } = rl;
 
   return (
     <>
@@ -88,6 +89,7 @@ const SectorsManager = () => {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [rl, setRl] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     polygon: '',
@@ -98,6 +100,7 @@ const SectorsManager = () => {
 
   useEffect(() => {
     setIsClient(true);
+    import('react-leaflet').then((module) => setRl(module));
   }, []);
 
   const loadSectors = async () => {
@@ -392,22 +395,22 @@ const SectorsManager = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[500px]">
-            {!isClient ? (
+            {!isClient || !rl ? (
               <div className="flex items-center justify-center h-full bg-muted rounded-lg">
                 <p className="text-muted-foreground">Cargando mapa...</p>
               </div>
             ) : sectors.length > 0 ? (
-              <MapContainer
+              <rl.MapContainer
                 center={[26.9, -105.8]}
                 zoom={8}
                 className="w-full h-full rounded-lg"
               >
-                <TileLayer
+                <rl.TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <SectorPolygons sectors={sectors} />
-              </MapContainer>
+                <SectorPolygons sectors={sectors} rl={rl} />
+              </rl.MapContainer>
             ) : (
               <div className="flex items-center justify-center h-full bg-muted rounded-lg">
                 <p className="text-muted-foreground">No hay sectores para mostrar</p>
