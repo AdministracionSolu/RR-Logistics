@@ -99,7 +99,7 @@ const Gestion = () => {
                   <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-blue-500/10 rounded-md">
                     <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </div>
-                  <span className="text-sm sm:text-base font-semibold">Eventos en Vivo</span>
+                  <span className="text-sm sm:text-base font-semibold">Eventos</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2">
