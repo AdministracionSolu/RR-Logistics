@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import DashboardA from "./pages/DashboardA";
 import DashboardB from "./pages/DashboardB";
 import Gestion from "./pages/Gestion";
+import Configuracion from "./pages/Configuracion";
 import Eventos from "./pages/Eventos";
 import BotAdmin from "./pages/BotAdmin";
 import NotFound from "./pages/NotFound";
@@ -65,6 +66,11 @@ const App = () => (
             <Route path="/gestion" element={
               <ProtectedRoute allowedUserTypes={['tipo_b']}>
                 <Gestion />
+              </ProtectedRoute>
+            } />
+            <Route path="/configuracion" element={
+              <ProtectedRoute allowedUserTypes={['tipo_b']}>
+                <Configuracion />
               </ProtectedRoute>
             } />
             <Route path="/eventos" element={

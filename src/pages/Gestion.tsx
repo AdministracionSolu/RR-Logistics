@@ -1,13 +1,9 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { LogOut, Map, Activity, MapPin, Box, Bell } from 'lucide-react';
+import { LogOut, Map, Activity, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import EventsPanel from '@/components/gestion/EventsPanel';
-import CheckpointsManager from '@/components/gestion/CheckpointsManager';
-import SectorsManager from '@/components/gestion/SectorsManager';
-import NotifyRulesManager from '@/components/gestion/NotifyRulesManager';
 import FleetMap from '@/components/FleetMap';
 
 const Gestion = () => {
@@ -62,6 +58,15 @@ const Gestion = () => {
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/configuracion')}
+              className="flex items-center gap-1.5"
+            >
+              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline text-xs sm:text-sm">Configuración</span>
+            </Button>
             <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline">
               {profile?.full_name || profile?.email}
             </span>
@@ -83,66 +88,10 @@ const Gestion = () => {
         <FleetMap />
       </section>
 
-      {/* Management Sections */}
+      {/* Events Panel */}
       <main className="flex-1 overflow-y-auto">
         <div className="container mx-auto p-3 sm:p-4 md:p-6">
-          <Accordion type="multiple" defaultValue={["eventos"]} className="w-full space-y-3 sm:space-y-4">
-            <AccordionItem value="eventos" className="border rounded-lg bg-card shadow-sm">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-blue-500/10 rounded-md">
-                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                  </div>
-                  <span className="text-sm sm:text-base font-semibold">Eventos</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <EventsPanel />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="checkpoints" className="border rounded-lg bg-card shadow-sm">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
-                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  </div>
-                  <span className="text-sm sm:text-base font-semibold">Checkpoints</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <CheckpointsManager />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="sectores" className="border rounded-lg bg-card shadow-sm">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-purple-500/10 rounded-md">
-                    <Box className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-                  </div>
-                  <span className="text-sm sm:text-base font-semibold">Sectores</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <SectorsManager />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="notificaciones" className="border rounded-lg bg-card shadow-sm">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-amber-500/10 rounded-md">
-                    <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
-                  </div>
-                  <span className="text-sm sm:text-base font-semibold">Notificaciones</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <NotifyRulesManager />
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <EventsPanel />
         </div>
       </main>
     </div>
