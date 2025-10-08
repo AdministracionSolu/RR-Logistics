@@ -79,7 +79,7 @@ const Gestion = () => {
       </header>
 
       {/* Map Section */}
-      <section className="w-full h-[40vh] sm:h-[45vh] md:h-[50vh] border-b">
+      <section className="w-full flex-shrink-0" style={{ height: 'min(50vh, 500px)' }}>
         <FleetMap />
       </section>
 

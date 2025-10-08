@@ -69,13 +69,12 @@ const FleetMap = () => {
   const [trucks, setTrucks] = useState<TruckLocation[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [checkpoints, setCheckpoints] = useState<any[]>([]);
-  const [mapCenter] = useState<[number, number]>([19.4326, -99.1332]);
 
   // Initialize map
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    const map = L.map(mapRef.current).setView(mapCenter, 10);
+    const map = L.map(mapRef.current).setView([19.4326, -99.1332], 10);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

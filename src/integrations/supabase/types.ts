@@ -157,6 +157,7 @@ export type Database = {
           ultimo_cruce_timestamp: string | null
           ultimo_mantenimiento: string | null
           updated_at: string
+          user_id: string | null
           velocidad_actual: number | null
         }
         Insert: {
@@ -179,6 +180,7 @@ export type Database = {
           ultimo_cruce_timestamp?: string | null
           ultimo_mantenimiento?: string | null
           updated_at?: string
+          user_id?: string | null
           velocidad_actual?: number | null
         }
         Update: {
@@ -201,6 +203,7 @@ export type Database = {
           ultimo_cruce_timestamp?: string | null
           ultimo_mantenimiento?: string | null
           updated_at?: string
+          user_id?: string | null
           velocidad_actual?: number | null
         }
         Relationships: [
