@@ -33,13 +33,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
-// Custom truck icon
+// Custom truck icon - larger and easier to click
 const truckIcon = L.divIcon({
-  html: '🚛',
+  html: '<div style="font-size: 32px; cursor: pointer; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🚛</div>',
   className: 'truck-marker',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [0, -15],
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -20],
 });
 
 // Helper: safely convert GeoJSON Polygon to Leaflet positions
@@ -116,6 +116,13 @@ const FleetMap = () => {
       })
       .subscribe();
 
+    const positionsChannel = supabase
+      .channel('positions_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, () => {
+        loadTrucks();
+      })
+      .subscribe();
+
     const sectorsChannel = supabase
       .channel('sectors_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sectors' }, () => {
@@ -132,6 +139,7 @@ const FleetMap = () => {
 
     return () => {
       trucksChannel.unsubscribe();
+      positionsChannel.unsubscribe();
       sectorsChannel.unsubscribe();
       checkpointsChannel.unsubscribe();
       cleanup();
@@ -186,6 +194,16 @@ const FleetMap = () => {
       const trucksWithLocations: TruckLocation[] = [];
 
       for (const truck of trucksData) {
+        // First try to get latest position from API (positions table)
+        const { data: apiPosition } = await supabase
+          .from('positions')
+          .select('lat, lng, ts')
+          .eq('unit_id', truck.tag_id)
+          .order('ts', { ascending: false })
+          .limit(1)
+          .single();
+
+        // If no API position, fallback to toll events
         const { data: latestEvent } = await supabase
           .from('toll_events')
           .select(`
@@ -202,6 +220,7 @@ const FleetMap = () => {
           .limit(1)
           .single();
 
+        // Get trail from both sources
         const { data: trailData } = await supabase
           .from('toll_events')
           .select(`
@@ -217,10 +236,14 @@ const FleetMap = () => {
           .order('fecha_hora', { ascending: false })
           .limit(5);
 
+        // Prioritize API position over toll events
+        const lat = apiPosition?.lat || latestEvent?.casetas_autopista?.lat;
+        const lng = apiPosition?.lng || latestEvent?.casetas_autopista?.lng;
+
         const truckLocation: TruckLocation = {
           ...truck,
-          lat: latestEvent?.casetas_autopista?.lat,
-          lng: latestEvent?.casetas_autopista?.lng,
+          lat,
+          lng,
           caseta_nombre: latestEvent?.caseta_nombre,
           trail: trailData?.map(event => ({
             lat: event.casetas_autopista?.lat || 0,
