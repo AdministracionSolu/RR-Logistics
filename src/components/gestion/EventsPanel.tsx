@@ -158,29 +158,31 @@ const EventsPanel = () => {
               </Select>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <DateRangePicker
-                startDate={startDate}
-                endDate={endDate}
-                onDateRangeChange={(start, end) => {
-                  setStartDate(start);
-                  setEndDate(end);
-                }}
-                className="flex-1"
-              />
-              {(startDate || endDate) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setStartDate(undefined);
-                    setEndDate(undefined);
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <DateRangePicker
+                  startDate={startDate}
+                  endDate={endDate}
+                  onDateRangeChange={(start, end) => {
+                    setStartDate(start);
+                    setEndDate(end);
                   }}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Limpiar fechas
-                </Button>
-              )}
+                  className="flex-1"
+                />
+                {(startDate || endDate) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setStartDate(undefined);
+                      setEndDate(undefined);
+                    }}
+                    className="flex-shrink-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 

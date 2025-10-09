@@ -323,8 +323,8 @@ const FleetMap = () => {
       'Sector Prueba Monterrey': '#1267FF',
     };
 
-    // Add sectors
-    sectors.forEach(sector => {
+    // Add sectors (filter out "Sector Monterrey")
+    sectors.filter(sector => sector.name !== 'Sector Monterrey').forEach(sector => {
       const positions = toPositions(sector.polygon);
       if (!positions) return;
       
