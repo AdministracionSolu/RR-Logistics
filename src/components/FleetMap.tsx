@@ -76,10 +76,12 @@ const FleetMap = () => {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    const map = L.map(mapRef.current).setView([19.4326, -99.1332], 10);
+    const map = L.map(mapRef.current, {
+      attributionControl: false
+    }).setView([19.4326, -99.1332], 10);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: ''
     }).addTo(map);
 
     mapInstanceRef.current = map;
