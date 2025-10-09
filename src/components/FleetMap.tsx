@@ -361,26 +361,60 @@ const FleetMap = () => {
 
     // Add sectors (filter out "Sector Monterrey")
     sectors.filter(sector => sector.name !== 'Sector Monterrey').forEach(sector => {
-      const positions = toPositions(sector.polygon);
-      if (!positions) return;
-      
-      const color = sectorColors[sector.name] || sector.color || '#3b82f6';
-      
-      const polygon = L.polygon(positions, {
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.25,
-        weight: 3,
-        opacity: 0.8,
-      }).addTo(mapInstanceRef.current!);
-      
-      polygon.bindPopup(`
-        <div style="padding: 8px;">
-          <strong style="color: ${color}; font-size: 1.1em;">${sector.name}</strong>
-          <p style="margin: 4px 0 0 0; font-size: 0.9em;">Zona de monitoreo activo</p>
-        </div>
-      `);
-      layersRef.current.push(polygon);
+      // Support both FeatureCollection and direct polygon formats
+      if (sector.polygon?.features) {
+        // FeatureCollection format (new)
+        sector.polygon.features.forEach((feature: any) => {
+          if (feature.geometry?.type === 'Polygon') {
+            const coords = feature.geometry.coordinates[0]; // First ring (outer boundary)
+            const properties = feature.properties || {};
+            const positions: [number, number][] = coords.map((coord: number[]) => 
+              [coord[1], coord[0]] as [number, number]
+            );
+
+            const fillColor = properties.fillColor || sectorColors[sector.name] || sector.color || '#3b82f6';
+            const borderColor = properties.borderColor || fillColor;
+
+            const polygon = L.polygon(positions, {
+              color: borderColor,
+              fillColor: fillColor,
+              fillOpacity: properties.fillOpacity || 0.25,
+              weight: properties.borderWeight || 3,
+              opacity: 0.8,
+            }).addTo(mapInstanceRef.current!);
+
+            polygon.bindPopup(`
+              <div style="padding: 8px;">
+                <strong style="color: ${fillColor}; font-size: 1.1em;">${properties.name || sector.name}</strong>
+                <p style="margin: 4px 0 0 0; font-size: 0.9em;">Zona de monitoreo activo</p>
+              </div>
+            `);
+            layersRef.current.push(polygon);
+          }
+        });
+      } else {
+        // Direct format (old)
+        const positions = toPositions(sector.polygon);
+        if (!positions) return;
+        
+        const color = sectorColors[sector.name] || sector.color || '#3b82f6';
+        
+        const polygon = L.polygon(positions, {
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.25,
+          weight: 3,
+          opacity: 0.8,
+        }).addTo(mapInstanceRef.current!);
+        
+        polygon.bindPopup(`
+          <div style="padding: 8px;">
+            <strong style="color: ${color}; font-size: 1.1em;">${sector.name}</strong>
+            <p style="margin: 4px 0 0 0; font-size: 0.9em;">Zona de monitoreo activo</p>
+          </div>
+        `);
+        layersRef.current.push(polygon);
+      }
     });
 
     // Add routes
