@@ -43,7 +43,7 @@ const DashboardB = () => {
             <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-md">
               <Map className="h-5 w-5 text-primary-foreground" />
             </div>
-            <h1 className="text-lg font-semibold">Dashboard de Seguimiento</h1>
+            <h1 className="text-lg font-semibold">RR Logistics - Demo</h1>
           </div>
           
           <div className="flex items-center space-x-4">
