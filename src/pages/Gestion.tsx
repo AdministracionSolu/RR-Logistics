@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { LogOut, Map, Activity, Settings } from 'lucide-react';
+import { LogOut, Map, Activity, Settings, Gauge } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -91,7 +91,7 @@ const Gestion = () => {
 
       {/* Events Panel */}
       <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto p-3 sm:p-4 md:p-6">
+        <div className="container mx-auto p-3 sm:p-4 md:p-6 space-y-4">
           <Accordion type="multiple" defaultValue={["eventos"]} className="w-full">
             <AccordionItem value="eventos" className="border rounded-lg bg-card shadow-sm">
               <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
@@ -104,6 +104,22 @@ const Gestion = () => {
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2">
                 <EventsPanel />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="velocidad" className="border rounded-lg bg-card shadow-sm">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
+                    <Gauge className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold">Velocidad</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <div className="w-full" style={{ height: '500px' }}>
+                  <FleetMap />
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
