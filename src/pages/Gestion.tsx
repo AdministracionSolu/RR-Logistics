@@ -40,22 +40,11 @@ const Gestion = () => {
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4">
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/dashboard-b')}
-              className="flex items-center gap-1.5 sm:gap-2"
-            >
-              <Map className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="text-xs sm:text-sm">Volver</span>
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-md">
-                <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
-              </div>
-              <h1 className="text-base sm:text-lg font-semibold">Gestión</h1>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-md">
+              <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
             </div>
+            <h1 className="text-base sm:text-lg font-semibold">Gestión</h1>
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
