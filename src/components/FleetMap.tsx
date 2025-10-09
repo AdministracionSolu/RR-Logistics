@@ -385,44 +385,71 @@ const FleetMap = () => {
 
     // Add routes
     routes.forEach(route => {
-      if (!route.line_geometry?.coordinates) return;
+      // Support both FeatureCollection and direct geometry formats
+      if (route.line_geometry?.features) {
+        // FeatureCollection format (new)
+        route.line_geometry.features.forEach((feature: any) => {
+          if (feature.geometry?.type === 'LineString') {
+            const coords = feature.geometry.coordinates;
+            const properties = feature.properties || {};
+            const latlngs: [number, number][] = coords.map((coord: number[]) => 
+              [coord[1], coord[0]] as [number, number]
+            );
 
-      const coords = route.line_geometry.coordinates;
-      const latlngs: [number, number][] = coords.map((coord: number[]) => 
-        [coord[1], coord[0]] as [number, number]
-      );
+            const polyline = L.polyline(latlngs, {
+              color: properties.color || '#1267FF',
+              weight: properties.weight || 5,
+              opacity: properties.opacity || 0.8,
+            }).addTo(mapInstanceRef.current!);
 
-      // Draw the route line
-      const polyline = L.polyline(latlngs, {
-        color: route.line_geometry.color || '#1267FF',
-        weight: route.line_geometry.weight || 5,
-        opacity: 0.8,
-      }).addTo(mapInstanceRef.current!);
+            polyline.bindPopup(`
+              <div style="padding: 8px;">
+                <strong style="font-size: 1.1em;">${properties.name || route.name}</strong>
+                <p style="margin: 4px 0 0 0; font-size: 0.9em; color: ${properties.color || '#1267FF'};">Ruta de referencia</p>
+              </div>
+            `);
 
-      polyline.bindPopup(`
-        <div style="padding: 8px;">
-          <strong style="font-size: 1.1em;">${route.name}</strong>
-          <p style="margin: 4px 0 0 0; font-size: 0.9em; color: ${route.line_geometry.color || '#1267FF'};">Ruta de referencia</p>
-        </div>
-      `);
-
-      layersRef.current.push(polyline);
-
-      // Add markers if specified
-      if (route.line_geometry.markers) {
-        route.line_geometry.markers.forEach((marker: any) => {
-          const markerIcon = L.divIcon({
-            className: 'custom-route-marker',
-            html: `<div style="background: ${marker.color || '#1267FF'}; color: white; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${marker.label}</div>`,
-            iconSize: [0, 0],
-            iconAnchor: [0, 0],
-          });
-
-          const leafletMarker = L.marker([marker.lat, marker.lng], { icon: markerIcon })
-            .addTo(mapInstanceRef.current!);
-
-          layersRef.current.push(leafletMarker);
+            layersRef.current.push(polyline);
+          }
         });
+      } else if (route.line_geometry?.coordinates) {
+        // Direct format (old)
+        const coords = route.line_geometry.coordinates;
+        const latlngs: [number, number][] = coords.map((coord: number[]) => 
+          [coord[1], coord[0]] as [number, number]
+        );
+
+        const polyline = L.polyline(latlngs, {
+          color: route.line_geometry.color || '#1267FF',
+          weight: route.line_geometry.weight || 5,
+          opacity: 0.8,
+        }).addTo(mapInstanceRef.current!);
+
+        polyline.bindPopup(`
+          <div style="padding: 8px;">
+            <strong style="font-size: 1.1em;">${route.name}</strong>
+            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: ${route.line_geometry.color || '#1267FF'};">Ruta de referencia</p>
+          </div>
+        `);
+
+        layersRef.current.push(polyline);
+
+        // Add markers if specified
+        if (route.line_geometry.markers) {
+          route.line_geometry.markers.forEach((marker: any) => {
+            const markerIcon = L.divIcon({
+              className: 'custom-route-marker',
+              html: `<div style="background: ${marker.color || '#1267FF'}; color: white; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${marker.label}</div>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            });
+
+            const leafletMarker = L.marker([marker.lat, marker.lng], { icon: markerIcon })
+              .addTo(mapInstanceRef.current!);
+
+            layersRef.current.push(leafletMarker);
+          });
+        }
       }
     });
 
