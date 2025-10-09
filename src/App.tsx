@@ -29,7 +29,7 @@ const DashboardRouter = () => {
   if (profile.user_type === 'tipo_a') {
     return <Navigate to="/dashboard-a" replace />;
   } else if (profile.user_type === 'tipo_b') {
-    return <Navigate to="/dashboard-b" replace />;
+    return <Navigate to="/gestion" replace />;
   }
 
   return <Navigate to="/login" replace />;
@@ -91,7 +91,11 @@ const App = () => (
                 </div>
               </ProtectedRoute>
             } />
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <DashboardRouter />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
