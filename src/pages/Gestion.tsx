@@ -85,7 +85,7 @@ const Gestion = () => {
       </header>
 
       {/* Map Section */}
-      <section className="w-full" style={{ height: '400px' }}>
+      <section id="mapa-velocidad" className="w-full" style={{ height: '400px' }}>
         <FleetMap />
       </section>
 
@@ -106,23 +106,28 @@ const Gestion = () => {
                 <EventsPanel />
               </AccordionContent>
             </AccordionItem>
-
-            <AccordionItem value="velocidad" className="border rounded-lg bg-card shadow-sm">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
-                    <Gauge className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  </div>
-                  <span className="text-sm sm:text-base font-semibold">Velocidad</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <div className="w-full" style={{ height: '500px' }}>
-                  <FleetMap />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
           </Accordion>
+
+          {/* Velocidad Button */}
+          <div className="border rounded-lg bg-card shadow-sm">
+            <Button
+              variant="ghost"
+              className="w-full px-4 py-3 hover:bg-muted/50 rounded-lg justify-start"
+              onClick={() => {
+                document.getElementById('mapa-velocidad')?.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'start' 
+                });
+              }}
+            >
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
+                  <Gauge className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                </div>
+                <span className="text-sm sm:text-base font-semibold">Velocidad</span>
+              </div>
+            </Button>
+          </div>
         </div>
       </main>
     </div>
