@@ -113,12 +113,7 @@ const Gestion = () => {
             <Button
               variant="ghost"
               className="w-full px-4 py-3 hover:bg-muted/50 rounded-lg justify-start"
-              onClick={() => {
-                document.getElementById('mapa-velocidad')?.scrollIntoView({ 
-                  behavior: 'smooth', 
-                  block: 'start' 
-                });
-              }}
+              onClick={() => navigate('/dashboard-b')}
             >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
