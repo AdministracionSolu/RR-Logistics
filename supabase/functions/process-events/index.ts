@@ -118,7 +118,23 @@ serve(async (req) => {
     let eventsCreated = 0;
 
     for (const pos of positions) {
-    // Process checkpoints
+      // Validate coordinates before processing
+      const lat = parseFloat(pos.lat);
+      const lng = parseFloat(pos.lng);
+      
+      if (lat === -99999 || lng === -99999 || 
+          lat < -90 || lat > 90 || 
+          lng < -180 || lng > 180) {
+        console.log(`Skipping invalid position for unit ${pos.unit_id}: lat=${lat}, lng=${lng}`);
+        // Mark as processed but don't create events
+        await supabase
+          .from('positions')
+          .update({ processed: true })
+          .eq('id', pos.id);
+        continue;
+      }
+
+      // Process checkpoints
       if (checkpoints) {
         for (const checkpoint of checkpoints) {
           let isInside = false;

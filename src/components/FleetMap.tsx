@@ -217,17 +217,28 @@ const FleetMap = () => {
 
       const trucksWithLocations: TruckLocation[] = [];
 
+      // Helper to validate coordinates
+      const isValidCoordinate = (lat: number, lng: number) => {
+        return lat !== -99999 && lng !== -99999 && 
+               lat >= -90 && lat <= 90 && 
+               lng >= -180 && lng <= 180;
+      };
+
       for (const truck of trucksData) {
-        // First try to get latest position from API (positions table)
+        // First try to get latest VALID position from API (positions table)
         // Use spot_unit_id if available, otherwise fallback to tag_id
         const unitId = truck.spot_unit_id || truck.tag_id;
-        const { data: apiPosition } = await supabase
+        const { data: apiPositions } = await supabase
           .from('positions')
           .select('lat, lng, ts')
           .eq('unit_id', unitId)
           .order('ts', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .limit(10);
+
+        // Find first valid position
+        const apiPosition = apiPositions?.find(pos => 
+          isValidCoordinate(Number(pos.lat), Number(pos.lng))
+        );
 
         // If no API position, fallback to toll events (only if truck has tag_id)
         const { data: latestEvent } = truck.tag_id ? await supabase
@@ -263,8 +274,14 @@ const FleetMap = () => {
           .limit(5) : { data: null };
 
         // Prioritize API position over toll events
-        const lat = apiPosition?.lat || latestEvent?.casetas_autopista?.lat;
-        const lng = apiPosition?.lng || latestEvent?.casetas_autopista?.lng;
+        let lat = apiPosition?.lat || latestEvent?.casetas_autopista?.lat;
+        let lng = apiPosition?.lng || latestEvent?.casetas_autopista?.lng;
+
+        // Validate final coordinates
+        if (lat && lng && !isValidCoordinate(Number(lat), Number(lng))) {
+          lat = undefined;
+          lng = undefined;
+        }
 
         const truckLocation: TruckLocation = {
           ...truck,
@@ -276,7 +293,9 @@ const FleetMap = () => {
             lng: event.casetas_autopista?.lng || 0,
             timestamp: event.fecha_hora,
             caseta_nombre: event.caseta_nombre
-          })).filter(point => point.lat && point.lng) || []
+          })).filter(point => 
+            point.lat && point.lng && isValidCoordinate(point.lat, point.lng)
+          ) || []
         };
 
         if (truckLocation.lat && truckLocation.lng) {
@@ -286,9 +305,24 @@ const FleetMap = () => {
 
       setTrucks(trucksWithLocations);
 
-      // Center map on first truck if available
-      if (trucksWithLocations.length > 0 && trucksWithLocations[0].lat && trucksWithLocations[0].lng && mapInstanceRef.current) {
-        mapInstanceRef.current.setView([trucksWithLocations[0].lat, trucksWithLocations[0].lng], 10);
+      // Center map on trucks or data points
+      if (mapInstanceRef.current) {
+        const allPoints: [number, number][] = [];
+        
+        // Add truck locations
+        trucksWithLocations.forEach(truck => {
+          if (truck.lat && truck.lng) {
+            allPoints.push([truck.lat, truck.lng]);
+          }
+        });
+        
+        if (allPoints.length > 0) {
+          const bounds = L.latLngBounds(allPoints);
+          mapInstanceRef.current.fitBounds(bounds, { 
+            padding: [50, 50],
+            maxZoom: 12
+          });
+        }
       }
     } catch (error) {
       console.error('Error loading trucks:', error);
