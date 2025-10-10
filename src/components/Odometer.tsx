@@ -190,9 +190,22 @@ const Odometer = ({ truckId }: OdometerProps) => {
     );
   }
 
-  const handleDateRangeChange = (start: Date, end: Date) => {
-    setStartDate(start);
-    setEndDate(end);
+  const handleDateRangeChange = (start: Date | undefined, end: Date | undefined) => {
+    if (start) {
+      // Ajustar a inicio del día (00:00:00)
+      const adjustedStart = new Date(start);
+      adjustedStart.setHours(0, 0, 0, 0);
+      setStartDate(adjustedStart);
+      console.log('Start date adjusted to:', adjustedStart.toISOString());
+    }
+    
+    if (end) {
+      // Ajustar a fin del día (23:59:59)
+      const adjustedEnd = new Date(end);
+      adjustedEnd.setHours(23, 59, 59, 999);
+      setEndDate(adjustedEnd);
+      console.log('End date adjusted to:', adjustedEnd.toISOString());
+    }
   };
 
   return (
