@@ -1,4 +1,4 @@
-# RR Logistics - Adrian Reyes y Diego Rosales
+# RR Logistics - Adrian Reyes - Diego Rosales
 
 
 ## Características Principales
