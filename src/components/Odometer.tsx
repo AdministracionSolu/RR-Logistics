@@ -15,7 +15,6 @@ interface TruckData {
   kilometraje_total: number;
   spot_unit_id: string;
   updated_at: string;
-  velocidad_actual: number;
 }
 
 const Odometer = ({ truckId }: OdometerProps) => {
@@ -46,8 +45,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
               t.id === payload.new.id 
                 ? { 
                     ...t, 
-                    kilometraje_total: payload.new.kilometraje_total, 
-                    velocidad_actual: payload.new.velocidad_actual,
+                    kilometraje_total: payload.new.kilometraje_total,
                     updated_at: payload.new.updated_at 
                   }
                 : t
@@ -72,7 +70,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
     try {
       let query = supabase
         .from('camiones')
-        .select('id, placas, modelo, kilometraje_total, spot_unit_id, updated_at, velocidad_actual')
+        .select('id, placas, modelo, kilometraje_total, spot_unit_id, updated_at')
         .eq('estado', 'activo')
         .not('spot_unit_id', 'is', null);
 
@@ -99,9 +97,12 @@ const Odometer = ({ truckId }: OdometerProps) => {
     const dailyDist: Record<string, number> = {};
 
     for (const truck of trucksData) {
-      const { data: positions } = await supabase
+      console.log(`Calculating distance for truck ${truck.placas} (${truck.spot_unit_id})`);
+      console.log(`Date range: ${startDate.toISOString()} to ${endDate.toISOString()}`);
+      
+      const { data: positions, error } = await supabase
         .from('positions')
-        .select('lat, lng')
+        .select('lat, lng, ts')
         .eq('unit_id', truck.spot_unit_id)
         .neq('lat', -99999)
         .neq('lng', -99999)
@@ -109,16 +110,27 @@ const Odometer = ({ truckId }: OdometerProps) => {
         .lte('ts', endDate.toISOString())
         .order('ts', { ascending: true });
 
+      if (error) {
+        console.error(`Error fetching positions for ${truck.placas}:`, error);
+        dailyDist[truck.id] = 0;
+        continue;
+      }
+
+      console.log(`Found ${positions?.length || 0} positions for ${truck.placas}`);
+
       if (positions && positions.length > 1) {
         let distance = 0;
         for (let i = 1; i < positions.length; i++) {
           const prev = positions[i - 1];
           const curr = positions[i];
-          distance += haversine(prev.lat, prev.lng, curr.lat, curr.lng);
+          const segmentDist = haversine(prev.lat, prev.lng, curr.lat, curr.lng);
+          distance += segmentDist;
         }
         dailyDist[truck.id] = distance;
+        console.log(`Total distance for ${truck.placas}: ${distance.toFixed(2)} km`);
       } else {
         dailyDist[truck.id] = 0;
+        console.log(`Not enough positions for ${truck.placas} to calculate distance`);
       }
     }
 
@@ -162,12 +174,6 @@ const Odometer = ({ truckId }: OdometerProps) => {
     });
   };
 
-  const getSpeedColor = (speed: number) => {
-    if (speed <= 80) return 'text-green-600 dark:text-green-400';
-    if (speed <= 100) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
-  };
-
   if (loading) {
     return (
       <Card>
@@ -206,7 +212,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               {/* Total Kilometraje */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -228,18 +234,6 @@ const Odometer = ({ truckId }: OdometerProps) => {
                 <div className="text-3xl font-bold font-mono tracking-tight text-green-600 dark:text-green-400">
                   {formatDistance(dailyDistance[truck.id] || 0)}
                   <span className="text-lg text-muted-foreground ml-1">km</span>
-                </div>
-              </div>
-
-              {/* Velocidad Actual */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Gauge className="h-4 w-4" />
-                  <span>Velocidad Actual</span>
-                </div>
-                <div className={`text-3xl font-bold font-mono tracking-tight ${getSpeedColor(truck.velocidad_actual || 0)}`}>
-                  {truck.velocidad_actual ? truck.velocidad_actual.toFixed(1) : '0.0'}
-                  <span className="text-lg text-muted-foreground ml-1">km/h</span>
                 </div>
               </div>
 

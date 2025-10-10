@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import EventsPanel from '@/components/gestion/EventsPanel';
 import FleetMap from '@/components/FleetMap';
 import Odometer from '@/components/Odometer';
+import SpeedMonitor from '@/components/SpeedMonitor';
 
 const Gestion = () => {
   const { profile, signOut } = useAuth();
@@ -97,6 +98,20 @@ const Gestion = () => {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="velocidad" className="border rounded-lg bg-card shadow-sm">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
+                    <Gauge className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold">Velocidad</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <SpeedMonitor />
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="odometro" className="border rounded-lg bg-card shadow-sm">
               <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 rounded-t-lg">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -112,7 +127,7 @@ const Gestion = () => {
             </AccordionItem>
           </Accordion>
 
-          {/* Velocidad Button */}
+          {/* Dashboard Velocidad Button */}
           <div className="border rounded-lg bg-card shadow-sm">
             <Button
               variant="ghost"
@@ -120,10 +135,10 @@ const Gestion = () => {
               onClick={() => navigate('/dashboard-b')}
             >
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-green-500/10 rounded-md">
-                  <Gauge className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-orange-500/10 rounded-md">
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                 </div>
-                <span className="text-sm sm:text-base font-semibold">Velocidad</span>
+                <span className="text-sm sm:text-base font-semibold">Dashboard Velocidad</span>
               </div>
             </Button>
           </div>
