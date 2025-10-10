@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 
 interface DateRangePickerProps {
@@ -21,14 +22,17 @@ const DateRangePicker = ({
 }: DateRangePickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleDateSelect = (date: Date | undefined, isStart: boolean) => {
-    if (isStart) {
-      onDateRangeChange(date, endDate);
-    } else {
-      onDateRangeChange(startDate, date);
+  const [range, setRange] = useState<DateRange | undefined>(
+    startDate || endDate ? { from: startDate, to: endDate } : undefined
+  );
+
+  const handleRangeSelect = (r: DateRange | undefined) => {
+    setRange(r);
+    if (r?.from && r?.to) {
+      onDateRangeChange(r.from, r.to);
+      setIsOpen(false);
     }
   };
-
   const formatDateRange = () => {
     if (!startDate && !endDate) {
       return "Seleccionar período";
@@ -40,7 +44,7 @@ const DateRangePicker = ({
       return `Hasta ${format(endDate, 'dd/MM/yyyy')}`;
     }
     if (startDate && endDate) {
-      return `${format(startDate, 'dd/MM')} - ${format(endDate, 'dd/MM')}`;
+      return `${format(startDate, 'dd/MM/yyyy')} - ${format(endDate, 'dd/MM/yyyy')}`;
     }
     return "Seleccionar período";
   };
@@ -97,38 +101,16 @@ const DateRangePicker = ({
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Fecha inicio</label>
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={(date) => handleDateSelect(date, true)}
-                disabled={(date) => date > new Date() || (endDate && date > endDate)}
-                initialFocus
-                className="rounded-md border p-2 pointer-events-auto w-full"
-              />
-            </div>
-            
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Fecha fin</label>
-              <Calendar
-                mode="single"
-                selected={endDate}
-                onSelect={(date) => handleDateSelect(date, false)}
-                disabled={(date) => date > new Date() || (startDate && date < startDate)}
-                className="rounded-md border p-2 pointer-events-auto w-full"
-              />
-            </div>
+          <div className="rounded-md border">
+            <Calendar
+              mode="range"
+              selected={range}
+              onSelect={handleRangeSelect}
+              numberOfMonths={2}
+              defaultMonth={range?.from || startDate || new Date()}
+              className="pointer-events-auto text-sm w-full"
+            />
           </div>
-          
-          <Button
-            size="sm"
-            onClick={() => setIsOpen(false)}
-            className="w-full min-h-[44px] touch-manipulation"
-          >
-            Aplicar
-          </Button>
         </div>
       </PopoverContent>
     </Popover>
