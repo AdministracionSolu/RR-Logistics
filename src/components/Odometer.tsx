@@ -225,19 +225,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              {/* Total Kilometraje */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Gauge className="h-4 w-4" />
-                  <span>Kilometraje Total</span>
-                </div>
-                <div className="text-3xl font-bold font-mono tracking-tight text-primary">
-                  {formatDistance(truck.kilometraje_total || 0)}
-                  <span className="text-lg text-muted-foreground ml-1">km</span>
-                </div>
-              </div>
-
+            <div className="grid gap-4 md:grid-cols-2">
               {/* Distancia del Período */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
