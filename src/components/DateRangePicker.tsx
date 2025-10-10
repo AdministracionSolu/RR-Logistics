@@ -76,10 +76,10 @@ const DateRangePicker = ({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="w-auto max-w-[min(95vw,380px)] p-3 bg-background border shadow-lg"
+        className="w-auto max-w-[min(95vw,380px)] pt-10 px-3 pb-3 bg-background border shadow-lg"
         aria-label="Selector de período"
       >
-        <DialogTitle className="text-sm font-semibold text-center mb-2">
+        <DialogTitle className="text-sm font-semibold text-center mb-3 mt-1">
           {selectingStart ? 'Fecha inicial' : 'Fecha final'}
         </DialogTitle>
         <DialogDescription className="sr-only">
