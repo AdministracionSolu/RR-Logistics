@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { LogOut, Map, Activity } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import SpotEmbed from '@/components/SpotEmbed';
+import FleetMap from '@/components/FleetMap';
 import { useNavigate } from 'react-router-dom';
 
 const DashboardB = () => {
@@ -72,9 +72,9 @@ const DashboardB = () => {
         </div>
       </header>
 
-      {/* Main content - Solo el mapa */}
+      {/* Main content - Mapa de flota con GPS */}
       <main className="w-full h-[calc(100vh-64px)]">
-        <SpotEmbed />
+        <FleetMap />
       </main>
     </div>
   );
