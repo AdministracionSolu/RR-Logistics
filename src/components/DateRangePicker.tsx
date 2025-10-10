@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -71,6 +71,8 @@ const DateRangePicker = ({
         className="w-[min(96vw,680px)] sm:w-auto sm:max-w-[680px] max-h-[85vh] overflow-auto overscroll-contain p-2 sm:p-3 bg-background border shadow-lg"
         aria-label="Selector de período"
       >
+        <DialogTitle className="sr-only">Seleccionar período</DialogTitle>
+        <DialogDescription className="sr-only">Elige un rango de fechas</DialogDescription>
         <div className="space-y-1.5">
           <div className="grid grid-cols-2 gap-1.5">
             <Button
