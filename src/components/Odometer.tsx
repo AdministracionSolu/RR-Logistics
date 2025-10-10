@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gauge, TrendingUp, Clock } from 'lucide-react';
+import DateRangePicker from '@/components/DateRangePicker';
 
 interface OdometerProps {
   truckId?: string;
@@ -20,6 +21,8 @@ const Odometer = ({ truckId }: OdometerProps) => {
   const [trucks, setTrucks] = useState<TruckData[]>([]);
   const [dailyDistance, setDailyDistance] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [startDate, setStartDate] = useState<Date>(new Date(new Date().setHours(0, 0, 0, 0)));
+  const [endDate, setEndDate] = useState<Date>(new Date(new Date().setHours(23, 59, 59, 999)));
 
   useEffect(() => {
     loadTruckData();
@@ -57,7 +60,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
       supabase.removeChannel(channel);
       clearInterval(interval);
     };
-  }, [truckId]);
+  }, [truckId, startDate, endDate]);
 
   const loadTruckData = async () => {
     try {
@@ -90,16 +93,14 @@ const Odometer = ({ truckId }: OdometerProps) => {
     const dailyDist: Record<string, number> = {};
 
     for (const truck of trucksData) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
       const { data: positions } = await supabase
         .from('positions')
         .select('lat, lng')
         .eq('unit_id', truck.spot_unit_id)
         .neq('lat', -99999)
         .neq('lng', -99999)
-        .gte('ts', today.toISOString())
+        .gte('ts', startDate.toISOString())
+        .lte('ts', endDate.toISOString())
         .order('ts', { ascending: true });
 
       if (positions && positions.length > 1) {
@@ -171,8 +172,19 @@ const Odometer = ({ truckId }: OdometerProps) => {
     );
   }
 
+  const handleDateRangeChange = (start: Date, end: Date) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
   return (
     <div className="space-y-4">
+      <DateRangePicker 
+        startDate={startDate}
+        endDate={endDate}
+        onDateRangeChange={handleDateRangeChange}
+      />
+      
       {trucks.map(truck => (
         <Card key={truck.id} className="overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900">
@@ -195,11 +207,11 @@ const Odometer = ({ truckId }: OdometerProps) => {
                 </div>
               </div>
 
-              {/* Distancia del Día */}
+              {/* Distancia del Período */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
-                  <span>Distancia Hoy</span>
+                  <span>Distancia del Período</span>
                 </div>
                 <div className="text-3xl font-bold font-mono tracking-tight text-green-600 dark:text-green-400">
                   {formatDistance(dailyDistance[truck.id] || 0)}
