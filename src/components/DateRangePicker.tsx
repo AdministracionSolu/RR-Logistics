@@ -68,9 +68,7 @@ const DateRangePicker = ({
       <PopoverContent 
         className="w-auto max-w-[min(95vw,600px)] p-2 bg-background border shadow-lg" 
         align="center" 
-        side="bottom" 
-        sideOffset={16}
-        avoidCollisions={false}
+        sideOffset={8}
         style={{ zIndex: 9999 }}
       >
         <div className="space-y-2">
