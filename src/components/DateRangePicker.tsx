@@ -61,7 +61,7 @@ const DateRangePicker = ({
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 bg-background z-50" align="start" side="bottom" sideOffset={8}>
+      <PopoverContent className="w-auto p-0 bg-background z-50" align="start" side="right" sideOffset={8}>
         <div className="flex flex-col space-y-3 p-4 max-h-[80vh] overflow-y-auto">
           <div className="text-sm font-medium">Período</div>
           
