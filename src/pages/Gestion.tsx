@@ -138,7 +138,7 @@ const Gestion = () => {
                 <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-orange-500/10 rounded-md">
                   <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                 </div>
-                <span className="text-sm sm:text-base font-semibold">Dashboard Velocidad</span>
+                <span className="text-sm sm:text-base font-semibold">Mapa Spot</span>
               </div>
             </Button>
           </div>
