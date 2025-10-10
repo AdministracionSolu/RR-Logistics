@@ -65,9 +65,9 @@ const DateRangePicker = ({
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto max-w-[min(95vw,700px)] p-3 bg-background border shadow-lg" align="start" side="bottom" sideOffset={8} style={{ zIndex: 9999 }}>
+      <PopoverContent className="w-auto max-w-[min(95vw,600px)] p-3 bg-background border shadow-lg" align="center" side="bottom" sideOffset={8} style={{ zIndex: 9999 }}>
         <div className="space-y-3">
-          <div className="text-sm font-medium">Período</div>
+          <div className="text-sm font-medium text-center">Período</div>
           
           <div className="grid grid-cols-2 gap-2">
             <Button
@@ -101,14 +101,14 @@ const DateRangePicker = ({
             </Button>
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-md border flex justify-center">
             <Calendar
               mode="range"
               selected={range}
               onSelect={handleRangeSelect}
               numberOfMonths={2}
               defaultMonth={range?.from || startDate || new Date()}
-              className="pointer-events-auto text-sm w-full"
+              className="pointer-events-auto scale-[0.7] origin-top"
             />
           </div>
         </div>
