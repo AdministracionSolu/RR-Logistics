@@ -86,41 +86,7 @@ const DateRangePicker = ({
           {selectingStart ? 'Selecciona la fecha de inicio' : 'Selecciona la fecha final'}
         </DialogDescription>
         
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const today = new Date();
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                onDateRangeChange(weekAgo, today);
-                setIsOpen(false);
-                setSelectingStart(true);
-              }}
-              className="text-xs h-8 px-2"
-            >
-              Última semana
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const today = new Date();
-                const monthAgo = new Date();
-                monthAgo.setDate(monthAgo.getDate() - 30);
-                onDateRangeChange(monthAgo, today);
-                setIsOpen(false);
-                setSelectingStart(true);
-              }}
-              className="text-xs h-8 px-2"
-            >
-              Último mes
-            </Button>
-          </div>
-
+        <div>
           <Calendar
             mode="single"
             selected={selectingStart ? startDate : endDate}
