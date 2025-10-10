@@ -61,11 +61,11 @@ const DateRangePicker = ({
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto max-w-[95vw] p-3 bg-background border shadow-lg" align="start" side="bottom" sideOffset={8} style={{ zIndex: 9999 }}>
+      <PopoverContent className="w-auto max-w-[min(95vw,700px)] p-3 bg-background border shadow-lg" align="start" side="bottom" sideOffset={8} style={{ zIndex: 9999 }}>
         <div className="space-y-3">
           <div className="text-sm font-medium">Período</div>
           
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -76,7 +76,7 @@ const DateRangePicker = ({
                 onDateRangeChange(weekAgo, today);
                 setIsOpen(false);
               }}
-              className="text-xs flex-1 min-h-[40px] touch-manipulation"
+              className="text-xs min-h-[40px] touch-manipulation"
             >
               Última semana
             </Button>
@@ -91,14 +91,14 @@ const DateRangePicker = ({
                 onDateRangeChange(monthAgo, today);
                 setIsOpen(false);
               }}
-              className="text-xs flex-1 min-h-[40px] touch-manipulation"
+              className="text-xs min-h-[40px] touch-manipulation"
             >
               Último mes
             </Button>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            <div className="flex-shrink-0">
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
               <label className="text-xs text-muted-foreground mb-1 block">Fecha inicio</label>
               <Calendar
                 mode="single"
@@ -106,18 +106,18 @@ const DateRangePicker = ({
                 onSelect={(date) => handleDateSelect(date, true)}
                 disabled={(date) => date > new Date() || (endDate && date > endDate)}
                 initialFocus
-                className="rounded-md border p-2 pointer-events-auto text-sm scale-90 origin-top-left"
+                className="rounded-md border p-2 pointer-events-auto w-full"
               />
             </div>
             
-            <div className="flex-shrink-0">
+            <div>
               <label className="text-xs text-muted-foreground mb-1 block">Fecha fin</label>
               <Calendar
                 mode="single"
                 selected={endDate}
                 onSelect={(date) => handleDateSelect(date, false)}
                 disabled={(date) => date > new Date() || (startDate && date < startDate)}
-                className="rounded-md border p-2 pointer-events-auto text-sm scale-90 origin-top-left"
+                className="rounded-md border p-2 pointer-events-auto w-full"
               />
             </div>
           </div>
