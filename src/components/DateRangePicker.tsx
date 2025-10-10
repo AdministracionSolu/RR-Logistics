@@ -61,36 +61,11 @@ const DateRangePicker = ({
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="flex flex-col space-y-2 p-3">
-          <div className="text-sm font-medium">Período de simulación</div>
+      <PopoverContent className="w-auto p-0 bg-background z-50" align="start" side="bottom" sideOffset={8}>
+        <div className="flex flex-col space-y-3 p-4 max-h-[80vh] overflow-y-auto">
+          <div className="text-sm font-medium">Período</div>
           
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-xs text-muted-foreground">Fecha inicio</label>
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={(date) => handleDateSelect(date, true)}
-                disabled={(date) => date > new Date() || (endDate && date > endDate)}
-                initialFocus
-                className="rounded-md border"
-              />
-            </div>
-            
-            <div>
-              <label className="text-xs text-muted-foreground">Fecha fin</label>
-              <Calendar
-                mode="single"
-                selected={endDate}
-                onSelect={(date) => handleDateSelect(date, false)}
-                disabled={(date) => date > new Date() || (startDate && date < startDate)}
-                className="rounded-md border"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-between">
+          <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -99,8 +74,9 @@ const DateRangePicker = ({
                 const weekAgo = new Date();
                 weekAgo.setDate(weekAgo.getDate() - 7);
                 onDateRangeChange(weekAgo, today);
+                setIsOpen(false);
               }}
-              className="text-xs"
+              className="text-xs flex-1"
             >
               Última semana
             </Button>
@@ -113,17 +89,43 @@ const DateRangePicker = ({
                 const monthAgo = new Date();
                 monthAgo.setDate(monthAgo.getDate() - 30);
                 onDateRangeChange(monthAgo, today);
+                setIsOpen(false);
               }}
-              className="text-xs"
+              className="text-xs flex-1"
             >
               Último mes
             </Button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Fecha inicio</label>
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={(date) => handleDateSelect(date, true)}
+                disabled={(date) => date > new Date() || (endDate && date > endDate)}
+                initialFocus
+                className="rounded-md border p-3 pointer-events-auto"
+              />
+            </div>
+            
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Fecha fin</label>
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={(date) => handleDateSelect(date, false)}
+                disabled={(date) => date > new Date() || (startDate && date < startDate)}
+                className="rounded-md border p-3 pointer-events-auto"
+              />
+            </div>
           </div>
           
           <Button
             size="sm"
             onClick={() => setIsOpen(false)}
-            className="text-xs"
+            className="w-full"
           >
             Aplicar
           </Button>
