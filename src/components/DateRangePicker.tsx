@@ -65,11 +65,11 @@ const DateRangePicker = ({
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto max-w-[min(95vw,600px)] p-3 bg-background border shadow-lg" align="center" side="bottom" sideOffset={8} style={{ zIndex: 9999 }}>
-        <div className="space-y-3">
-          <div className="text-sm font-medium text-center">Período</div>
+      <PopoverContent className="w-auto max-w-[min(95vw,600px)] p-2 bg-background border shadow-lg" align="center" side="bottom" sideOffset={8} style={{ zIndex: 9999 }}>
+        <div className="space-y-2">
+          <div className="text-xs font-medium text-center">Período</div>
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-1.5">
             <Button
               variant="outline"
               size="sm"
@@ -80,7 +80,7 @@ const DateRangePicker = ({
                 onDateRangeChange(weekAgo, today);
                 setIsOpen(false);
               }}
-              className="text-xs min-h-[40px] touch-manipulation"
+              className="text-[10px] h-8 touch-manipulation px-2"
             >
               Última semana
             </Button>
@@ -95,20 +95,20 @@ const DateRangePicker = ({
                 onDateRangeChange(monthAgo, today);
                 setIsOpen(false);
               }}
-              className="text-xs min-h-[40px] touch-manipulation"
+              className="text-[10px] h-8 touch-manipulation px-2"
             >
               Último mes
             </Button>
           </div>
 
-          <div className="rounded-md border flex justify-center">
+          <div className="rounded-md border flex justify-center overflow-hidden">
             <Calendar
               mode="range"
               selected={range}
               onSelect={handleRangeSelect}
               numberOfMonths={2}
               defaultMonth={range?.from || startDate || new Date()}
-              className="pointer-events-auto scale-[0.7] origin-top"
+              className="pointer-events-auto p-1 [&_.rdp-months]:gap-2 [&_.rdp-month]:p-0 [&_.rdp-caption]:pb-1 [&_.rdp-table]:m-0"
             />
           </div>
         </div>
