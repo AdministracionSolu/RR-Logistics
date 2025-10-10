@@ -15,6 +15,7 @@ interface TruckData {
   kilometraje_total: number;
   spot_unit_id: string;
   updated_at: string;
+  velocidad_actual: number;
 }
 
 const Odometer = ({ truckId }: OdometerProps) => {
@@ -43,7 +44,12 @@ const Odometer = ({ truckId }: OdometerProps) => {
           setTrucks(prev => 
             prev.map(t => 
               t.id === payload.new.id 
-                ? { ...t, kilometraje_total: payload.new.kilometraje_total, updated_at: payload.new.updated_at }
+                ? { 
+                    ...t, 
+                    kilometraje_total: payload.new.kilometraje_total, 
+                    velocidad_actual: payload.new.velocidad_actual,
+                    updated_at: payload.new.updated_at 
+                  }
                 : t
             )
           );
@@ -66,7 +72,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
     try {
       let query = supabase
         .from('camiones')
-        .select('id, placas, modelo, kilometraje_total, spot_unit_id, updated_at')
+        .select('id, placas, modelo, kilometraje_total, spot_unit_id, updated_at, velocidad_actual')
         .eq('estado', 'activo')
         .not('spot_unit_id', 'is', null);
 
@@ -156,6 +162,12 @@ const Odometer = ({ truckId }: OdometerProps) => {
     });
   };
 
+  const getSpeedColor = (speed: number) => {
+    if (speed <= 80) return 'text-green-600 dark:text-green-400';
+    if (speed <= 100) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
+  };
+
   if (loading) {
     return (
       <Card>
@@ -194,7 +206,7 @@ const Odometer = ({ truckId }: OdometerProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               {/* Total Kilometraje */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -216,6 +228,18 @@ const Odometer = ({ truckId }: OdometerProps) => {
                 <div className="text-3xl font-bold font-mono tracking-tight text-green-600 dark:text-green-400">
                   {formatDistance(dailyDistance[truck.id] || 0)}
                   <span className="text-lg text-muted-foreground ml-1">km</span>
+                </div>
+              </div>
+
+              {/* Velocidad Actual */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Gauge className="h-4 w-4" />
+                  <span>Velocidad Actual</span>
+                </div>
+                <div className={`text-3xl font-bold font-mono tracking-tight ${getSpeedColor(truck.velocidad_actual || 0)}`}>
+                  {truck.velocidad_actual ? truck.velocidad_actual.toFixed(1) : '0.0'}
+                  <span className="text-lg text-muted-foreground ml-1">km/h</span>
                 </div>
               </div>
 
