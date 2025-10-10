@@ -6,6 +6,7 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DateRangePickerProps {
   startDate: Date | undefined;
@@ -21,6 +22,7 @@ const DateRangePicker = ({
   className
 }: DateRangePickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const [range, setRange] = useState<DateRange | undefined>(
     startDate || endDate ? { from: startDate, to: endDate } : undefined
@@ -66,12 +68,10 @@ const DateRangePicker = ({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="w-[min(95vw,640px)] max-w-none p-2 sm:p-3 bg-background border shadow-lg"
+        className="w-[min(96vw,680px)] sm:w-auto sm:max-w-[680px] max-h-[85vh] overflow-auto overscroll-contain p-2 sm:p-3 bg-background border shadow-lg"
         aria-label="Selector de período"
       >
-        <div className="space-y-2">
-          <div className="text-xs font-medium text-center">Período</div>
-          
+        <div className="space-y-1.5">
           <div className="grid grid-cols-2 gap-1.5">
             <Button
               variant="outline"
@@ -109,9 +109,31 @@ const DateRangePicker = ({
               mode="range"
               selected={range}
               onSelect={handleRangeSelect}
-              numberOfMonths={2}
+              numberOfMonths={isMobile ? 1 : 2}
               defaultMonth={range?.from || startDate || new Date()}
-              className="pointer-events-auto p-1 [&_.rdp-months]:gap-2 [&_.rdp-month]:p-0 [&_.rdp-caption]:pb-1 [&_.rdp-table]:m-0"
+              className="pointer-events-auto p-1"
+              classNames={{
+                months: "flex flex-col sm:flex-row gap-2",
+                month: "space-y-2",
+                caption: "flex justify-center pt-1 relative items-center",
+                caption_label: "text-xs font-medium",
+                nav: "space-x-1 flex items-center",
+                nav_button: "h-6 w-6 bg-transparent p-0 opacity-50 hover:opacity-100",
+                nav_button_previous: "absolute left-1",
+                nav_button_next: "absolute right-1",
+                table: "w-full border-collapse space-y-1",
+                head_row: "flex",
+                head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.7rem]",
+                row: "flex w-full mt-1",
+                cell: "relative p-0 text-center text-xs focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent",
+                day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md",
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                day_today: "bg-accent text-accent-foreground",
+                day_outside: "text-muted-foreground opacity-50",
+                day_disabled: "text-muted-foreground opacity-50",
+                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                day_hidden: "invisible",
+              }}
             />
           </div>
         </div>
