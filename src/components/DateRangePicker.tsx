@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -50,8 +50,8 @@ const DateRangePicker = ({
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
         <Button
           variant="outline"
           size="sm"
@@ -64,12 +64,10 @@ const DateRangePicker = ({
           <CalendarIcon className="mr-1 h-3 w-3" />
           {formatDateRange()}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className="w-auto max-w-[min(95vw,600px)] p-2 bg-background border shadow-lg" 
-        align="center" 
-        sideOffset={8}
-        style={{ zIndex: 9999 }}
+      </DialogTrigger>
+      <DialogContent
+        className="w-[min(95vw,640px)] max-w-none p-2 sm:p-3 bg-background border shadow-lg"
+        aria-label="Selector de período"
       >
         <div className="space-y-2">
           <div className="text-xs font-medium text-center">Período</div>
@@ -117,8 +115,8 @@ const DateRangePicker = ({
             />
           </div>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 };
 
