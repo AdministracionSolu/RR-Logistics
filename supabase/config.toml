@@ -74,6 +74,9 @@ verify_jwt = false
 [functions.send-notification]
 verify_jwt = false
 
+[functions.update-odometer]
+verify_jwt = false
+
 [edge_runtime]
 ip_version = "ipv4"
 policy = "per_worker"
