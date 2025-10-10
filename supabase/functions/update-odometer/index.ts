@@ -35,7 +35,7 @@ serve(async (req) => {
     // Get all active trucks with SPOT IDs
     const { data: trucks, error: trucksError } = await supabase
       .from('camiones')
-      .select('id, spot_unit_id, kilometraje_total')
+      .select('id, spot_unit_id, kilometraje_total, updated_at')
       .eq('estado', 'activo')
       .not('spot_unit_id', 'is', null);
 
@@ -44,40 +44,47 @@ serve(async (req) => {
     let updatedCount = 0;
 
     for (const truck of trucks || []) {
-      // Get last two valid positions for this truck
+      // Get all NEW positions since last update (only positions after truck's updated_at)
       const { data: positions, error: posError } = await supabase
         .from('positions')
         .select('lat, lng, ts')
         .eq('unit_id', truck.spot_unit_id)
         .neq('lat', -99999)
         .neq('lng', -99999)
-        .order('ts', { ascending: false })
-        .limit(2);
+        .gt('ts', truck.updated_at)
+        .order('ts', { ascending: true });
 
       if (posError) {
         console.error(`Error getting positions for truck ${truck.id}:`, posError);
         continue;
       }
 
-      if (!positions || positions.length < 2) {
-        console.log(`Not enough positions for truck ${truck.id}`);
+      if (!positions || positions.length === 0) {
+        console.log(`No new positions for truck ${truck.id} since ${truck.updated_at}`);
         continue;
       }
 
-      const [latest, previous] = positions;
+      // Calculate total distance from all consecutive new positions
+      let totalDistance = 0;
+      for (let i = 1; i < positions.length; i++) {
+        const segmentDistance = haversine(
+          positions[i - 1].lat,
+          positions[i - 1].lng,
+          positions[i].lat,
+          positions[i].lng
+        );
+        
+        // Skip unrealistic individual segments (GPS jumps)
+        if (segmentDistance > 0 && segmentDistance < 200) {
+          totalDistance += segmentDistance;
+        } else if (segmentDistance >= 200) {
+          console.log(`Skipping GPS jump for truck ${truck.id}: ${segmentDistance.toFixed(2)} km`);
+        }
+      }
 
-      // Calculate distance between the two points
-      const distance = haversine(
-        previous.lat,
-        previous.lng,
-        latest.lat,
-        latest.lng
-      );
-
-      // Only update if the distance is reasonable (not a GPS jump)
-      // Filter out movements > 200km (likely GPS errors or long offline periods)
-      if (distance > 0 && distance < 200) {
-        const newKilometraje = (truck.kilometraje_total || 0) + distance;
+      // Only update if there's actual distance to add
+      if (totalDistance > 0) {
+        const newKilometraje = (truck.kilometraje_total || 0) + totalDistance;
 
         const { error: updateError } = await supabase
           .from('camiones')
@@ -90,11 +97,11 @@ serve(async (req) => {
         if (updateError) {
           console.error(`Error updating truck ${truck.id}:`, updateError);
         } else {
-          console.log(`Updated truck ${truck.id}: +${distance.toFixed(2)} km (Total: ${newKilometraje.toFixed(2)} km)`);
+          console.log(`Updated truck ${truck.id}: +${totalDistance.toFixed(2)} km from ${positions.length} new positions (Total: ${newKilometraje.toFixed(2)} km)`);
           updatedCount++;
         }
       } else {
-        console.log(`Skipping unrealistic distance for truck ${truck.id}: ${distance.toFixed(2)} km`);
+        console.log(`No valid distance to add for truck ${truck.id} (${positions.length} positions checked)`);
       }
     }
 
