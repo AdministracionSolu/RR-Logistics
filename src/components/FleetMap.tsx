@@ -308,8 +308,8 @@ const FleetMap = () => {
 
       setTrucks(trucksWithLocations);
 
-      // Center map on trucks or data points
-      if (mapInstanceRef.current) {
+      // Center map on trucks only before initial global fit
+      if (mapInstanceRef.current && !hasFitInitialRef.current) {
         const allPoints: [number, number][] = [];
         
         // Add truck locations
@@ -623,7 +623,10 @@ const FleetMap = () => {
 
     if (!hasFitInitialRef.current && allPoints.length > 0) {
       const bounds = L.latLngBounds(allPoints);
-      mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 12 });
+      const map = mapInstanceRef.current;
+      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 12 });
+      // Slight vertical offset so the focus quede un poco más abajo
+      map.panBy([0, 100], { animate: false });
       hasFitInitialRef.current = true;
     }
   }, [trucks, sectors, checkpoints, routes]);
