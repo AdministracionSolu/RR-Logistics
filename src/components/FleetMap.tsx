@@ -66,6 +66,7 @@ const FleetMap = () => {
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const layersRef = useRef<L.Layer[]>([]);
+  const hasFitInitialRef = useRef(false);
   
   const [trucks, setTrucks] = useState<TruckLocation[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
@@ -582,26 +583,48 @@ const FleetMap = () => {
       }
     });
 
-    // Add sector points
+    // Add sector points (both direct and FeatureCollection)
     sectors.forEach(sector => {
-      const positions = toPositions(sector.polygon);
-      if (positions) {
-        positions.forEach(pos => allPoints.push(pos));
+      if (sector.polygon?.features) {
+        sector.polygon.features.forEach((feature: any) => {
+          if (feature.geometry?.type === 'Polygon') {
+            const coords = feature.geometry.coordinates[0] || [];
+            coords.forEach((coord: number[]) => {
+              if (Array.isArray(coord) && coord.length >= 2) {
+                allPoints.push([coord[1], coord[0]]);
+              }
+            });
+          }
+        });
+      } else {
+        const positions = toPositions(sector.polygon);
+        if (positions) positions.forEach(pos => allPoints.push(pos));
       }
     });
 
-    // Add route points
+    // Add route points (both direct and FeatureCollection)
     routes.forEach(route => {
-      if (route.line_geometry?.coordinates) {
+      if (route.line_geometry?.features) {
+        route.line_geometry.features.forEach((feature: any) => {
+          if (feature.geometry?.type === 'LineString' && Array.isArray(feature.geometry.coordinates)) {
+            feature.geometry.coordinates.forEach((coord: number[]) => {
+              if (Array.isArray(coord) && coord.length >= 2) {
+                allPoints.push([coord[1], coord[0]]);
+              }
+            });
+          }
+        });
+      } else if (route.line_geometry?.coordinates) {
         route.line_geometry.coordinates.forEach((coord: number[]) => {
           allPoints.push([coord[1], coord[0]]);
         });
       }
     });
 
-    if (allPoints.length > 0) {
+    if (!hasFitInitialRef.current && allPoints.length > 0) {
       const bounds = L.latLngBounds(allPoints);
-      mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
+      mapInstanceRef.current.fitBounds(bounds, { padding: [60, 60], maxZoom: 12 });
+      hasFitInitialRef.current = true;
     }
   }, [trucks, sectors, checkpoints, routes]);
 
