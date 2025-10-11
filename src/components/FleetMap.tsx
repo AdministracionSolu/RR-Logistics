@@ -501,7 +501,7 @@ const FleetMap = () => {
         circle.bindPopup(`
           <div style="padding: 8px;">
             <strong style="font-size: 1.1em;">${checkpoint.name}</strong>
-            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #DB4436;">CheckPoint (${checkpoint.radius_m}m)</p>
+            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #DB4436;">Radio: ${checkpoint.radius_m} m</p>
           </div>
         `);
 
@@ -520,7 +520,6 @@ const FleetMap = () => {
         polygon.bindPopup(`
           <div style="padding: 8px;">
             <strong style="font-size: 1.1em;">${checkpoint.name}</strong>
-            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #DB4436;">CheckPoint (polígono)</p>
           </div>
         `);
 
