@@ -89,7 +89,6 @@ export function drawCheckpoints(map: mapboxgl.Map, checkpointsData: any[]) {
           .setHTML(`
             <div class="p-3">
               <h3 class="font-bold text-lg">${checkpoint.name}</h3>
-              <p class="text-sm text-gray-600">Checkpoint Circular</p>
               <p class="text-xs mt-2">Radio: ${checkpoint.radius_m}m</p>
               <p class="text-xs">Coordenadas: ${checkpoint.lat.toFixed(4)}, ${checkpoint.lng.toFixed(4)}</p>
             </div>
@@ -186,8 +185,6 @@ export function drawCheckpoints(map: mapboxgl.Map, checkpointsData: any[]) {
           .setHTML(`
             <div class="p-3">
               <h3 class="font-bold text-lg">${checkpoint.name}</h3>
-              <p class="text-sm text-gray-600">Checkpoint Poligonal</p>
-              <p class="text-xs mt-2">Área de interés específica</p>
             </div>
           `)
           .addTo(map);
