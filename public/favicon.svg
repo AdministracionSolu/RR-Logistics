@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Cabina del camión -->
+  <rect fill="#2563eb" x="8" y="20" width="32" height="20" rx="2"/>
+  <!-- Remolque/caja -->
+  <rect fill="#3b82f6" x="40" y="28" width="16" height="12" rx="1"/>
+  <!-- Ruedas -->
+  <circle fill="#1e293b" cx="18" cy="42" r="5"/>
+  <circle fill="#1e293b" cx="46" cy="42" r="5"/>
+  <!-- Rines -->
+  <circle fill="#64748b" cx="18" cy="42" r="2"/>
+  <circle fill="#64748b" cx="46" cy="42" r="2"/>
+  <!-- Ventanas de la cabina -->
+  <rect fill="#1e40af" x="10" y="22" width="10" height="8" rx="1"/>
+  <rect fill="#1e40af" x="22" y="22" width="10" height="8" rx="1"/>
+</svg>
