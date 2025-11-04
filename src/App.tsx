@@ -20,20 +20,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-// Component to handle dashboard routing based on user type
-const DashboardRouter = () => {
-  const { profile } = useAuth();
-
-  if (!profile) return null;
-
-  if (profile.user_type === 'tipo_a') {
-    return <Navigate to="/dashboard-a" replace />;
-  } else if (profile.user_type === 'tipo_b') {
-    return <Navigate to="/gestion" replace />;
-  }
-
-  return <Navigate to="/login" replace />;
-};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -43,12 +29,8 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <DashboardRouter />
-              </ProtectedRoute>
-            } />
             <Route path="/dashboard-a" element={
               <ProtectedRoute allowedUserTypes={['tipo_a']}>
                 <AlertsGenerator />
@@ -89,11 +71,6 @@ const App = () => (
                   <Navigation />
                   <BotAdmin />
                 </div>
-              </ProtectedRoute>
-            } />
-            <Route path="/" element={
-              <ProtectedRoute>
-                <DashboardRouter />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

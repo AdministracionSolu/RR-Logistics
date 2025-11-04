@@ -16,17 +16,24 @@ const Login = () => {
   const [error, setError] = useState('');
   const {
     signIn,
-    user
+    user,
+    profile
   } = useAuth();
   const navigate = useNavigate();
   const {
     toast
   } = useToast();
+  
+  // Redirigir usuarios ya autenticados a su dashboard correspondiente
   useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
+    if (user && profile) {
+      if (profile.user_type === 'tipo_a') {
+        navigate('/dashboard-a', { replace: true });
+      } else if (profile.user_type === 'tipo_b') {
+        navigate('/gestion', { replace: true });
+      }
     }
-  }, [user, navigate]);
+  }, [user, profile, navigate]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -46,13 +53,14 @@ const Login = () => {
         title: "Error de autenticación",
         description: "Credenciales incorrectas"
       });
+      setLoading(false);
     } else {
+      // La redirección se maneja automáticamente por el useEffect
       toast({
         title: "Bienvenido",
         description: "Inicio de sesión exitoso"
       });
     }
-    setLoading(false);
   };
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
