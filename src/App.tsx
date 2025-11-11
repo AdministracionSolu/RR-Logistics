@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import Index from "./pages/Index";
+import Soluciones from "./pages/Soluciones";
 import Login from "./pages/Login";
 import DashboardA from "./pages/DashboardA";
 import DashboardB from "./pages/DashboardB";
@@ -30,6 +31,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/soluciones" element={<Soluciones />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard-a" element={
               <ProtectedRoute allowedUserTypes={['tipo_a']}>
