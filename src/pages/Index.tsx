@@ -123,19 +123,19 @@ const Index = () => {
       </section>
 
       {/* Our Solutions */}
-      <section id="solutions" className="py-24">
+      <section id="solutions" className="py-24 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Nuestras Soluciones
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">
               Soluciones tecnológicas integrales para operaciones logísticas modernas
             </p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/30">
+            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm">
               <CardContent className="p-6 text-center space-y-4">
                 <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <Satellite className="h-6 w-6 text-primary" />
@@ -145,7 +145,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/30">
+            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm">
               <CardContent className="p-6 text-center space-y-4">
                 <div className="mx-auto w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
                   <Code className="h-6 w-6 text-accent" />
@@ -157,7 +157,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/30">
+            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm">
               <CardContent className="p-6 text-center space-y-4">
                 <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <Monitor className="h-6 w-6 text-primary" />
@@ -169,7 +169,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/30">
+            <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm">
               <CardContent className="p-6 text-center space-y-4">
                 <div className="mx-auto w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
                   <Code className="h-6 w-6 text-accent" />
