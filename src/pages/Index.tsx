@@ -47,35 +47,13 @@ const Index = () => {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/login">
-                  <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-white text-primary hover:bg-white/90">
-                    Iniciar Sesión <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  
                 </Link>
                 
               </div>
             </div>
 
-            <div className="relative">
-              <div className="aspect-square w-full max-w-md mx-auto relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary rounded-full opacity-20 blur-3xl" />
-                <div className="relative bg-card/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="aspect-square bg-accent/20 rounded-xl flex items-center justify-center">
-                      <Satellite className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="aspect-square bg-primary/40 rounded-xl flex items-center justify-center">
-                      <Monitor className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="aspect-square bg-primary/40 rounded-xl flex items-center justify-center">
-                      <MapPin className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="aspect-square bg-accent/20 rounded-xl flex items-center justify-center">
-                      <BarChart3 className="h-8 w-8 text-white" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </section>
