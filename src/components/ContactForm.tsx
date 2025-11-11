@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Mail } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const contactSchema = z.object({
   nombre: z.string().trim().min(1, 'El nombre es requerido').max(100, 'Máximo 100 caracteres'),
@@ -22,19 +23,44 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 export const ContactForm = () => {
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
 
-  const onSubmit = (data: ContactFormData) => {
-    console.log('Formulario enviado:', data);
-    toast({
-      title: 'Mensaje enviado',
-      description: 'Nos pondremos en contacto contigo pronto.',
-    });
-    reset();
-    setOpen(false);
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('contactos')
+        .insert([{
+          nombre: data.nombre,
+          empresa: data.empresa,
+          celular: data.celular,
+          correo: data.correo,
+          necesidad: data.necesidad,
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Mensaje enviado',
+        description: 'Nos pondremos en contacto contigo pronto.',
+      });
+      reset();
+      setOpen(false);
+    } catch (error) {
+      console.error('Error al enviar formulario:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo enviar el mensaje. Intenta de nuevo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -80,8 +106,8 @@ export const ContactForm = () => {
             {errors.necesidad && <p className="text-sm text-destructive">{errors.necesidad.message}</p>}
           </div>
 
-          <Button type="submit" className="w-full">
-            Enviar
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Enviando...' : 'Enviar'}
           </Button>
         </form>
       </DialogContent>

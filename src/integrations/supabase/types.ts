@@ -346,6 +346,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contactos: {
+        Row: {
+          celular: string
+          correo: string
+          created_at: string
+          empresa: string
+          id: string
+          leido: boolean | null
+          necesidad: string
+          nombre: string
+        }
+        Insert: {
+          celular: string
+          correo: string
+          created_at?: string
+          empresa: string
+          id?: string
+          leido?: boolean | null
+          necesidad: string
+          nombre: string
+        }
+        Update: {
+          celular?: string
+          correo?: string
+          created_at?: string
+          empresa?: string
+          id?: string
+          leido?: boolean | null
+          necesidad?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
       cruces_registrados: {
         Row: {
           camion_id: string
