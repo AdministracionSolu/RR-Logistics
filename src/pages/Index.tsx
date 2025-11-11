@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Truck, Satellite, Monitor, Code, MapPin, Shield, BarChart3, CheckCircle, Star, ArrowRight, Menu, X } from 'lucide-react';
+import { ContactForm } from '@/components/ContactForm';
 const Index = () => {
   return <div className="min-h-screen bg-background">
       {/* Header */}
@@ -274,12 +275,12 @@ const Index = () => {
               modernizar sus operaciones de transporte y logística en México.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <ContactForm />
               <Link to="/login">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-white text-primary hover:bg-white/90">
                   Iniciar Sesión <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              
             </div>
           </div>
         </div>
