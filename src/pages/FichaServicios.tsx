@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Printer, MapPin, Shield, Gauge, Bell, BarChart3, Phone, Mail, Building2, Satellite, Mountain, Compass, Truck, HardHat, Users, Check, Radio, Globe, AlertTriangle, Clock, Route, Target } from "lucide-react";
+import { Printer, MapPin, Shield, Gauge, Bell, BarChart3, Phone, Building2, Satellite, Mountain, Compass, Truck, HardHat, Users, Check, Radio, Globe, AlertTriangle, Clock, Route, Target } from "lucide-react";
 
 const FichaServicios = () => {
   const handlePrint = () => {
@@ -539,17 +539,12 @@ const FichaServicios = () => {
           </p>
 
           {/* Información de contacto */}
-          <div className="grid md:grid-cols-3 gap-8 mb-12 max-w-4xl w-full">
+          <div className="grid md:grid-cols-2 gap-8 mb-12 max-w-2xl w-full">
             <div className="bg-white rounded-xl p-6 border border-slate-200">
               <Phone className="h-8 w-8 text-blue-600 mx-auto mb-4" />
               <h3 className="font-semibold text-slate-800 mb-2">Teléfono</h3>
-              <p className="text-slate-600">[Tu número de teléfono]</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <Mail className="h-8 w-8 text-blue-600 mx-auto mb-4" />
-              <h3 className="font-semibold text-slate-800 mb-2">Email</h3>
-              <p className="text-slate-600">[tu@email.com]</p>
+              <p className="text-slate-600">311-122-3365</p>
+              <p className="text-slate-600">81-1016-6812</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 border border-slate-200">
