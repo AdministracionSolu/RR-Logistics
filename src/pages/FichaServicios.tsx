@@ -454,8 +454,8 @@ const FichaServicios = () => {
             <div className="bg-white rounded-xl p-6 border border-slate-200">
               <Phone className="h-8 w-8 text-blue-600 mx-auto mb-4" />
               <h3 className="font-semibold text-slate-800 mb-2">Teléfono</h3>
-              <p className="text-slate-600">311-122-3365</p>
-              <p className="text-slate-600">81-1016-6812</p>
+                <p className="text-slate-600">81-1016-6812</p>
+                <p className="text-slate-600">311-122-3365</p>
             </div>
 
             <div className="bg-white rounded-xl p-6 border border-slate-200">
