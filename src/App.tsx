@@ -14,6 +14,7 @@ import Gestion from "./pages/Gestion";
 import Configuracion from "./pages/Configuracion";
 import Eventos from "./pages/Eventos";
 import BotAdmin from "./pages/BotAdmin";
+import FichaServicios from "./pages/FichaServicios";
 import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
 import AlertsGenerator from "./components/AlertsGenerator";
@@ -32,6 +33,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/soluciones" element={<Soluciones />} />
+            <Route path="/ficha-servicios" element={<FichaServicios />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard-a" element={
               <ProtectedRoute allowedUserTypes={['tipo_a']}>

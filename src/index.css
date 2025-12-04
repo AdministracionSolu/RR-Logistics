@@ -120,3 +120,31 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Print Styles for Ficha de Servicios */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .print-section {
+    page-break-after: always;
+    page-break-inside: avoid;
+    min-height: 100vh !important;
+    height: 100vh !important;
+  }
+
+  .print-section:last-child {
+    page-break-after: auto;
+  }
+
+  .print\\:hidden {
+    display: none !important;
+  }
+}
