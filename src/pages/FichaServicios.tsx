@@ -31,10 +31,9 @@ const FichaServicios = () => {
               <p className="text-slate-500 text-sm">Tecnología para Transporte</p>
             </div>
           </div>
-          <div className="text-right text-sm text-slate-400 print:block hidden">
-            <p>Ficha de Servicios</p>
-            <p>{new Date().toLocaleDateString('es-MX')}</p>
-          </div>
+        <div className="text-right text-sm text-slate-400 print:block hidden">
+          <p>Ficha de Servicios</p>
+        </div>
         </div>
 
         {/* Título principal */}
