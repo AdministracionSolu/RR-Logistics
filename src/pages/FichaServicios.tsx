@@ -1,6 +1,6 @@
-import React from 'react';
-import { Printer, MapPin, Phone, Mail, Check, X, Clock, DollarSign, Shield, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Printer, MapPin, Shield, Gauge, Bell, BarChart3, Route, Phone, Mail, Building2, Satellite, CreditCard, Target, Activity, Check } from "lucide-react";
 
 const FichaServicios = () => {
   const handlePrint = () => {
@@ -8,453 +8,487 @@ const FichaServicios = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      {/* Print Button - Hidden when printing */}
-      <div className="print:hidden fixed bottom-6 right-6 z-50">
-        <Button 
-          onClick={handlePrint}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg gap-2"
-          size="lg"
-        >
-          <Printer className="h-5 w-5" />
-          Imprimir / Descargar PDF
-        </Button>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Botón de impresión flotante */}
+      <Button
+        onClick={handlePrint}
+        className="fixed bottom-6 right-6 z-50 print:hidden shadow-lg"
+        size="lg"
+      >
+        <Printer className="mr-2 h-5 w-5" />
+        Imprimir / Descargar PDF
+      </Button>
 
-      {/* Slide 1: Portada */}
-      <section className="print-section min-h-screen flex flex-col bg-gradient-to-br from-[#0F1A3D] to-[#1a2d5c] text-white p-8 md:p-12">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
-            <span className="text-[#0F1A3D] font-bold text-xl">RR</span>
+      {/* Página 1: Portada */}
+      <section className="print-page min-h-screen p-8 md:p-12 flex flex-col bg-gradient-to-br from-[#0F1A3D] to-[#1a2d5c] text-white">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-12">
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-[#0F1A3D] font-bold text-2xl">RR</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">RR Logistics</h1>
+              <p className="text-white/70 text-sm">Tecnología para Transporte</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">RR Logistics</h1>
-            <p className="text-white/70 text-sm">Soluciones Tecnológicas para Transporte</p>
+          <div className="text-right text-sm text-white/50 print:block hidden">
+            <p>Ficha de Servicios</p>
+            <p>{new Date().toLocaleDateString('es-MX')}</p>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center max-w-4xl">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-            Soluciones de software y hardware para el transporte y la logística en México
+        {/* Título principal */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            Soluciones de Software y Hardware
           </h2>
-          
-          <div className="grid md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-white/10 backdrop-blur rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-3 text-emerald-400">Acerca de Nosotros</h3>
-              <p className="text-white/80 text-sm leading-relaxed">
-                Somos una empresa emergente que ofrece soluciones tecnológicas adaptadas a las necesidades del sector transporte y logístico en México. Nuestro enfoque combina tecnología GPS avanzada con soluciones de firma digital para optimizar procesos operativos y administrativos.
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-3 text-amber-400">Contexto Actual</h3>
-              <p className="text-white/80 text-sm leading-relaxed">
-                El sector transporte enfrenta desafíos como la falta de visibilidad en tiempo real de sus flotillas, procesos documentales lentos, y la necesidad de herramientas accesibles que impulsen la eficiencia operativa.
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-3 text-sky-400">Nuestra Solución</h3>
-              <p className="text-white/80 text-sm leading-relaxed">
-                Ofrecemos un ecosistema integral: desde el monitoreo satelital de unidades hasta la firma electrónica de documentos logísticos, todo diseñado para mejorar el control operativo y reducir tiempos.
-              </p>
-            </div>
+          <p className="text-xl md:text-2xl text-emerald-400 font-medium">
+            para el Transporte y la Logística en México
+          </p>
+        </div>
+
+        {/* Tres columnas de información */}
+        <div className="grid md:grid-cols-3 gap-8 flex-1">
+          <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+            <h3 className="text-lg font-bold text-emerald-400 mb-4">Acerca de Nosotros</h3>
+            <p className="text-white/80 leading-relaxed">
+              RR Logistics es una empresa de tecnología enfocada en la transformación digital 
+              del sector de transporte y logística en México. Desarrollamos soluciones de 
+              software y hardware que permiten a las empresas monitorear, controlar y 
+              optimizar sus operaciones de manera eficiente y segura.
+            </p>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+            <h3 className="text-lg font-bold text-amber-400 mb-4">Contexto Actual</h3>
+            <p className="text-white/80 leading-relaxed">
+              El transporte en México enfrenta desafíos críticos: inseguridad en carreteras, 
+              falta de visibilidad en tiempo real, control deficiente de gastos en peajes, 
+              y procesos manuales que generan ineficiencias. Las empresas necesitan 
+              herramientas tecnológicas para mantener competitividad y seguridad.
+            </p>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+            <h3 className="text-lg font-bold text-sky-400 mb-4">Nuestra Solución</h3>
+            <p className="text-white/80 leading-relaxed">
+              Ofrecemos una plataforma integral de rastreo GPS dual que combina 
+              dispositivos SPOT Trace con TAGs de peaje para lograr cobertura total 
+              sin zonas muertas. Nuestro sistema incluye dashboards en tiempo real, 
+              alertas inteligentes y reconciliación automática de gastos.
+            </p>
           </div>
         </div>
 
-        <div className="text-center text-white/50 text-sm mt-8">
-          Página 1 de 5
+        {/* Footer de página */}
+        <div className="mt-8 pt-4 border-t border-white/20 text-center text-sm text-white/50">
+          <p>RR Logistics — Monterrey, Nuevo León, México — Página 1 de 5</p>
         </div>
       </section>
 
-      {/* Slide 2: GPS Avanzado + Impacto */}
-      <section className="print-section min-h-screen flex flex-col bg-white p-8 md:p-12">
+      {/* Página 2: Sistema de Monitoreo GPS */}
+      <section className="print-page min-h-screen p-8 md:p-12 flex flex-col bg-white">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-[#0F1A3D] rounded-lg flex items-center justify-center">
-            <MapPin className="h-5 w-5 text-white" />
+            <Satellite className="h-5 w-5 text-white" />
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#0F1A3D]">GPS Avanzado</h2>
+          <h2 className="text-3xl font-bold text-[#0F1A3D]">Sistema de Monitoreo GPS Dual</h2>
         </div>
-
-        <div className="bg-gradient-to-r from-[#0F1A3D] to-[#1a2d5c] text-white rounded-2xl p-8 mb-8">
-          <h3 className="text-xl font-semibold mb-4">Monitoreo Satelital Inteligente</h3>
-          <p className="text-white/90 leading-relaxed mb-4">
-            Nuestra solución de rastreo GPS permite a las empresas de transporte tener visibilidad completa de su flotilla en tiempo real. Con tecnología de última generación, ofrecemos:
-          </p>
-          <ul className="grid md:grid-cols-2 gap-3">
-            {[
-              'Ubicación en tiempo real de todas las unidades',
-              'Historial de recorridos y rutas',
-              'Alertas de geocercas personalizables',
-              'Reportes de velocidad y comportamiento',
-              'Integración con sistemas existentes',
-              'Dashboard intuitivo y fácil de usar'
-            ].map((item, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <h3 className="text-xl font-bold text-[#0F1A3D] mb-4">Impacto Operativo: Antes vs Después</h3>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-[#0F1A3D] text-white">
-                <th className="p-4 text-left font-semibold">Dimensión</th>
-                <th className="p-4 text-left font-semibold">
-                  <span className="flex items-center gap-2">
-                    <X className="h-4 w-4 text-red-400" />
-                    Situación Actual
-                  </span>
-                </th>
-                <th className="p-4 text-left font-semibold">
-                  <span className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-emerald-400" />
-                    Con SignSolú
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-gray-200">
-                <td className="p-4 font-medium">
-                  <span className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-[#0F1A3D]" />
-                    Tiempo
-                  </span>
-                </td>
-                <td className="p-4 text-gray-600 bg-red-50">Firma manual, presencial o procesos largos</td>
-                <td className="p-4 text-gray-900 bg-emerald-50">Envío y firma digital en minutos desde cualquier lugar</td>
-              </tr>
-              <tr className="border-b border-gray-200">
-                <td className="p-4 font-medium">
-                  <span className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-[#0F1A3D]" />
-                    Costo
-                  </span>
-                </td>
-                <td className="p-4 text-gray-600 bg-red-50">Impresiones, escaneos, envío físico, almacenamiento</td>
-                <td className="p-4 text-gray-900 bg-emerald-50">Hasta 90% más económico con documentos 100% digitales</td>
-              </tr>
-              <tr className="border-b border-gray-200">
-                <td className="p-4 font-medium">
-                  <span className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-[#0F1A3D]" />
-                    Riesgo
-                  </span>
-                </td>
-                <td className="p-4 text-gray-600 bg-red-50">Pérdida, deterioro o alteración de documentos</td>
-                <td className="p-4 text-gray-900 bg-emerald-50">Documentos inalterables con sello de tiempo y respaldo en la nube</td>
-              </tr>
-              <tr>
-                <td className="p-4 font-medium">
-                  <span className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-[#0F1A3D]" />
-                    Imagen
-                  </span>
-                </td>
-                <td className="p-4 text-gray-600 bg-red-50">Procesos percibidos como poco ágiles o anticuados</td>
-                <td className="p-4 text-gray-900 bg-emerald-50">Mejor experiencia para clientes, socios y colaboradores</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-auto text-center text-gray-400 text-sm pt-8">
-          Página 2 de 5
-        </div>
-      </section>
-
-      {/* Slide 3: Dashboard SignSolú */}
-      <section className="print-section min-h-screen flex flex-col bg-gray-50 p-8 md:p-12">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">S</span>
-          </div>
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0F1A3D]">SignSolú</h2>
-            <p className="text-gray-500">Plataforma de Firma Electrónica</p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 flex-1">
-          <div>
-            <h3 className="text-xl font-semibold text-[#0F1A3D] mb-4">Dashboard Principal</h3>
-            <p className="text-gray-600 mb-6">
-              Panel de control intuitivo que permite gestionar todos tus documentos desde un solo lugar. Visualiza métricas clave y accede rápidamente a las funciones más utilizadas.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <p className="text-3xl font-bold text-[#0F1A3D]">247</p>
-                <p className="text-sm text-gray-500">Documentos Totales</p>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <p className="text-3xl font-bold text-emerald-500">189</p>
-                <p className="text-sm text-gray-500">Completados</p>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <p className="text-3xl font-bold text-amber-500">42</p>
-                <p className="text-sm text-gray-500">Pendientes</p>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <p className="text-3xl font-bold text-gray-400">16</p>
-                <p className="text-sm text-gray-500">Borradores</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-[#0F1A3D] mb-3">Acciones Rápidas</h4>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm">+ Nuevo Documento</span>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">Usar Plantilla</span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">Importar PDF</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold text-[#0F1A3D] mb-4">Flujo de Trabajo</h3>
-            <p className="text-gray-600 mb-6">
-              Proceso simplificado en 5 pasos para crear, enviar y gestionar documentos firmados digitalmente.
-            </p>
-            
-            <div className="space-y-4">
-              {[
-                { step: 1, title: 'Crear documento', desc: 'Sube un PDF o usa una plantilla prediseñada' },
-                { step: 2, title: 'Agregar firmantes', desc: 'Añade los correos de quienes deben firmar' },
-                { step: 3, title: 'Colocar campos', desc: 'Arrastra campos de firma, fecha e iniciales' },
-                { step: 4, title: 'Enviar para firma', desc: 'Los firmantes reciben notificación por correo' },
-                { step: 5, title: 'Documento completado', desc: 'Recibe el documento firmado con certificación' }
-              ].map((item) => (
-                <div key={item.step} className="flex items-start gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <div className="w-8 h-8 bg-[#0F1A3D] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-sm">{item.step}</span>
-                  </div>
-                  <div>
-                    <h5 className="font-semibold text-[#0F1A3D]">{item.title}</h5>
-                    <p className="text-sm text-gray-500">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center text-gray-400 text-sm pt-8">
-          Página 3 de 5
-        </div>
-      </section>
-
-      {/* Slide 4: Interfaz del Cliente */}
-      <section className="print-section min-h-screen flex flex-col bg-white p-8 md:p-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#0F1A3D] mb-2">Interfaz del Firmante</h2>
-        <p className="text-gray-500 mb-8">Experiencia simple y profesional para tus clientes</p>
-
-        <div className="grid md:grid-cols-2 gap-8 flex-1">
-          <div className="space-y-6">
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-[#0F1A3D] mb-4">📧 Notificación por Correo</h3>
-              <div className="bg-white rounded-xl p-4 shadow-sm">
-                <p className="text-sm text-gray-500 mb-2">De: SignSolú &lt;notificaciones@signsolu.com&gt;</p>
-                <p className="text-sm text-gray-500 mb-3">Para: cliente@empresa.com</p>
-                <div className="border-t pt-3">
-                  <p className="font-medium text-[#0F1A3D]">Tienes un documento pendiente de firma</p>
-                  <p className="text-sm text-gray-600 mt-2">RR Logistics te ha enviado "Contrato de Servicios" para tu firma electrónica.</p>
-                  <div className="mt-4 bg-emerald-500 text-white text-center py-2 px-4 rounded-lg text-sm font-medium">
-                    Revisar y Firmar Documento
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200">
-              <h3 className="text-lg font-semibold text-[#0F1A3D] mb-4">✍️ Panel de Firma</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                El firmante puede crear su firma de tres formas diferentes:
-              </p>
-              <div className="space-y-3">
-                <div className="bg-white rounded-lg p-3 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                    <span className="text-blue-600 text-xs">T</span>
-                  </div>
-                  <span className="text-sm">Escribir nombre (genera firma tipográfica)</span>
-                </div>
-                <div className="bg-white rounded-lg p-3 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center">
-                    <span className="text-purple-600 text-xs">✏️</span>
-                  </div>
-                  <span className="text-sm">Dibujar firma con mouse o dedo</span>
-                </div>
-                <div className="bg-white rounded-lg p-3 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-amber-100 rounded flex items-center justify-center">
-                    <span className="text-amber-600 text-xs">📷</span>
-                  </div>
-                  <span className="text-sm">Subir imagen de firma existente</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="bg-[#0F1A3D] rounded-2xl p-6 text-white h-full">
-              <h3 className="text-lg font-semibold mb-4">Vista del Documento</h3>
-              <p className="text-white/70 text-sm mb-6">
-                El firmante visualiza el documento completo con los campos de firma claramente marcados.
-              </p>
-              
-              <div className="bg-white rounded-xl p-4 text-gray-900">
-                <div className="border-b pb-3 mb-3">
-                  <p className="font-semibold text-sm">CONTRATO DE SERVICIOS LOGÍSTICOS</p>
-                  <p className="text-xs text-gray-500">RR Logistics S.A. de C.V.</p>
-                </div>
-                <div className="space-y-2 text-xs text-gray-600">
-                  <p>En la ciudad de Monterrey, N.L., a los...</p>
-                  <p className="text-gray-400">...</p>
-                  <p>Las partes acuerdan los siguientes términos...</p>
-                </div>
-                <div className="mt-6 pt-4 border-t">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Firma del Cliente:</p>
-                      <div className="border-2 border-dashed border-emerald-400 rounded-lg px-8 py-4 bg-emerald-50">
-                        <span className="text-emerald-600 text-xs font-medium">CLICK PARA FIRMAR</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Fecha:</p>
-                      <div className="border-2 border-dashed border-blue-400 rounded-lg px-4 py-2 bg-blue-50">
-                        <span className="text-blue-600 text-xs">04/12/2025</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex gap-3">
-                <div className="flex-1 bg-white/10 rounded-lg py-2 text-center text-sm">
-                  Rechazar
-                </div>
-                <div className="flex-1 bg-emerald-500 rounded-lg py-2 text-center text-sm font-medium">
-                  Confirmar Firma
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center text-gray-400 text-sm pt-8">
-          Página 4 de 5
-        </div>
-      </section>
-
-      {/* Slide 5: Gestión + Precios + Contacto */}
-      <section className="print-section min-h-screen flex flex-col bg-gradient-to-br from-[#0F1A3D] to-[#1a2d5c] text-white p-8 md:p-12">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8">Gestión de Documentos & Precios</h2>
 
         <div className="grid md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-emerald-400">📁 Organización por Carpetas</h3>
-            <p className="text-white/70 text-sm mb-4">
-              Mantén todos tus documentos organizados con un sistema de carpetas intuitivo.
+          <div className="bg-gradient-to-br from-[#0F1A3D] to-[#1a2d5c] text-white rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                <Satellite className="h-6 w-6 text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold">SPOT Trace</h3>
+            </div>
+            <p className="text-white/80 mb-4">
+              Dispositivo satelital de rastreo que funciona en cualquier ubicación, 
+              incluyendo zonas remotas sin cobertura celular.
             </p>
-            <div className="bg-white/10 backdrop-blur rounded-xl p-4 space-y-2">
-              {['📂 Contratos 2025', '📂 Cartas Porte', '📂 Facturas Firmadas', '📂 Acuses de Recibo'].map((folder, i) => (
-                <div key={i} className="flex items-center gap-3 py-2 px-3 hover:bg-white/5 rounded-lg">
-                  <span className="text-sm">{folder}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-amber-400">🔒 Seguridad y Cumplimiento</h3>
-            <ul className="space-y-3">
-              {[
-                'Cifrado de extremo a extremo',
-                'Sello de tiempo certificado',
-                'Respaldo automático en la nube',
-                'Cumplimiento NOM-151',
-                'Auditoría completa de acciones'
-              ].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm text-white/80">
-                  <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <h3 className="text-xl font-bold mb-4 text-center">Planes SignSolú</h3>
-        
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
-            <p className="text-white/60 text-sm mb-1">GRATIS</p>
-            <p className="text-3xl font-bold mb-1">$0 <span className="text-base font-normal text-white/60">MXN/mes</span></p>
-            <p className="text-emerald-400 text-sm mb-4">5 documentos/mes</p>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Firma ilimitada</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> 1 usuario</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Soporte por correo</li>
-            </ul>
-          </div>
-          
-          <div className="bg-emerald-500 rounded-2xl p-6 border-2 border-emerald-300 relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-[#0F1A3D] text-xs font-bold px-3 py-1 rounded-full">
-              POPULAR
-            </div>
-            <p className="text-white/80 text-sm mb-1">BÁSICO</p>
-            <p className="text-3xl font-bold mb-1">$99 <span className="text-base font-normal text-white/80">MXN/mes</span></p>
-            <p className="text-white text-sm mb-4">25 documentos/mes</p>
             <ul className="space-y-2 text-sm text-white/90">
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Todo lo anterior</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> 3 usuarios</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Plantillas personalizadas</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Soporte prioritario</li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                Cobertura satelital global
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                Sin zonas muertas
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                Batería de larga duración
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400" />
+                Actualización cada 5-10 minutos
+              </li>
             </ul>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500 to-amber-600 text-white rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                <CreditCard className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold">TAGs de Peaje</h3>
+            </div>
+            <p className="text-white/90 mb-4">
+              Integración con sistemas de telepeaje para rastreo complementario 
+              y control automático de gastos en casetas.
+            </p>
+            <ul className="space-y-2 text-sm text-white/90">
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-white" />
+                Registro automático de cruces
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-white" />
+                Control de saldos en tiempo real
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-white" />
+                Detección de cobros duplicados
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-white" />
+                Alertas de saldo bajo
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Tabla de Impacto Operativo */}
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-[#0F1A3D] mb-4 text-center">
+            Impacto Operativo: Antes vs Después
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-[#0F1A3D] text-white">
+                  <th className="border border-gray-300 p-4 text-left font-semibold">Dimensión</th>
+                  <th className="border border-gray-300 p-4 text-left font-semibold text-red-300">❌ Sin RR Logistics</th>
+                  <th className="border border-gray-300 p-4 text-left font-semibold text-emerald-300">✓ Con RR Logistics</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-gray-200 p-4 font-medium bg-gray-50">Visibilidad</td>
+                  <td className="border border-gray-200 p-4 text-gray-600 bg-red-50">Zonas muertas, sin datos en tiempo real</td>
+                  <td className="border border-gray-200 p-4 text-gray-700 bg-emerald-50">Rastreo 24/7 sin interrupciones en toda la ruta</td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-200 p-4 font-medium bg-gray-50">Control de Gastos</td>
+                  <td className="border border-gray-200 p-4 text-gray-600 bg-red-50">Revisión manual de casetas y tickets físicos</td>
+                  <td className="border border-gray-200 p-4 text-gray-700 bg-emerald-50">Reconciliación automática de peajes y alertas</td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-200 p-4 font-medium bg-gray-50">Seguridad</td>
+                  <td className="border border-gray-200 p-4 text-gray-600 bg-red-50">Alertas tardías o inexistentes ante incidentes</td>
+                  <td className="border border-gray-200 p-4 text-gray-700 bg-emerald-50">Alertas instantáneas en zonas críticas y desvíos</td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-200 p-4 font-medium bg-gray-50">Eficiencia</td>
+                  <td className="border border-gray-200 p-4 text-gray-600 bg-red-50">Rutas no optimizadas, sin historial de recorridos</td>
+                  <td className="border border-gray-200 p-4 text-gray-700 bg-emerald-50">Análisis de recorridos y optimización de rutas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="mt-4 text-center text-sm text-gray-400">
+          <p>Página 2 de 5</p>
+        </div>
+      </section>
+
+      {/* Página 3: Soluciones Tecnológicas */}
+      <section className="print-page min-h-screen p-8 md:p-12 flex flex-col bg-gray-50">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-[#0F1A3D] rounded-lg flex items-center justify-center">
+            <Target className="h-5 w-5 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold text-[#0F1A3D]">Soluciones Tecnológicas</h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
+          {/* Rastreo GPS Dual */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-[#0F1A3D]/10 rounded-lg flex items-center justify-center mb-4">
+              <Satellite className="h-6 w-6 text-[#0F1A3D]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-2">Rastreo GPS Dual</h3>
+            <p className="text-sm text-gray-600">
+              Combinación de SPOT Trace satelital y TAGs de peaje para cobertura 
+              total sin zonas muertas. Posición actualizada cada 5 minutos.
+            </p>
+          </div>
+
+          {/* Control de Peajes */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center mb-4">
+              <CreditCard className="h-6 w-6 text-orange-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-2">Control de Peajes</h3>
+            <p className="text-sm text-gray-600">
+              Reconciliación automática de cruces en casetas, alertas de saldo bajo, 
+              y detección de cobros duplicados o no autorizados.
+            </p>
+          </div>
+
+          {/* Geofencing Inteligente */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-4">
+              <MapPin className="h-6 w-6 text-emerald-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-2">Geofencing Inteligente</h3>
+            <p className="text-sm text-gray-600">
+              Definición de checkpoints y sectores con alertas automáticas 
+              de entrada/salida. Ideal para control de rutas y seguridad.
+            </p>
+          </div>
+
+          {/* Odómetro Automático */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4">
+              <Gauge className="h-6 w-6 text-blue-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-2">Odómetro Automático</h3>
+            <p className="text-sm text-gray-600">
+              Cálculo preciso de kilometraje recorrido basado en posiciones GPS. 
+              Útil para mantenimiento preventivo y control de combustible.
+            </p>
+          </div>
+
+          {/* Dashboards en Tiempo Real */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4">
+              <BarChart3 className="h-6 w-6 text-purple-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-2">Dashboards en Tiempo Real</h3>
+            <p className="text-sm text-gray-600">
+              Paneles personalizados por rol: vista operativa para monitoreo 
+              diario y vista estratégica para análisis y toma de decisiones.
+            </p>
+          </div>
+
+          {/* Sistema de Alertas */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-4">
+              <Bell className="h-6 w-6 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-2">Sistema de Alertas</h3>
+            <p className="text-sm text-gray-600">
+              Notificaciones configurables por velocidad excesiva, inactividad 
+              prolongada, saldo bajo, y eventos de entrada/salida de zonas.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 text-center text-sm text-gray-400">
+          <p>Página 3 de 5</p>
+        </div>
+      </section>
+
+      {/* Página 4: Beneficios y Resultados */}
+      <section className="print-page min-h-screen p-8 md:p-12 flex flex-col bg-white">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-[#0F1A3D] rounded-lg flex items-center justify-center">
+            <Activity className="h-5 w-5 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold text-[#0F1A3D]">Beneficios y Resultados</h2>
+        </div>
+
+        {/* Métricas destacadas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-[#0F1A3D] text-white rounded-xl p-6 text-center">
+            <div className="text-4xl font-bold mb-2">24/7</div>
+            <p className="text-sm text-white/80">Monitoreo Continuo</p>
+          </div>
+          <div className="bg-emerald-500 text-white rounded-xl p-6 text-center">
+            <div className="text-4xl font-bold mb-2">99.9%</div>
+            <p className="text-sm text-white/90">Disponibilidad</p>
+          </div>
+          <div className="bg-orange-500 text-white rounded-xl p-6 text-center">
+            <div className="text-4xl font-bold mb-2">-30%</div>
+            <p className="text-sm text-white/90">Reducción de Costos</p>
+          </div>
+          <div className="bg-blue-500 text-white rounded-xl p-6 text-center">
+            <div className="text-4xl font-bold mb-2">+40%</div>
+            <p className="text-sm text-white/90">Mejora en Eficiencia</p>
+          </div>
+        </div>
+
+        {/* Beneficios detallados */}
+        <div className="grid md:grid-cols-2 gap-6 flex-1">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-4 flex items-center gap-2">
+              <Shield className="h-5 w-5 text-[#0F1A3D]" />
+              Seguridad Mejorada
+            </h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-[#0F1A3D] rounded-full mt-2"></span>
+                <span>Alertas instantáneas ante eventos de riesgo</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-[#0F1A3D] rounded-full mt-2"></span>
+                <span>Monitoreo de zonas de alto riesgo con geofencing</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-[#0F1A3D] rounded-full mt-2"></span>
+                <span>Historial completo de recorridos para auditoría</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-[#0F1A3D] rounded-full mt-2"></span>
+                <span>Detección de desviaciones de ruta programada</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-4 flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-emerald-600" />
+              Control Financiero
+            </h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full mt-2"></span>
+                <span>Reconciliación automática de gastos en peajes</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full mt-2"></span>
+                <span>Detección de cobros duplicados o fraudulentos</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full mt-2"></span>
+                <span>Reportes detallados de consumo por unidad</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full mt-2"></span>
+                <span>Alertas de saldo bajo para evitar interrupciones</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-4 flex items-center gap-2">
+              <Route className="h-5 w-5 text-orange-600" />
+              Eficiencia Operativa
+            </h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-orange-500 rounded-full mt-2"></span>
+                <span>Visibilidad completa de la flota en tiempo real</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-orange-500 rounded-full mt-2"></span>
+                <span>Optimización de rutas basada en datos históricos</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-orange-500 rounded-full mt-2"></span>
+                <span>Reducción de tiempos muertos y paradas innecesarias</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-orange-500 rounded-full mt-2"></span>
+                <span>Planificación de mantenimiento basada en kilometraje</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-[#0F1A3D] mb-4 flex items-center gap-2">
+              <Gauge className="h-5 w-5 text-blue-600" />
+              Tecnología de Punta
+            </h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                <span>Plataforma web moderna (React + TypeScript)</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                <span>Base de datos en la nube (Supabase + PostgreSQL)</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                <span>Integración con API de SPOT y sistemas de peaje</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                <span>Mapas interactivos con Leaflet/Mapbox</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-4 text-center text-sm text-gray-400">
+          <p>Página 4 de 5</p>
+        </div>
+      </section>
+
+      {/* Página 5: Contacto */}
+      <section className="print-page min-h-screen p-8 md:p-12 flex flex-col bg-gradient-to-br from-[#0F1A3D] to-[#1a2d5c] text-white">
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          {/* Logo grande */}
+          <div className="w-32 h-32 bg-white rounded-2xl flex items-center justify-center mb-8">
+            <span className="text-[#0F1A3D] font-bold text-5xl">RR</span>
           </div>
           
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
-            <p className="text-white/60 text-sm mb-1">PRO</p>
-            <p className="text-3xl font-bold mb-1">$399 <span className="text-base font-normal text-white/60">MXN/mes</span></p>
-            <p className="text-emerald-400 text-sm mb-4">500 documentos/mes</p>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Todo lo anterior</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Usuarios ilimitados</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> API de integración</li>
-              <li className="flex items-center gap-2"><Check className="h-3 w-3" /> Soporte 24/7</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mt-auto bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
-          <h3 className="text-xl font-bold mb-4 text-center">Contacto</h3>
-          <div className="flex flex-wrap justify-center gap-8">
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-emerald-400" />
-              <span>info@solufintech.com</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-emerald-400" />
-              <span>311-122-3365</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-emerald-400" />
-              <span>81-1016-6812</span>
-            </div>
-          </div>
-          <p className="text-center text-white/50 text-sm mt-4">
-            www.solufintech.com | Monterrey, Nuevo León, México
+          <h2 className="text-4xl font-bold mb-4">RR Logistics</h2>
+          <p className="text-xl text-white/80 mb-12 max-w-2xl">
+            Transformamos la logística de transporte en México con tecnología 
+            de vanguardia, ofreciendo visibilidad total y control de su flota.
           </p>
+
+          {/* Información de contacto */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12 w-full max-w-3xl">
+            <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+              <Phone className="h-8 w-8 text-emerald-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Teléfono</h3>
+              <p className="text-white/80">+52 (81) XXXX-XXXX</p>
+              <p className="text-sm text-white/60">Lun - Vie, 9:00 - 18:00</p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+              <Mail className="h-8 w-8 text-emerald-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Email</h3>
+              <p className="text-white/80">contacto@rrlogistics.mx</p>
+              <p className="text-sm text-white/60">Respuesta en 24 hrs</p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+              <Building2 className="h-8 w-8 text-emerald-400 mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Ubicación</h3>
+              <p className="text-white/80">Monterrey, N.L.</p>
+              <p className="text-sm text-white/60">México</p>
+            </div>
+          </div>
+
+          {/* Llamado a la acción */}
+          <div className="bg-white text-[#0F1A3D] rounded-2xl p-8 w-full max-w-2xl">
+            <h3 className="text-2xl font-bold mb-4">¿Listo para optimizar su flota?</h3>
+            <p className="mb-6 text-gray-600">
+              Agenda una demostración personalizada y descubre cómo RR Logistics 
+              puede transformar las operaciones de tu empresa.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="bg-[#0F1A3D] text-white px-6 py-3 rounded-lg font-semibold">
+                Solicitar Demo Gratuita
+              </div>
+              <div className="border-2 border-[#0F1A3D] text-[#0F1A3D] px-6 py-3 rounded-lg font-semibold">
+                Ver Más Información
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="text-center text-white/50 text-sm pt-8">
-          Página 5 de 5
+        <div className="mt-8 pt-4 border-t border-white/20 text-center text-sm text-white/50">
+          <p>© {new Date().getFullYear()} RR Logistics — Todos los derechos reservados</p>
+          <p className="mt-1">Monterrey, Nuevo León, México — Página 5 de 5</p>
         </div>
       </section>
     </div>
