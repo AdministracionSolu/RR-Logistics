@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Printer, MapPin, Shield, Gauge, Bell, BarChart3, Phone, Building2, Satellite, Mountain, Compass, Truck, HardHat, Users, Check, Radio, Globe, AlertTriangle, Clock, Route, Target } from "lucide-react";
+import { Printer, MapPin, Shield, Bell, BarChart3, Phone, Building2, Satellite, Mountain, Compass, Truck, HardHat, Users, Check, Radio, Globe, AlertTriangle, Clock, Target } from "lucide-react";
 
 const FichaServicios = () => {
   const handlePrint = () => {
@@ -274,33 +274,6 @@ const FichaServicios = () => {
             </ul>
           </div>
 
-          {/* Sectores y Geofencing */}
-          <div className="bg-white rounded-xl p-6 border border-slate-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Route className="h-5 w-5 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-800">Sectores y Geofencing</h3>
-            </div>
-            <p className="text-slate-600 mb-4">
-              Crea zonas virtuales (sectores) y recibe alertas cuando una unidad 
-              entra o sale de áreas definidas. Ideal para rutas predeterminadas.
-            </p>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600" />
-                Definición de zonas permitidas/restringidas
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600" />
-                Alertas de desvío de ruta
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600" />
-                Tiempo de permanencia en cada sector
-              </li>
-            </ul>
-          </div>
 
           {/* Sistema de Alertas */}
           <div className="bg-white rounded-xl p-6 border border-slate-200">
@@ -358,33 +331,6 @@ const FichaServicios = () => {
             </ul>
           </div>
 
-          {/* Odómetro y Velocidad */}
-          <div className="bg-white rounded-xl p-6 border border-slate-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Gauge className="h-5 w-5 text-amber-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-800">Odómetro y Velocidad</h3>
-            </div>
-            <p className="text-slate-600 mb-4">
-              Cálculo automático de kilometraje recorrido y monitoreo de velocidad 
-              basado en posiciones GPS.
-            </p>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-amber-600" />
-                Kilometraje acumulado por unidad
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-amber-600" />
-                Velocidad promedio por tramo
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-amber-600" />
-                Alertas de exceso de velocidad
-              </li>
-            </ul>
-          </div>
 
           {/* Historial de Eventos */}
           <div className="bg-white rounded-xl p-6 border border-slate-200">
@@ -432,41 +378,11 @@ const FichaServicios = () => {
         {/* Mensaje de posicionamiento */}
         <div className="bg-slate-800 text-white rounded-xl p-8 mb-8 max-w-4xl">
           <p className="text-xl font-medium leading-relaxed">
-            "No somos para flotas masivas. Somos para operaciones de <span className="text-blue-400">alto valor</span> en 
-            <span className="text-blue-400"> zonas críticas</span> donde la conectividad convencional no existe."
+            "Cuidamos lo que más importa: <span className="text-blue-400">personas</span>, 
+            <span className="text-blue-400">expediciones</span> y 
+            <span className="text-blue-400">cargas de alto valor</span> en lugares donde 
+            la tecnología convencional simplemente no llega."
           </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl font-bold text-blue-600">1-10</span>
-            </div>
-            <h3 className="font-semibold text-slate-800 mb-2">Unidades Críticas</h3>
-            <p className="text-sm text-slate-600">
-              Empresas con pocas unidades que operan en rutas complicadas o zonas remotas
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Shield className="h-10 w-10 text-green-600" />
-            </div>
-            <h3 className="font-semibold text-slate-800 mb-2">Seguridad Prioritaria</h3>
-            <p className="text-sm text-slate-600">
-              Operaciones donde la seguridad y el monitoreo son más importantes que el costo
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mountain className="h-10 w-10 text-amber-600" />
-            </div>
-            <h3 className="font-semibold text-slate-800 mb-2">Zonas Sin Cobertura</h3>
-            <p className="text-sm text-slate-600">
-              Rutas que atraviesan montañas, desiertos o áreas rurales sin señal celular
-            </p>
-          </div>
         </div>
 
         {/* Tabla comparativa */}
@@ -486,11 +402,6 @@ const FichaServicios = () => {
                   <td className="border border-slate-200 p-4 text-slate-600">Rutas en zonas urbanas con buena cobertura</td>
                   <td className="border border-slate-200 p-4 text-center text-green-600">✓ Suficiente</td>
                   <td className="border border-slate-200 p-4 text-center text-slate-400 bg-blue-50/50">No necesario</td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-200 p-4 text-slate-600">Flotas masivas (50+ unidades) en rutas estándar</td>
-                  <td className="border border-slate-200 p-4 text-center text-green-600">✓ Recomendado</td>
-                  <td className="border border-slate-200 p-4 text-center text-slate-400 bg-blue-50/50">No rentable</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="border border-slate-200 p-4 text-slate-700 font-medium">Operaciones en zonas remotas sin señal</td>
