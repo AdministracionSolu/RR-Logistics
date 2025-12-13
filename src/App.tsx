@@ -35,7 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/soluciones" element={<Soluciones />} />
             <Route path="/ficha-servicios" element={<FichaServicios />} />
-            <Route path="/ficha-expediciones" element={<FichaExpediciones />} />
+            <Route path="/expediciones" element={<FichaExpediciones />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard-a" element={
               <ProtectedRoute allowedUserTypes={['tipo_a']}>
