@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Printer, MapPin, Shield, Heart, Users, Phone, Building2, Satellite, Mountain, Compass, Check, Globe, Clock, Eye, Lock, ChurchIcon, Tent, Backpack, Baby, TreePine, Map, ArrowRight, Star } from "lucide-react";
+import { Printer, MapPin, Shield, Heart, Users, Phone, Building2, Satellite, Mountain, Compass, Check, Globe, Clock, Eye, Lock, ChurchIcon, Tent, TreePine, Map, ArrowRight, Star } from "lucide-react";
 
 const FichaExpediciones = () => {
   const handlePrint = () => {
@@ -70,8 +70,8 @@ const FichaExpediciones = () => {
               <h3 className="text-lg font-semibold text-slate-800">Para tu Empresa</h3>
             </div>
             <p className="text-slate-600 leading-relaxed">
-              Un valor agregado que te diferencia de la competencia. Mayor conversión 
-              con papás que ahora sí dejarán ir a sus hijos con total confianza.
+              Un valor agregado que te diferencia de la competencia. Mayor confianza 
+              de los participantes y sus seres queridos al saber su ubicación en todo momento.
             </p>
           </div>
         </div>
@@ -104,11 +104,11 @@ const FichaExpediciones = () => {
             </div>
             <h3 className="text-lg font-semibold text-slate-800 mb-2">Misiones de Iglesias</h3>
             <p className="text-sm text-slate-600 mb-4">
-              30 jóvenes van a comunidades remotas. Los papás pueden ver en tiempo real 
-              cómo avanza el viaje y cuándo llegaron a destino.
+              Grupos de voluntarios van a comunidades remotas. Sus familias pueden ver 
+              en tiempo real cómo avanza el viaje y cuándo llegaron a destino.
             </p>
             <div className="text-xs text-slate-500 bg-white rounded px-3 py-2 border border-slate-100">
-              <strong>Valor:</strong> Los papás autorizan el viaje con confianza
+              <strong>Valor:</strong> Mayor tranquilidad para participantes y familias
             </div>
           </div>
 
@@ -132,10 +132,10 @@ const FichaExpediciones = () => {
             <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
               <Tent className="h-6 w-6 text-amber-700" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">Campamentos Juveniles</h3>
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">Campamentos y Retiros</h3>
             <p className="text-sm text-slate-600 mb-4">
               Campamentos de verano, retiros espirituales, programas scout. 
-              Los papás saben que el grupo llegó bien y dónde están acampando.
+              Las familias saben que el grupo llegó bien y dónde están instalados.
             </p>
             <div className="text-xs text-slate-500 bg-white rounded px-3 py-2 border border-slate-100">
               <strong>Valor:</strong> Mayor inscripción de participantes
@@ -160,12 +160,12 @@ const FichaExpediciones = () => {
           {/* Viajes Escolares */}
           <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
             <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
-              <Backpack className="h-6 w-6 text-teal-700" />
+              <Globe className="h-6 w-6 text-teal-700" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">Viajes Escolares</h3>
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">Viajes de Grupos</h3>
             <p className="text-sm text-slate-600 mb-4">
-              Excursiones a zonas arqueológicas, reservas naturales, granjas educativas. 
-              Tranquilidad para la escuela y los padres de familia.
+              Excursiones, tours organizados, viajes corporativos a zonas sin señal. 
+              Tranquilidad para organizadores y participantes.
             </p>
             <div className="text-xs text-slate-500 bg-white rounded px-3 py-2 border border-slate-100">
               <strong>Valor:</strong> Cumplimiento de protocolos de seguridad
@@ -383,11 +383,11 @@ const FichaExpediciones = () => {
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <Heart className="h-5 w-5 text-green-600" />
               </div>
-              <h4 className="text-lg font-semibold text-slate-800">Confianza de los Papás</h4>
+              <h4 className="text-lg font-semibold text-slate-800">Confianza de los Participantes</h4>
             </div>
             <p className="text-slate-600">
-              Mayor conversión en viajes con menores. Los papás que antes dudaban, 
-              ahora autorizan el viaje porque saben que pueden ver la ubicación.
+              Mayor conversión en reservaciones. Los participantes que antes dudaban, 
+              ahora se animan porque saben que sus familias pueden verlos.
             </p>
           </div>
 
@@ -432,8 +432,8 @@ const FichaExpediciones = () => {
             </thead>
             <tbody>
               <tr className="border-t border-slate-200">
-                <td className="p-4 text-slate-700 font-medium">Misión con 30 jóvenes</td>
-                <td className="p-4 text-slate-600">Papás preocupados 3 días sin noticias</td>
+                <td className="p-4 text-slate-700 font-medium">Misión con 30 personas</td>
+                <td className="p-4 text-slate-600">Familias 3 días sin noticias</td>
                 <td className="p-4 text-slate-600">Ubicación visible en todo momento</td>
               </tr>
               <tr className="border-t border-slate-200 bg-white">
@@ -447,14 +447,14 @@ const FichaExpediciones = () => {
                 <td className="p-4 text-slate-600">Checkpoints: llegó, instalado, seguro</td>
               </tr>
               <tr className="border-t border-slate-200 bg-white">
-                <td className="p-4 text-slate-700 font-medium">Viaje escolar a zona remota</td>
-                <td className="p-4 text-slate-600">Papás llamando a la escuela</td>
+                <td className="p-4 text-slate-700 font-medium">Viaje grupal a zona remota</td>
+                <td className="p-4 text-slate-600">Llamadas constantes sin respuesta</td>
                 <td className="p-4 text-slate-600">Cada familia con acceso propio</td>
               </tr>
               <tr className="border-t border-slate-200">
-                <td className="p-4 text-slate-700 font-medium">Decisión de autorizar viaje</td>
-                <td className="p-4 text-slate-600">"No lo dejo ir, muy riesgoso"</td>
-                <td className="p-4 text-slate-600">"Sí lo dejo, puedo verlo"</td>
+                <td className="p-4 text-slate-700 font-medium">Decisión de participar</td>
+                <td className="p-4 text-slate-600">"Dudas sobre ir, muy riesgoso"</td>
+                <td className="p-4 text-slate-600">"Confianza total, pueden verme"</td>
               </tr>
             </tbody>
           </table>
