@@ -1,23 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Printer, MapPin, Shield, Heart, Users, Phone, Building2, Satellite, Mountain, Compass, Check, Globe, Clock, Eye, Lock, ChurchIcon, Tent, TreePine, Map, ArrowRight, Star } from "lucide-react";
+import { MapPin, Shield, Heart, Users, Phone, Building2, Satellite, Mountain, Compass, Check, Globe, Clock, Eye, Lock, ChurchIcon, Tent, TreePine, Map, ArrowRight, Star } from "lucide-react";
 
 const FichaExpediciones = () => {
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Botón de impresión flotante */}
-      <Button
-        onClick={handlePrint}
-        className="fixed bottom-6 right-6 z-50 print:hidden shadow-lg bg-slate-800 hover:bg-slate-700"
-        size="lg"
-      >
-        <Printer className="mr-2 h-5 w-5" />
-        Imprimir / Descargar PDF
-      </Button>
-
       {/* Página 1: Portada */}
       <section className="print-page min-h-screen p-8 md:p-12 flex flex-col bg-slate-50">
         {/* Header */}
